@@ -78,6 +78,8 @@
 
 ## Milestone 9: ApplyOnline and AFG Flex Feasibility
 
+- Request access to the AFG ZAP Confluence space or exported ZAP documentation.
+- Review ZAP authentication, endpoint, validation, lodgement, document, status, webhook/back-channel, and error documentation.
 - Confirm ApplyOnline direct injection availability with NextGen or the relevant partner channel.
 - Confirm required certification/conformance pathway.
 - Confirm whether draft creation, validation, submission, and status retrieval are supported.
