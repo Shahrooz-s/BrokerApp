@@ -8,7 +8,7 @@ The preferred future lodgement path is direct injection into ApplyOnline. AFG Fl
 
 The first integration release should prioritize reliable sync and operational clarity over deep LIXI payload generation.
 
-The reviewed AFG ZAP Confluence space is BrokerEngine Zapier integration documentation. Zapier is not preferred for this project and should not be used in the target architecture unless explicitly approved as a temporary fallback. Use direct APIs, webhooks, polling fallbacks, or approved vendor integrations instead.
+The reviewed AFG ZAP Confluence space is BrokerEngine Zapier integration documentation. Zapier is not preferred for this project and should not become the target architecture unless explicitly approved as a temporary fallback. The information in the ZAP documentation is still useful for understanding BrokerEngine field names, trigger concepts, board/stage references, dates, URLs, lender/application identifiers, and workflow workarounds while direct APIs are being confirmed.
 
 ## Required API Information
 
@@ -57,7 +57,7 @@ Request from AFG, BrokerEngine, ApplyOnline/NextGen, AFG Flex, and selected spec
 | LMI | External platform/provider | Inbound summary/reference | Store quote/approval status. |
 | Settlement | Mixed | Inbound status plus Twenty tasks | Twenty coordinates internal follow-up. |
 | Reporting | Twenty | Internal | Use normalized fields and derived metrics. |
-| BrokerEngine Zapier events | BrokerEngine/Zapier | Out of scope by default | Reference only; consider only as temporary fallback if direct APIs are unavailable. |
+| BrokerEngine Zapier events | BrokerEngine/Zapier | Reference/workaround input | Use documentation for field/event mapping and controlled fallbacks; do not make Zapier the primary architecture. |
 
 ## Integration Architecture
 
@@ -70,6 +70,7 @@ Recommended components:
 - Persistent mapping table for external IDs and sync cursors.
 - LIXI validation/conversion component for development and approved lodgement prototypes.
 - Direct API/webhook adapters for approved systems. Avoid Zapier for the target architecture.
+- ZAP-informed mapping notes to help design direct API payloads, polling jobs, manual reconciliation, and temporary operational workarounds.
 - Webhook receiver for external events if supported.
 - Scheduled polling fallback if webhooks are unavailable.
 - Dead-letter/error queue for failed sync items.
@@ -180,4 +181,4 @@ For each failure:
 - Whether external APIs expose enough data to map to LIXI-informed field groups.
 - Whether sandbox data can use LIXI development materials.
 - Which specialist providers will be selected for ID verification, open banking, product research, serviceability, valuation, and LMI.
-- Whether BrokerEngine Zapier should remain fully out of scope or be retained only as an emergency fallback. Default: out of scope.
+- Which ZAP-documented fields, events, and actions can safely inform direct API mapping, manual reconciliation, or temporary fallback workflows without making Zapier the target architecture.
