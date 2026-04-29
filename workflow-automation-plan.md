@@ -2,83 +2,130 @@
 
 ## Workflow Principles
 
-- Keep Twenty workflows focused on internal loan origination management, credit proposal preparation, visibility, ownership, reminders, compliance evidence, and reporting.
+- Keep Twenty workflows focused on internal loan origination management, fact-find review, credit proposal preparation, visibility, ownership, reminders, compliance evidence, and reporting.
 - Keep client-facing steps in the portal, broker workflow in Twenty, specialist checks in dedicated tools, and lodgement actions in ApplyOnline/AFG Flex/AFG/BrokerEngine unless direct integration is approved.
-- Use normalized stages in Twenty even when external platforms have different status labels.
-- Every automated step should create a visible task, status, or event record that staff can inspect.
+- Use `Contacts` as the staff-facing label for borrower and professional person records.
+- Use multiple board-style work queues instead of forcing every process into one pipeline.
+- Use normalized stages in Twenty even when external platforms have different board/stage/status labels.
+- Every automated step should create a visible task, status, event, or board movement that staff can inspect.
 
-## Pipeline Stages
+## Board-Based Workflow Model
+
+The workspace should use these operational boards:
+
+1. Lead Intake Board.
+2. Fact Find Board.
+3. Document Collection Board.
+4. BID and Compliance Board.
+5. Credit Proposal Board.
+6. Lodgement Preparation Board.
+7. Lodged Application Status Board.
+8. Conditions Board.
+9. Valuation and LMI Board.
+10. Settlement Board.
+11. Post-Settlement Review Board.
+12. Integration Exceptions Board.
+
+Detailed board stages are defined in `pipeline-and-board-configuration.md`. Automations should move work between these boards by creating or updating the right object, not by overloading one generic stage field.
+
+## Normalized Mortgage Lifecycle
+
+The following lifecycle is used for reporting and cross-board normalization:
 
 1. Lead received.
 2. Discovery booked.
-3. Fact find in progress.
-4. Fact find complete.
-5. Documents requested.
-6. Documents received.
-7. Credit review.
-8. Credit proposal in progress.
-9. Scenario/product selection.
-10. Ready for lodgement.
-11. Lodged.
-12. Awaiting assessment.
-13. Conditional approval.
-14. Conditions in progress.
-15. Formal approval.
-16. Loan documents issued.
-17. Loan documents returned.
-18. Settlement booked.
-19. Settled.
-20. Post-settlement review.
-21. Withdrawn/declined/lost.
+3. Fact find invited.
+4. Fact find in progress.
+5. Fact find submitted.
+6. Fact find under review.
+7. Documents requested.
+8. Documents received/verified.
+9. Credit review.
+10. Credit proposal in progress.
+11. Credit proposal approved.
+12. Ready for lodgement.
+13. Lodged/submitted.
+14. Awaiting assessment.
+15. Conditional approval.
+16. Conditions in progress.
+17. Formal approval.
+18. Loan documents issued.
+19. Loan documents returned.
+20. Settlement booked.
+21. Settled.
+22. Post-settlement review.
+23. Withdrawn/declined/lost.
 
 ## Lead Intake
 
 Trigger:
 
-- New lead/person/opportunity created.
+- New Contact, Deal, portal lead, referral, or imported lead created.
 
 Actions:
 
 - Assign broker owner.
 - Create discovery call task.
-- Send intake email if approved.
-- Create initial opportunity.
+- Create or update Deal.
 - Set source, referral partner, and lead type.
+- Place Deal on Lead Intake Board.
 
 Acceptance:
 
-- Every new lead has an owner, next task, source, and opportunity stage.
+- Every new lead has a Contact, owner, next task, source, and Deal stage.
 
-## Fact Find and Needs Analysis
+## Discovery to Fact Find
 
 Trigger:
 
-- Discovery completed or opportunity moved to fact-find stage.
+- Discovery completed or Deal moved to fact-find-ready stage.
 
 Actions:
 
-- Create fact-find checklist.
-- Create applicant/household records.
-- Request client portal/fact-find completion through the chat/dashboard experience.
-- Track BID/compliance tasks.
-- Flag missing applicant consent.
+- Create Fact Find Session.
+- Create required Fact Find Sections.
+- Link Contacts, Household, Deal, and Mortgage Application.
+- Send portal/fact-find invitation if approved.
+- Create processor review placeholder task.
 
 Acceptance:
 
-- Application cannot move to credit review until fact-find status, consent status, and minimum applicant details are complete.
+- Every discovery-complete Deal has a Fact Find Session with section tracking.
+
+## BrokerEngine-Style Fact Find Automation
+
+Trigger:
+
+- Fact Find Session created, client updates a section, or staff requests missing information.
+
+Actions:
+
+- Update section status and completion percentage.
+- Update overall Fact Find Session completion percentage.
+- Create missing information tasks by section.
+- Create document requests linked to section requirements.
+- Move Fact Find Session through the Fact Find Board.
+- Notify processor when client submits.
+- Notify broker when processor review is complete.
+
+Acceptance:
+
+- Staff can see which section is incomplete without reading free-text notes.
+- Credit Review is blocked until minimum required sections are complete or waived.
 
 ## BID and Compliance
 
 Trigger:
 
-- Fact find started, product recommendation started, or loan requirement changed.
+- Fact find started, product recommendation started, loan requirement changed, or Credit Proposal created.
 
 Actions:
 
 - Create Best Interests Duty evidence task.
 - Create credit guide/privacy consent task.
 - Require reason notes for recommended lender/product.
-- Flag conflicts, referral source, fees, or unusual client objectives.
+- Flag conflicts, referral source, fees, unusual client objectives, or policy exceptions.
+- Move compliance work through BID and Compliance Board.
 
 Acceptance:
 
@@ -88,19 +135,20 @@ Acceptance:
 
 Trigger:
 
-- Application enters documents requested stage.
+- Fact-find section or Mortgage Application requires documents.
 
 Actions:
 
-- Generate required document metadata checklist.
+- Generate required Document Metadata checklist.
 - Display document requests in the client portal.
 - Link to the approved document provider, BrokerEngine, ApplyOnline/AFG Flex, AFG portal, or other storage if used.
 - Create follow-up tasks for overdue documents.
 - Update received/verified status from external platform if available.
+- Move items through the Document Collection Board.
 
 Acceptance:
 
-- Twenty shows outstanding, received, verified, expired, and waived document items.
+- Twenty shows outstanding, received, verified, rejected, expired, and waived document items.
 - Document binaries are not stored in Twenty unless approved.
 
 ## ID Verification
@@ -158,33 +206,34 @@ Acceptance:
 
 Trigger:
 
-- Product research, serviceability, and packaging review are ready for broker assessment.
+- Fact Find Session complete, documents substantially ready, and product/serviceability inputs available or manually bypassed.
 
 Actions:
 
 - Create or update the Credit Proposal record in Twenty.
+- Move proposal through Credit Proposal Board.
 - Capture client objectives, shortlisted options, recommendation rationale, policy exceptions, risks, and mitigants.
-- Link serviceability, product research, document, and compliance evidence.
+- Link serviceability, product research, document, fact-find, and compliance evidence.
 - Assign internal review task if required.
 - Mark any client-facing summary as approved before portal display.
 
 Acceptance:
 
-- Twenty contains the working credit proposal history and approval status before lodgement or client presentation.
+- Twenty contains the working Credit Proposal history and approval status before lodgement or client presentation.
 - Client portal only receives approved summaries, not internal working notes or risk commentary.
 
 ## Credit Review
 
 Trigger:
 
-- Fact find complete and core documents received.
+- Fact Find complete and required core documents received/verified/waived.
 
 Actions:
 
-- Assign credit analyst or processor.
+- Assign credit/admin reviewer or processor.
 - Review income, expenses, assets, liabilities, loan requirement, and property/security.
 - Create missing-info tasks.
-- Set packaging status.
+- Set packaging/readiness status.
 
 Acceptance:
 
@@ -198,7 +247,7 @@ Trigger:
 
 Actions:
 
-- Create serviceability assessment record.
+- Create Serviceability Assessment record.
 - Store provider/reference.
 - Record pass/fail/refer summary where permitted.
 - Create follow-up task for shortfall or manual review.
@@ -207,34 +256,19 @@ Acceptance:
 
 - Every application marked ready for lodgement has a serviceability status or documented reason it is not required.
 
-## Lender/Product Selection
-
-Trigger:
-
-- Application enters scenario/product selection.
-
-Actions:
-
-- Capture preferred lender/product.
-- Capture recommendation rationale.
-- Track policy exceptions.
-- Flag LMI, valuation, title, or special document requirements.
-
-Acceptance:
-
-- Selected lender/product and recommendation rationale are visible before lodgement.
-
 ## Lodgement Preparation
 
 Trigger:
 
-- Application moves to ready for lodgement.
+- Application moves to ready-for-lodgement review.
 
 Actions:
 
+- Check required fact-find sections.
 - Check required field groups.
 - Check documents and compliance tasks.
 - Confirm external platform target: ApplyOnline preferred, AFG Flex alternate, AFG/BrokerEngine/manual fallback.
+- Move application through Lodgement Preparation Board.
 - Create lodgement task for responsible user.
 
 Acceptance:
@@ -252,7 +286,8 @@ Actions:
 - Store external application/deal ID.
 - Switch authoritative lodgement/status ownership to ApplyOnline, AFG Flex, AFG, or BrokerEngine as applicable.
 - Import status events.
-- Normalize external status to Twenty pipeline stage.
+- Normalize external status to Twenty lifecycle stage.
+- Move application through Lodged Application Status Board.
 - Create tasks for lender requests, errors, or conditions.
 
 Acceptance:
@@ -268,47 +303,32 @@ Trigger:
 
 Actions:
 
-- Create condition records.
+- Create Condition records.
 - Assign each condition to an owner.
 - Link document/evidence reference.
+- Move condition through Conditions Board.
 - Escalate overdue conditions.
 
 Acceptance:
 
 - Conditional approvals show all outstanding, satisfied, waived, and blocked conditions.
 
-## Valuation
+## Valuation and LMI
 
 Trigger:
 
-- Valuation ordered externally or required by selected lender/product.
+- Valuation or LMI is required by selected lender/product, or external valuation/LMI event imported.
 
 Actions:
 
-- Create valuation record.
-- Track ordered, booked, inspected, received, queried, and complete statuses.
-- Link valuation to property/security.
-- Flag shortfall.
+- Create Valuation and/or LMI Assessment record.
+- Track ordered, quoted, inspected, received, approved, shortfall, condition, and expiry statuses.
+- Link valuation to Property/Security.
+- Move work through Valuation and LMI Board.
 
 Acceptance:
 
-- Applications with property/security show valuation status and next action.
-
-## LMI
-
-Trigger:
-
-- LVR/product rules indicate LMI may be required, or external LMI event imported.
-
-Actions:
-
-- Create LMI assessment record.
-- Track quote, approval, decline, condition, and expiry.
-- Store high-level premium summary where permitted.
-
-Acceptance:
-
-- LMI requirement and status are visible before formal approval.
+- Applications show valuation and LMI status and next action before formal approval.
 
 ## Loan Documents and Settlement
 
@@ -320,7 +340,8 @@ Actions:
 
 - Create loan documents task.
 - Track issued, signed, returned, certified, and accepted states.
-- Create settlement record.
+- Create Settlement record.
+- Move settlement through Settlement Board.
 - Track settlement booking and funds-to-complete status.
 
 Acceptance:
@@ -337,12 +358,31 @@ Actions:
 
 - Create post-settlement review task.
 - Schedule loan review.
-- Update client lifecycle status.
+- Update Contact lifecycle status.
+- Move review through Post-Settlement Review Board.
 - Trigger referral/review workflow if approved.
 
 Acceptance:
 
 - Every settled client has a review date and ownership assigned.
+
+## Integration Exceptions
+
+Trigger:
+
+- API/webhook/polling job fails, external status is unknown, duplicate match candidate is detected, document link expires, or provider consent expires.
+
+Actions:
+
+- Create Integration Error Log record.
+- Link to Contact, Deal, Mortgage Application, or external ID.
+- Move item through Integration Exceptions Board.
+- Create admin/developer/operations task.
+- Retry where safe.
+
+Acceptance:
+
+- Failed sync work is visible and assigned rather than hidden in logs.
 
 ## Management Reporting
 
@@ -350,11 +390,14 @@ Dashboards should include:
 
 - New leads by source.
 - Deals by stage.
+- Fact finds incomplete by age and section.
 - Documents outstanding.
 - Applications awaiting client.
 - Applications awaiting lender.
+- Credit proposals awaiting review.
 - Conditional approvals with overdue conditions.
 - Settlement pipeline.
 - Settlements completed.
 - At-risk deals.
 - Broker/processor workload.
+- Integration errors by source.
