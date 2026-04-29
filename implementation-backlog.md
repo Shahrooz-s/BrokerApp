@@ -69,7 +69,8 @@
 - Build portal-to-Twenty API adapter.
 - Build provider status/reference records in Twenty.
 - Use direct APIs/webhooks/polling fallbacks for integrations; do not build Zapier into the target architecture.
-- Keep BrokerEngine Zapier trigger field mapping as reference only unless a temporary fallback is explicitly approved.
+- Use BrokerEngine ZAP/Zapier trigger field mapping as available discovery material for direct API mapping, reconciliation, and interim workaround design.
+- Only use actual Zapier execution if a controlled temporary fallback is explicitly approved.
 - Build webhook receiver.
 - Build polling fallback where webhooks are unavailable.
 - Build external ID mapping table.
@@ -84,7 +85,7 @@
 - Request access to the AFG ZAP Confluence space or exported ZAP documentation.
 - Review ZAP authentication, endpoint, validation, lodgement, document, status, webhook/back-channel, and error documentation.
 - Treat reviewed ZAP content as BrokerEngine Zapier automation documentation, not direct ApplyOnline or AFG Flex lodgement documentation.
-- Mark Zapier as not preferred and out of scope for the target architecture.
+- Mark Zapier as not preferred for the target architecture, while using available ZAP information for mapping and workaround planning.
 - Confirm ApplyOnline direct injection availability with NextGen or the relevant partner channel.
 - Confirm required certification/conformance pathway.
 - Confirm whether draft creation, validation, submission, and status retrieval are supported.
