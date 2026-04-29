@@ -1,0 +1,160 @@
+# Client Portal and Dashboard Architecture
+
+## Positioning
+
+The planned client experience is a chat-style online portal plus dashboard. Twenty is the backend CRM and internal loan origination application, not the borrower-facing application by itself.
+
+The portal should make the mortgage process feel like a guided conversation while still producing structured records that Twenty, specialist tools, and future lodgement integrations can use.
+
+Internal staff will work primarily in Twenty for origination management, credit proposal preparation, application packaging, compliance evidence, lender/status follow-up, settlement tasks, reporting, and post-settlement review.
+
+## Architecture
+
+Recommended flow:
+
+1. Client interacts with portal chat, dashboard, forms, document checklist, and task requests.
+2. Portal backend validates and normalizes client inputs.
+3. Backend writes structured records into Twenty through the API.
+4. Twenty manages broker workflow, origination pipeline, credit proposal work, tasks, statuses, ownership, reporting, and operational notes.
+5. Specialist tools handle ID verification, open banking, product research, serviceability, valuations, LMI, and related functions.
+6. Future lodgement integration injects approved application data into ApplyOnline first, or AFG Flex if ApplyOnline direct injection is not available.
+7. Status events from ApplyOnline, AFG Flex, AFG, BrokerEngine, or other systems sync back into Twenty and then into the client dashboard.
+
+## Client Portal Capabilities
+
+### Chat Experience
+
+- Guided intake conversation.
+- Borrower goals and objectives capture.
+- Dynamic follow-up questions based on answers.
+- Secure broker/client messages.
+- Task reminders.
+- Document request prompts.
+- Explanation of application status in client-friendly language.
+
+The chat layer should not store the only copy of important data. Any decision-grade answer must be written to structured records in Twenty or the relevant specialist system.
+
+### Client Dashboard
+
+Dashboard sections:
+
+- Application progress.
+- Outstanding tasks.
+- Required documents.
+- Uploaded/received/verified document status.
+- ID verification status.
+- Open banking connection/status.
+- Product research or shortlist status.
+- Broker messages.
+- Key dates: appointment, approval milestones, settlement, review.
+- Consent and disclosure records.
+
+Avoid exposing internal lender notes, credit exceptions, fraud/risk flags, or raw external system errors to clients.
+
+### Guided Fact Find
+
+The portal should collect:
+
+- Applicant and co-applicant details.
+- Contact details.
+- Household and dependant information.
+- Employment.
+- Income.
+- Expenses.
+- Assets.
+- Liabilities.
+- Loan purpose.
+- Property/security details.
+- Objectives and preferences.
+- Consent and disclosure acknowledgements.
+
+Structured fields should map to Twenty objects first, then later to LIXI-informed payloads or ApplyOnline/AFG Flex fields where permitted.
+
+### Document Collection
+
+The portal can manage document requests and upload handoffs, but the default design should avoid making Twenty the binary document store.
+
+Recommended model:
+
+- Portal shows the checklist.
+- Approved document provider or portal storage handles files.
+- Twenty stores document metadata, status, owner, expiry, and external reference.
+- Broker/processor verification updates sync back to the client dashboard.
+
+## Specialist Tool Layer
+
+Specialist tools should be treated as replaceable services behind stable internal interfaces.
+
+| Function | External tool role | Twenty record |
+| --- | --- | --- |
+| ID verification | Verify identity, biometric/document checks, KYC/AML where applicable | Verification record and status |
+| Open banking | Collect bank transaction data and verified financial information | Open banking session/status and summary references |
+| Product research | Compare lender/product options and policy fit | Product research record and recommendation summary |
+| Serviceability | Calculate borrowing capacity and lender-specific servicing | Serviceability assessment |
+| Valuation | Order/track valuation or consume valuation status | Valuation record |
+| LMI | Quote/track LMI requirement and approval | LMI assessment |
+| Credit checks | Request/track credit report or bureau check where approved | Credit check status/reference |
+| Title/property search | Order/track title and property reports | Title/property search status |
+
+For each provider, capture:
+
+- Provider name.
+- API documentation.
+- Sandbox access.
+- Authentication method.
+- Consent model.
+- Data retention terms.
+- Webhook support.
+- Status/event list.
+- Result storage policy.
+- External reference IDs.
+- Manual fallback process.
+
+## ApplyOnline and AFG Flex Future State
+
+ApplyOnline is the preferred future lodgement injection target. Public NextGen material positions ApplyOnline as a digital loan lodgement platform with CRM, lender-system, and third-party service integration. AFG Flex is the alternate path, with public AFG material describing Flex as supporting website, business partner, and third-party integrations plus electronic lodgement and live deal tracking.
+
+Implementation stance:
+
+- Do not build direct injection until ApplyOnline/NextGen or AFG confirms the approved integration path.
+- Treat ApplyOnline as preferred because it is the direct lodgement destination.
+- Treat AFG Flex as the fallback or aggregator-mediated lodgement route.
+- Keep the portal/Twenty data model platform-neutral so a later ApplyOnline or AFG Flex adapter can consume the same prepared application data.
+
+## Data Ownership
+
+| Data area | Primary owner | Client visible | Notes |
+| --- | --- | --- | --- |
+| Client profile | Twenty | Yes | Portal edits sync to Twenty after validation. |
+| Chat messages | Portal/messaging service plus Twenty summary | Yes | Store broker-relevant notes in Twenty. |
+| Fact find answers | Twenty | Yes | Structured data, with audit trail. |
+| Consent/disclosures | Twenty plus document/e-sign provider | Yes | Store timestamp, version, and evidence reference. |
+| Document files | Document provider/portal storage | Yes | Twenty stores metadata only by default. |
+| ID verification result | ID provider | Limited | Show high-level status only. |
+| Open banking result | Open banking provider | Limited | Show connection/status; restrict raw data visibility. |
+| Product research | Product research provider/Twenty | Limited | Client-facing shortlist only after broker approval. |
+| Application workflow | Twenty | Yes | Client-friendly status mapping required. |
+| Credit proposal work | Twenty | No by default | Internal broker/credit workflow; expose only approved summaries. |
+| Lodgement record | ApplyOnline/AFG Flex/fallback platform | Limited | Sync external status back to Twenty. |
+
+## Security and Privacy Requirements
+
+- Use strong client authentication.
+- Use MFA for sensitive portal actions where practical.
+- Encrypt data in transit and at rest.
+- Keep provider tokens out of client-side code.
+- Store consent records for each specialist tool.
+- Avoid exposing raw bank data, identity results, or internal risk notes in the client dashboard.
+- Use least-privilege API credentials for Twenty and providers.
+- Log access to sensitive records.
+
+## Open Implementation Questions
+
+- Which portal framework will be used.
+- Whether chat is AI-assisted, rule-guided, human-only, or hybrid.
+- Which ID verification provider will be selected.
+- Which open banking provider will be selected.
+- Which product research/serviceability provider will be selected.
+- Whether documents are stored by the portal, BrokerEngine, ApplyOnline/AFG Flex, or a dedicated document provider.
+- Whether ApplyOnline direct injection is available to this business and under what commercial/certification terms.
+- Whether AFG Flex is available as an integration target for this business.
