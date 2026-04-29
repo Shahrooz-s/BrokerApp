@@ -58,6 +58,7 @@ Public source material used to frame this pack:
 - [Twenty CRM Setup Plan](./twenty-crm-setup-plan.md)
 - [AFG and BrokerEngine Integration Plan](./afg-brokerengine-integration-plan.md)
 - [AFG ZAP Confluence Access Plan](./afg-zap-confluence-access-plan.md)
+- [AFG ZAP / BrokerEngine Zapier Review](./afg-zap-review.md)
 - [Workflow Automation Plan](./workflow-automation-plan.md)
 - [Licence and Readiness Checklist](./licence-and-readiness-checklist.md)
 - [Implementation Backlog](./implementation-backlog.md)
