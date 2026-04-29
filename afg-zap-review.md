@@ -12,7 +12,7 @@ The space is titled `BE - Zapier Integration Documentation`. The overview page i
 
 This documentation is for BrokerEngine's Zapier integration, not a direct ApplyOnline, AFG Flex, or lender lodgement API.
 
-The project preference is not to use Zapier. This documentation is useful only as background on BrokerEngine event/action concepts and available field names. It should not drive the main integration design.
+The project preference is not to use Zapier as the main integration layer. This documentation is still useful as background on BrokerEngine event/action concepts, available field names, board/stage behavior, dates, URLs, applicant/contact data, and possible workaround paths while direct API access is being confirmed.
 
 ## Relevant Pages
 
@@ -157,7 +157,16 @@ Project implication:
 
 Do not use BrokerEngine Zapier as a primary integration path.
 
-Only consider it as an emergency/manual fallback for:
+Use the information available in the ZAP documentation for:
+
+- Field discovery before direct API documentation is available.
+- Designing Twenty object and field mappings.
+- Understanding practical BrokerEngine events and workflow terminology.
+- Building manual reconciliation reports and exception handling.
+- Planning direct API, webhook, or polling adapters.
+- Defining temporary workarounds where no direct API endpoint is available yet.
+
+Only consider actual Zapier usage as a controlled temporary fallback for:
 
 - Transitional event sync.
 - Simple workflow notifications.
@@ -179,6 +188,6 @@ Do not use it as the primary design for:
 
 - Keep Twenty as the internal origination system.
 - Keep client portal as borrower-facing.
-- Treat BrokerEngine Zapier as out of scope for the target architecture unless explicitly approved as a temporary fallback.
+- Treat BrokerEngine Zapier as out of scope for the target architecture, but use the available ZAP documentation to inform mapping and workaround design.
 - Continue to request direct API documentation for ApplyOnline, AFG Flex, AFG/BrokerEngine APIs, and specialist tools.
-- Keep Zapier key rotation, date normalization, and field mapping notes only for risk/fallback planning.
+- Keep Zapier key rotation, date normalization, and field mapping notes for risk planning, fallback design, and direct-adapter implementation.
