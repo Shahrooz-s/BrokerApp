@@ -34,6 +34,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 
 - [Twenty CRM First Docker Deployment](./DEPLOYMENT.md)
 - [Application Configuration Guide](./application-configuration-guide.md)
+- [BrokerEngine Board and Bulk Edit Reference](./brokerengine-board-and-bulk-edit-reference.md)
 - [BrokerEngine Contact Import Mapping](./brokerengine-contact-import-mapping.md)
 - [Pipeline and Board Configuration](./pipeline-and-board-configuration.md)
 - [Fact Find Configuration](./fact-find-configuration.md)
@@ -66,6 +67,8 @@ The first usable internal application should include:
 
 The BrokerEngine contact workbook supplied for planning contains the contact columns that should drive the first contact import template: names, preferred name, phone/email fields, home/postal/office address fields, spouse/referred-by/company/broker references, review dates, tags, source creation date, Flex Contact Id, and BrokerEngine ID.
 
+The BrokerEngine board screenshots supplied for planning show useful operational patterns to reproduce in Brandroll: grouped board navigation, stage-numbered lead boards, collapsed columns, card-level owner/source/due-date indicators, and guarded bulk edits for review date, source, role, brand, broker, and referred-by fields.
+
 ## Board Strategy
 
 Twenty should be configured with multiple boards/views so each team works from a focused queue:
@@ -84,6 +87,8 @@ Twenty should be configured with multiple boards/views so each team works from a
 - Integration Exceptions Board.
 
 This is intentionally closer to BrokerEngine-style operational boards than a single generic sales pipeline. Each board should have clear ownership, entry criteria, exit criteria, task automation, and reporting.
+
+Bulk edit should be available only for approved operational fields and must include explicit field selection, confirmation, permission checks, audit logging, and a separate `Allow empty to clear this field` safeguard.
 
 ## Implementation Roadmap
 

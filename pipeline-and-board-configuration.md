@@ -12,6 +12,23 @@ Twenty should be configured with multiple mortgage workflow boards rather than a
 - Do not duplicate the same status across many objects without a clear source of truth.
 - Store raw external statuses separately from normalized internal stages.
 - Every board needs an owner field, next action, due date, and stale-work indicator.
+- Support stage order numbers so boards can stay stable and scannable.
+- Use compact card metadata for owner, source/brand, key due dates, and blocker indicators.
+- Where the platform allows it, support collapsed low-activity columns so long boards remain usable.
+
+## BrokerEngine Reference Patterns
+
+The supplied BrokerEngine screenshots show useful patterns for the Brandroll board setup:
+
+- Board groups for Asset Finance, Construction, Deals, Leads, Maintenance, Partnerships, and Reviews.
+- A Leads board with record count and aggregate dollar-value summary.
+- Stage-numbered columns with counts and aggregate values.
+- Collapsed columns displayed as narrow vertical stage headers.
+- Lead cards showing owner, broker/lender/brand marker, status dots, and chips for Finance, Settlement, and Stage Due dates.
+- Toolbar actions for search, filtering, display controls, and list/board switching.
+- A guarded bulk-edit modal for operational fields.
+
+Brandroll should use these as workflow requirements, not as UI-copy requirements. The implementation should feel familiar to BrokerEngine users while remaining native to Twenty.
 
 ## Recommended Boards
 
@@ -22,12 +39,17 @@ Primary object: Deals.
 Stages:
 
 1. New lead.
-2. Contact attempted.
-3. Discovery booked.
-4. Discovery complete.
-5. Fact find invited.
-6. Nurture.
-7. Lost/not proceeding.
+2. Attempted contact 1.
+3. Attempted contact 2.
+4. Attempted contact 3.
+5. Initial call held > get docs.
+6. Docs requested.
+7. Research > servicing.
+8. Prepare loan proposal.
+9. Loan proposal presented.
+10. Client accepted > handover.
+11. On hold.
+12. Lost opps.
 
 Primary owners: broker, support.
 
@@ -42,6 +64,19 @@ Automation candidates:
 - Create discovery task on new lead.
 - Alert broker if no first contact within target SLA.
 - Create Fact Find Session when discovery is complete.
+- Create stage-due tasks when a lead sits too long in an attempted-contact or proposal stage.
+
+Recommended card fields:
+
+- Contact or deal name.
+- Broker owner.
+- Broker brand.
+- Lead source.
+- Finance due date.
+- Settlement target.
+- Stage due date.
+- Estimated loan amount.
+- Blocker/status indicator.
 
 ### 2. Fact Find Board
 
@@ -358,6 +393,33 @@ Automation candidates:
 - Escalate repeated failures.
 - Link error to Contact, Deal, Application, or external ID.
 
+## Bulk Edit Requirements
+
+BrokerEngine provides a guarded bulk-edit pattern for selected records. Brandroll should reproduce the operational behavior where Twenty supports it natively, or through a controlled admin action if native Twenty bulk edit is not sufficient.
+
+Approved first-release bulk-edit fields:
+
+- Next Review On.
+- Lead Source.
+- Contact Role.
+- Broker Brand.
+- Broker.
+- Referred By.
+- Tags.
+- Stage Due Date.
+- Processor Owner.
+- Priority.
+
+Required safeguards:
+
+- Field values are changed only when the field is explicitly selected.
+- Empty-value clearing requires a separate `Allow empty to clear this field` confirmation.
+- Users see a confirmation step with record count, object type, and fields being changed.
+- Bulk edits respect role and field permissions.
+- Bulk edits write an audit record.
+- Bulk edits do not overwrite external IDs, raw external statuses, source-created dates, verification outcomes, consent evidence, or restricted compliance fields.
+- Large updates run as background jobs and route failures to the Integration Exceptions board.
+
 ## Reporting Views
 
 Management dashboards should include:
@@ -381,3 +443,4 @@ Management dashboards should include:
 - Each board has stage definitions, owner fields, due dates, and stale-item indicators.
 - Moving a record between boards or stages creates the right next task.
 - Broker-facing boards and client-facing dashboard statuses are mapped but not identical.
+- Bulk-edit behavior is limited to approved operational fields and has clear audit/clear-field safeguards.

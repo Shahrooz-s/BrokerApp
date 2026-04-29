@@ -384,6 +384,28 @@ Acceptance:
 
 - Failed sync work is visible and assigned rather than hidden in logs.
 
+## Controlled Bulk Edit
+
+Trigger:
+
+- User selects multiple records from an approved board or list view and starts a bulk edit.
+
+Actions:
+
+- Show only approved bulk-edit fields for the selected object type.
+- Require the user to explicitly select each field being changed.
+- Validate field values before enabling the next step.
+- Require separate confirmation before empty values can clear existing data.
+- Preview record count, object type, target fields, and clearing behavior.
+- Apply updates through the Twenty API or approved workflow action.
+- Write a bulk-edit audit record and per-record result.
+- Route failed records to the Integration Exceptions Board.
+
+Acceptance:
+
+- Staff can safely update review dates, source, role, brand, broker owner, referred-by, tags, stage due date, processor owner, and priority in bulk.
+- Sensitive fields, external identifiers, raw external statuses, and compliance/verification outcomes cannot be bulk overwritten.
+
 ## Management Reporting
 
 Dashboards should include:

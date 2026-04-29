@@ -42,6 +42,18 @@ This backlog prepares the Brandroll broker CRM for a self-hosted Twenty deployme
 - Configure views for broker workload, processor workload, compliance queue, stuck applications, settlement watchlist, and exception recovery.
 - Ensure a loan can be active on multiple operational boards without losing its single normalized lifecycle stage.
 - Add roll-up reporting fields for current board, current stage, blockers, SLA breach, and next action.
+- Configure BrokerEngine-inspired lead board stages, collapsed-column behavior where supported, card fields, and board group navigation from `brokerengine-board-and-bulk-edit-reference.md`.
+
+## Milestone 4A: Controlled Bulk Edit
+
+- Confirm whether the deployed Twenty version supports native multi-record bulk edit for board/table selections.
+- If native behavior is sufficient, restrict bulk edit to approved operational fields.
+- If native behavior is not sufficient, build a controlled admin bulk-edit action through the integration layer.
+- Support first-release bulk edits for Next Review On, Lead Source, Contact Role, Broker Brand, Broker, Referred By, Tags, Stage Due Date, Processor Owner, and Priority.
+- Require explicit selected fields, confirmation, permission checks, and audit logging.
+- Require a separate `Allow empty to clear this field` confirmation before clearing values.
+- Block bulk overwrite of external IDs, raw external statuses, source-created dates, consent evidence, verification outcomes, open banking summaries, and restricted compliance fields.
+- Route failed bulk edit records to the Integration Exceptions board.
 
 ## Milestone 5: Mortgage Origination Objects
 

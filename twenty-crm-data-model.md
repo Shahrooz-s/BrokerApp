@@ -48,6 +48,18 @@ Recommended fields:
 - Portal user/account reference.
 - External IDs for AFG, BrokerEngine, ApplyOnline, AFG Flex, and specialist tools where applicable.
 
+Bulk-edit eligible contact fields:
+
+- Next review date.
+- Lead source.
+- Contact role.
+- Broker brand.
+- Broker owner.
+- Referred by.
+- Tags.
+
+These fields match the BrokerEngine bulk-edit pattern in the supplied screenshots. Empty-value clearing must require explicit confirmation and should be audited.
+
 BrokerEngine contact import baseline:
 
 - Import columns observed from `contact.xlsx`: First Name, Last Name, Preferred Name, Mobile Phone Number, Office Phone Number, Home Phone Number, Email, Home Address, Postal Address Is Same, Office Address, Spouse Name, Birth Date, Last Review On, Next Review On, Lead Source, Company Name, Broker Name, Brand Name, Tags, Referred By, Created At, Flex Contact Id, and BrokerEngine ID.
@@ -108,6 +120,17 @@ Recommended fields:
 - Credit/admin reviewer owner.
 - Compliance status.
 - External AFG/BrokerEngine/ApplyOnline/AFG Flex deal ID.
+
+Recommended board/card fields:
+
+- Stage order number.
+- Stage due date.
+- Finance due date.
+- Settlement target.
+- Broker brand.
+- Display tags/chips.
+- Blocker indicator.
+- Aggregate reporting amount.
 
 Ownership: `Twenty-owned` for sales/process visibility; `bidirectional` for stage/status only if API support exists.
 
