@@ -51,6 +51,7 @@ Public source material used to frame this pack:
 
 ## Documentation Index
 
+- [Twenty CRM First Docker Deployment](./DEPLOYMENT.md)
 - [LIXI Standards Overview](./lixi-standards-overview.md)
 - [Twenty CRM Data Model](./twenty-crm-data-model.md)
 - [LIXI to Twenty Mapping](./lixi-to-twenty-mapping.md)
@@ -72,7 +73,7 @@ Public source material used to frame this pack:
    - Confirm whether AFG, BrokerEngine, or both will be used in the first release.
 
 2. Configure Twenty foundation
-   - Deploy self-hosted Twenty in a secure development environment.
+   - Deploy self-hosted Twenty in a secure development environment using the Docker baseline in `docker-compose.yml`.
    - Configure users, roles, permissions, email/calendar sync, API keys, and audit expectations.
    - Create custom objects and fields from the data model in this pack.
    - Follow the setup sequence in `twenty-crm-setup-plan.md` so core CRM, origination objects, credit proposal workspace, specialist-tool records, views, automations, and integrations are built in order.
