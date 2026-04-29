@@ -137,8 +137,28 @@ Twenty should normalize external status events into:
 
 The LIXI downloads page lists recent public release identifiers for CAL, DAS, SVC, LMI, VAL, ACC, AFD, ALA, PSA, TSA, and related standards. Implementation must confirm the exact versions available under the development licence and use those versions consistently across mapping, validation, and tests.
 
+Public download snapshot reviewed on 29 April 2026:
+
+| Standard | Public current/recent release shown | Date shown | Project use |
+| --- | --- | --- | --- |
+| CAL: Credit Applications for Australia | CAL 2.6.91 | 11 November 2025 | Primary mortgage application reference. |
+| CDA: Credit Decisioning | CDA 2.0.86 | 14 October 2025 | Decision/status/reference model. |
+| DAS: Document Preparation | DAS 2.2.90 | 11 November 2025 | Document pack and settlement readiness. |
+| EGB: Electronic Guidebook | EGB 2.0.0 | 30 November 2016 | Lender/product rule reference where licensed. |
+| SVC: Serviceability | SVC 2.0.75 | 14 October 2025 | Serviceability request/result reference. |
+| LMI: Mortgage Insurance | LMI 2.0.25 | 16 September 2025 | LMI quote/approval status reference. |
+| VAL: Valuations | VAL 2.0.25 | 15 July 2025 | Valuation order/result lifecycle reference. |
+| ACC: Account Creation for Australia | ACC 2.0.56 | 14 October 2025 | Supporting account/product creation reference. |
+| AFD: Application Fraud Detection | AFD 2.0.30 | 15 July 2025 | Fraud check status/reference model. |
+| TSA: Title and Property Search for Australia | TSA 2.0.2 | 16 September 2025 | Title/property search reference; listed as request for comment. |
+| PSA: Policy Search for Australia | PSA 2.0.3 | 11 November 2025 | Product/policy search reference; listed as request for comment. |
+| ALA: Account Lookup Australia | ALA 2.0.8 | 11 November 2025 | Account lookup/maintenance reference; listed as request for comment. |
+
+Do not assume these are the exact versions available under the development licence or accepted by ApplyOnline, AFG Flex, AFG/BrokerEngine, lenders, insurers, or specialist providers. Treat this table as public orientation only. The implementation version lock must be confirmed from licensed LIXI materials and each integration partner's requirements.
+
 The release history should be treated as an implementation control. Each prototype should record the Master Schema and transaction schema versions used, especially where CAL, EGB, DAS, SVC, LMI, VAL, ACC, CDA, AFD, or TSA concepts are mapped into Twenty.
 
+Reference: https://lixi.org.au/lixi-standards/downloads/
 Reference: https://lixi.org.au/lixi-standards/downloads/history/
 
 ## Tooling Awareness
