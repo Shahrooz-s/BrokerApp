@@ -1,0 +1,28 @@
+.env
+.env.*
+!.env.example
+
+# Local Docker/runtime state
+backups/
+tmp/
+*.log
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/
+
+# Sensitive exports and generated payloads
+*.sql
+*.dump
+*.backup
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
+# LIXI/licensed or client-sensitive artifacts must not be committed.
+licensed-lixi/
+sample-payloads/
+client-data/
