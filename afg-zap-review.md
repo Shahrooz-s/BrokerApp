@@ -12,7 +12,7 @@ The space is titled `BE - Zapier Integration Documentation`. The overview page i
 
 This documentation is for BrokerEngine's Zapier integration, not a direct ApplyOnline, AFG Flex, or lender lodgement API.
 
-It is still useful for the project because it shows a lightweight automation path for BrokerEngine events and actions. It should be treated as a transitional/no-code integration option, not the primary future-state lodgement architecture.
+The project preference is not to use Zapier. This documentation is useful only as background on BrokerEngine event/action concepts and available field names. It should not drive the main integration design.
 
 ## Relevant Pages
 
@@ -155,7 +155,9 @@ Project implication:
 
 ## Fit For Our Architecture
 
-Use BrokerEngine Zapier integration for:
+Do not use BrokerEngine Zapier as a primary integration path.
+
+Only consider it as an emergency/manual fallback for:
 
 - Transitional event sync.
 - Simple workflow notifications.
@@ -177,6 +179,6 @@ Do not use it as the primary design for:
 
 - Keep Twenty as the internal origination system.
 - Keep client portal as borrower-facing.
-- Treat BrokerEngine Zapier as an optional transitional integration channel.
+- Treat BrokerEngine Zapier as out of scope for the target architecture unless explicitly approved as a temporary fallback.
 - Continue to request direct API documentation for ApplyOnline, AFG Flex, AFG/BrokerEngine APIs, and specialist tools.
-- Add explicit Zapier key rotation, date normalization, and field mapping tasks to the integration backlog.
+- Keep Zapier key rotation, date normalization, and field mapping notes only for risk/fallback planning.
