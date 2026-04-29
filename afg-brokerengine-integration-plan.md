@@ -8,6 +8,8 @@ The preferred future lodgement path is direct injection into ApplyOnline. AFG Fl
 
 The first integration release should prioritize reliable sync and operational clarity over deep LIXI payload generation.
 
+The reviewed AFG ZAP Confluence space is BrokerEngine Zapier integration documentation. It should be treated as a transitional automation option for events/actions, not as the primary ApplyOnline/AFG Flex lodgement integration path.
+
 ## Required API Information
 
 Request from AFG, BrokerEngine, ApplyOnline/NextGen, AFG Flex, and selected specialist providers:
@@ -55,6 +57,7 @@ Request from AFG, BrokerEngine, ApplyOnline/NextGen, AFG Flex, and selected spec
 | LMI | External platform/provider | Inbound summary/reference | Store quote/approval status. |
 | Settlement | Mixed | Inbound status plus Twenty tasks | Twenty coordinates internal follow-up. |
 | Reporting | Twenty | Internal | Use normalized fields and derived metrics. |
+| BrokerEngine Zapier events | BrokerEngine/Zapier | Optional inbound bridge | Useful for transitional event sync; not a complete origination/lodgement API. |
 
 ## Integration Architecture
 
@@ -66,6 +69,7 @@ Recommended components:
 - Sync service or worker process hosted alongside the self-hosted Twenty stack.
 - Persistent mapping table for external IDs and sync cursors.
 - LIXI validation/conversion component for development and approved lodgement prototypes.
+- Optional BrokerEngine Zapier bridge for lightweight transitional automation.
 - Webhook receiver for external events if supported.
 - Scheduled polling fallback if webhooks are unavailable.
 - Dead-letter/error queue for failed sync items.
@@ -152,6 +156,8 @@ Required failure states:
 - Draft application rejected before submission.
 - LIXI schema validation failed.
 - LIXI business-rule validation failed.
+- BrokerEngine Zapier API key expired or rotated.
+- BrokerEngine/Zapier date-time parsing failed.
 
 For each failure:
 
@@ -174,3 +180,4 @@ For each failure:
 - Whether external APIs expose enough data to map to LIXI-informed field groups.
 - Whether sandbox data can use LIXI development materials.
 - Which specialist providers will be selected for ID verification, open banking, product research, serviceability, valuation, and LMI.
+- Whether BrokerEngine Zapier should be used in phase one, or deferred in favour of direct APIs.
