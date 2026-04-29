@@ -6,19 +6,21 @@ The planned client experience is a chat-style online portal plus dashboard. Twen
 
 The portal should make the mortgage process feel like a guided conversation while still producing structured records that Twenty, specialist tools, and future lodgement integrations can use.
 
-Internal staff will work primarily in Twenty for origination management, credit proposal preparation, application packaging, compliance evidence, lender/status follow-up, settlement tasks, reporting, and post-settlement review.
+Internal staff will work primarily in Twenty for origination management, fact-find review, credit proposal preparation, application packaging, compliance evidence, lender/status follow-up, settlement tasks, reporting, and post-settlement review.
+
+Use `Contacts` as the borrower/professional person label in portal copy, staff documentation, and CRM navigation wherever possible.
 
 ## Architecture
 
 Recommended flow:
 
-1. Client interacts with portal chat, dashboard, forms, document checklist, and task requests.
+1. Client interacts with portal chat, dashboard, fact-find sections, document checklist, and task requests.
 2. Portal backend validates and normalizes client inputs.
-3. Backend writes structured records into Twenty through the API.
-4. Twenty manages broker workflow, origination pipeline, credit proposal work, tasks, statuses, ownership, reporting, and operational notes.
+3. Backend writes structured Contacts, Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Document Metadata, and status records into Twenty through the API.
+4. Twenty manages broker workflow, boards, origination pipeline, credit proposal work, tasks, statuses, ownership, reporting, and operational notes.
 5. Specialist tools handle ID verification, open banking, product research, serviceability, valuations, LMI, and related functions.
 6. Future lodgement integration injects approved application data into ApplyOnline first, or AFG Flex if ApplyOnline direct injection is not available.
-7. Status events from ApplyOnline, AFG Flex, AFG, BrokerEngine, or other systems sync back into Twenty and then into the client dashboard.
+7. Status events from ApplyOnline, AFG Flex, AFG, BrokerEngine, or other systems sync back into Twenty and then into the client dashboard as client-friendly status labels.
 
 ## Client Portal Capabilities
 
@@ -39,6 +41,8 @@ The chat layer should not store the only copy of important data. Any decision-gr
 Dashboard sections:
 
 - Application progress.
+- Fact-find completion progress.
+- Outstanding fact-find sections.
 - Outstanding tasks.
 - Required documents.
 - Uploaded/received/verified document status.
@@ -49,28 +53,40 @@ Dashboard sections:
 - Key dates: appointment, approval milestones, settlement, review.
 - Consent and disclosure records.
 
-Avoid exposing internal lender notes, credit exceptions, fraud/risk flags, or raw external system errors to clients.
+Avoid exposing internal lender notes, credit exceptions, fraud/risk flags, raw external system errors, or unapproved Credit Proposal notes to clients.
 
-### Guided Fact Find
+## Guided Fact Find
 
-The portal should collect:
+The portal fact find should be section-based and similar in operating pattern to BrokerEngine: the client sees clear sections, can save progress, and staff can review completion by section in Twenty.
 
-- Applicant and co-applicant details.
-- Contact details.
-- Household and dependant information.
-- Employment.
-- Income.
-- Expenses.
-- Assets.
-- Liabilities.
-- Loan purpose.
-- Property/security details.
-- Objectives and preferences.
-- Consent and disclosure acknowledgements.
+Required sections:
+
+1. Applicant details.
+2. Co-applicant and guarantor details.
+3. Household and dependants.
+4. Goals, objectives, and loan requirements.
+5. Employment.
+6. Income.
+7. Expenses.
+8. Assets.
+9. Liabilities.
+10. Property/security.
+11. Documents.
+12. Consent and disclosures.
+
+Portal behaviour:
+
+- Save progress section by section.
+- Allow multiple applicants to complete their own sections.
+- Show missing or incomplete sections.
+- Allow staff to request clarification on a section.
+- Write completion percentage and section status back to Twenty.
+- Create or update Document Metadata when a section requires evidence.
+- Keep internal staff notes separate from client-facing messages.
 
 Structured fields should map to Twenty objects first, then later to LIXI-informed payloads or ApplyOnline/AFG Flex fields where permitted.
 
-### Document Collection
+## Document Collection
 
 The portal can manage document requests and upload handoffs, but the default design should avoid making Twenty the binary document store.
 
@@ -78,7 +94,7 @@ Recommended model:
 
 - Portal shows the checklist.
 - Approved document provider or portal storage handles files.
-- Twenty stores document metadata, status, owner, expiry, and external reference.
+- Twenty stores Document Metadata, status, owner, expiry, section relationship, and external reference.
 - Broker/processor verification updates sync back to the client dashboard.
 
 ## Specialist Tool Layer
@@ -125,9 +141,10 @@ Implementation stance:
 
 | Data area | Primary owner | Client visible | Notes |
 | --- | --- | --- | --- |
-| Client profile | Twenty | Yes | Portal edits sync to Twenty after validation. |
+| Contact profile | Twenty | Yes | Portal edits sync to Twenty after validation. |
 | Chat messages | Portal/messaging service plus Twenty summary | Yes | Store broker-relevant notes in Twenty. |
-| Fact find answers | Twenty | Yes | Structured data, with audit trail. |
+| Fact find answers | Twenty | Yes | Structured data, section status, and audit trail. |
+| Fact find staff review | Twenty | No by default | Internal review status and notes. |
 | Consent/disclosures | Twenty plus document/e-sign provider | Yes | Store timestamp, version, and evidence reference. |
 | Document files | Document provider/portal storage | Yes | Twenty stores metadata only by default. |
 | ID verification result | ID provider | Limited | Show high-level status only. |
@@ -144,7 +161,7 @@ Implementation stance:
 - Encrypt data in transit and at rest.
 - Keep provider tokens out of client-side code.
 - Store consent records for each specialist tool.
-- Avoid exposing raw bank data, identity results, or internal risk notes in the client dashboard.
+- Avoid exposing raw bank data, identity results, internal risk notes, or unapproved Credit Proposal notes in the client dashboard.
 - Use least-privilege API credentials for Twenty and providers.
 - Log access to sensitive records.
 
@@ -158,3 +175,4 @@ Implementation stance:
 - Whether documents are stored by the portal, BrokerEngine, ApplyOnline/AFG Flex, or a dedicated document provider.
 - Whether ApplyOnline direct injection is available to this business and under what commercial/certification terms.
 - Whether AFG Flex is available as an integration target for this business.
+- Which fact-find fields are required for MVP versus lodgement readiness.
