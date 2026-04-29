@@ -33,14 +33,30 @@ Recommended fields:
 
 - Contact role tags: applicant, co-applicant, guarantor, referrer, professional contact, broker contact, lender contact.
 - Preferred name.
-- Mobile, email, address.
+- Mobile, office phone, home phone, email, home address, office address, and postal-address-same flag.
 - Preferred communication method.
 - Date of birth where approved for storage.
 - Residency/citizenship status where approved for storage.
 - Privacy consent status.
 - Marketing consent status.
+- Lead source.
+- Brand/business unit.
+- Company/organisation raw name and matched Organisation.
+- Broker owner and source broker name.
+- Spouse/referred-by raw names plus reviewed Contact/Organisation relationships.
+- Last review date and next review date.
 - Portal user/account reference.
 - External IDs for AFG, BrokerEngine, ApplyOnline, AFG Flex, and specialist tools where applicable.
+
+BrokerEngine contact import baseline:
+
+- Import columns observed from `contact.xlsx`: First Name, Last Name, Preferred Name, Mobile Phone Number, Office Phone Number, Home Phone Number, Email, Home Address, Postal Address Is Same, Office Address, Spouse Name, Birth Date, Last Review On, Next Review On, Lead Source, Company Name, Broker Name, Brand Name, Tags, Referred By, Created At, Flex Contact Id, and BrokerEngine ID.
+- Preserve `BrokerEngine ID` as `brokerEngineContactId`.
+- Preserve `Flex Contact Id` as `afgFlexContactId`.
+- Store BrokerEngine `Created At` as `sourceCreatedAt`; do not overwrite the Twenty system-created timestamp.
+- Use review dates to drive the Post-Settlement Review board and retention workflow.
+- Do not auto-create spouse, referred-by, broker, or company relationships from name-only fields. Import raw values first and route ambiguous matches to review.
+- Full field mapping and import rules are documented in `brokerengine-contact-import-mapping.md`.
 
 Ownership: `bidirectional` for contact basics if APIs support it; otherwise `Twenty-owned` with external references.
 

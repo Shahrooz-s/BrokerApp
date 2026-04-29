@@ -29,6 +29,7 @@ This backlog prepares the Brandroll broker CRM for a self-hosted Twenty deployme
 - Configure `Opportunities` as `Deals` for commercial pipeline reporting.
 - Add ownership fields for broker, processor, credit reviewer, compliance reviewer, and settlement owner.
 - Add lead source, referral source, channel, campaign, and aggregator fields.
+- Add BrokerEngine contact import fields from `brokerengine-contact-import-mapping.md`, including `brokerEngineContactId`, `afgFlexContactId`, review dates, preferred name, phone variants, source-created date, and raw relationship fields.
 - Create borrower-friendly status labels separate from internal workflow stages.
 - Test contact-to-deal-to-application creation flow.
 - Confirm permissions for brokers, processors, reviewers, admins, and read-only reporting users.
@@ -101,6 +102,7 @@ This backlog prepares the Brandroll broker CRM for a self-hosted Twenty deployme
 
 - Build portal-to-Twenty API adapter.
 - Build provider status/reference records in Twenty.
+- Build a controlled BrokerEngine contact import path using the supplied contact workbook structure before any broader BrokerEngine data migration.
 - Use direct APIs/webhooks/polling fallbacks for integrations; do not build Zapier into the target architecture.
 - Use BrokerEngine ZAP/Zapier trigger field mapping as available discovery material for direct API mapping, reconciliation, and interim workaround design.
 - Only use actual Zapier execution if a controlled temporary fallback is explicitly approved.

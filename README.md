@@ -34,6 +34,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 
 - [Twenty CRM First Docker Deployment](./DEPLOYMENT.md)
 - [Application Configuration Guide](./application-configuration-guide.md)
+- [BrokerEngine Contact Import Mapping](./brokerengine-contact-import-mapping.md)
 - [Pipeline and Board Configuration](./pipeline-and-board-configuration.md)
 - [Fact Find Configuration](./fact-find-configuration.md)
 - [Twenty CRM Data Model](./twenty-crm-data-model.md)
@@ -62,6 +63,8 @@ The first usable internal application should include:
 - Document Metadata: checklist, request, received, verified, expired, waived, and external-storage references.
 - Specialist Tool Records: ID verification, open banking, product research, serviceability, valuation, LMI, credit check, and title/property search status references.
 - Status Events and Integration Errors: append-only external status history, normalized stage mapping, and sync exception handling.
+
+The BrokerEngine contact workbook supplied for planning contains the contact columns that should drive the first contact import template: names, preferred name, phone/email fields, home/postal/office address fields, spouse/referred-by/company/broker references, review dates, tags, source creation date, Flex Contact Id, and BrokerEngine ID.
 
 ## Board Strategy
 
@@ -143,6 +146,7 @@ Public source material used to frame this pack:
 - Twenty key features: https://docs.twenty.com/getting-started/key-features
 - BrokerEngine public product information: https://brokerengine.com.au/
 - BrokerEngine feature information: https://brokerengine.com.au/features/
+- BrokerEngine contact workbook supplied by Brandroll: `contact.xlsx` header structure only.
 - ApplyOnline / NextGen digital lodgement: https://nextgen.net/digital-lodgement/
 - ApplyOnline platform overview: https://nextgen.net/applyonline/
 - AFG Flex: https://www.afgonline.com.au/flex/

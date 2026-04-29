@@ -65,6 +65,8 @@ Request from AFG, BrokerEngine, ApplyOnline/NextGen, AFG Flex, and selected spec
 | Reporting | Twenty | Internal | Use normalized fields and derived metrics. |
 | BrokerEngine Zapier events | BrokerEngine/Zapier | Reference/workaround input | Use documentation for field/event mapping and controlled fallbacks; do not make Zapier the primary architecture. |
 
+The supplied BrokerEngine contact workbook gives an initial contact import shape with name, preferred name, phone/email, address, spouse, review dates, lead source, company, broker, brand, tags, referred-by, source-created date, Flex Contact Id, and BrokerEngine ID fields. Use `brokerengine-contact-import-mapping.md` as the first contact import reference while direct BrokerEngine and AFG Flex APIs are being confirmed.
+
 ## Board and Stage Integration Strategy
 
 Twenty should have multiple operational boards instead of one overloaded pipeline. External statuses should not directly overwrite staff workflow without normalization.
