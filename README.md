@@ -24,7 +24,7 @@ The immediate goal is implementation readiness: define the CRM data model, workf
 - A custom client portal will provide chat, borrower dashboard, guided fact find, document requests, status updates, and specialist-tool handoffs.
 - Specialist external tools will be used for ID verification, open banking, product research, serviceability, valuation, LMI, and other mortgage workflow functions where appropriate.
 - ApplyOnline is the preferred future lodgement target; AFG Flex is the fallback or alternate path.
-- Zapier is not preferred for the target architecture. BrokerEngine Zapier documentation is retained for reference only and should not drive the main integration design.
+- Zapier is not preferred for the target architecture. BrokerEngine Zapier documentation can still be used as interim reference material for field names, event concepts, status handling, and workaround design while direct API access is confirmed.
 - AFG, BrokerEngine, ApplyOnline, AFG Flex, and specialist tool API documentation, credentials, sandbox details, and object models must still be confirmed.
 - Twenty will not directly inject into ApplyOnline, AFG Flex, or lender systems unless production licensing, certification, aggregator permissions, vendor approval, and lender requirements are confirmed.
 
@@ -92,6 +92,7 @@ Public source material used to frame this pack:
    - Implement API jobs/webhooks to sync portal activity, contacts, deals, tasks, notes, statuses, document metadata, and key application events.
    - Integrate specialist providers for ID verification, open banking, product research, and other point solutions using reference/status records in Twenty.
    - Prefer direct APIs, webhooks, polling fallbacks, and approved vendor integrations over Zapier.
+   - Use ZAP/BrokerEngine documentation to infer practical field mappings and interim workaround steps, without making Zapier the core integration layer.
    - Use an explicit ownership matrix so each field has one primary system of record.
    - Add retry, reconciliation, and audit logging from day one.
 
