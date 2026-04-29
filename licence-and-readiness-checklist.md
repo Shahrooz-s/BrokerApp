@@ -6,6 +6,7 @@ Confirm with LIXI or internal licence records:
 
 - Which standards are included in the development licence.
 - Whether CAL, EGB, SVC, VAL, LMI, DAS, CDA, AFD, and TSA materials are accessible.
+- Which exact public/downloaded/development versions are available and approved for use, starting from the public snapshot reviewed on 29 April 2026: CAL 2.6.91, CDA 2.0.86, DAS 2.2.90, EGB 2.0.0, SVC 2.0.75, LMI 2.0.25, VAL 2.0.25, ACC 2.0.56, AFD 2.0.30, TSA 2.0.2, PSA 2.0.3, and ALA 2.0.8.
 - Whether schema documentation, CSV representations, XML/JSON schemas, and samples can be used internally.
 - Whether generated code from LIXI tooling can be stored in the project.
 - Whether internal mapping documents can include schema paths or enumerations.
@@ -65,6 +66,7 @@ Required before integration implementation:
 
 - API documentation.
 - Sandbox credentials.
+- Required/accepted LIXI standard versions for any ApplyOnline, AFG Flex, AFG/BrokerEngine, lender, insurer, valuation, or title-search workflow.
 - Production credential process.
 - Authentication and token refresh details.
 - Rate limits.
