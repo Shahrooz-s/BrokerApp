@@ -28,6 +28,14 @@ The workspace should use these operational boards:
 
 Detailed board stages are defined in `pipeline-and-board-configuration.md`. Automations should move work between these boards by creating or updating the right object, not by overloading one generic stage field.
 
+Kanban behavior:
+
+- Expand stages that currently contain cards/opportunities by default.
+- Collapse empty stages by default so active work remains visible.
+- Preserve stage number, name, count, and aggregate amount on collapsed columns.
+- Provide expand all, collapse all, and individual stage expand/collapse controls where the platform allows it.
+- Preserve current filters when switching between list and kanban.
+
 ## Normalized Mortgage Lifecycle
 
 The following lifecycle is used for reporting and cross-board normalization:
@@ -396,6 +404,7 @@ Actions:
 - Require the user to explicitly select each field being changed.
 - Validate field values before enabling the next step.
 - Require separate confirmation before empty values can clear existing data.
+- Require an explicit workflow-trigger choice when Board Stage is changed in bulk.
 - Preview record count, object type, target fields, and clearing behavior.
 - Apply updates through the Twenty API or approved workflow action.
 - Write a bulk-edit audit record and per-record result.
@@ -404,6 +413,7 @@ Actions:
 Acceptance:
 
 - Staff can safely update review dates, source, role, brand, broker owner, referred-by, tags, stage due date, processor owner, and priority in bulk.
+- Staff can safely update Board Stage, Broker, Assigned Team, Loan Processor, workflow on/off, and archive actions in bulk where role permissions allow it.
 - Sensitive fields, external identifiers, raw external statuses, and compliance/verification outcomes cannot be bulk overwritten.
 
 ## Management Reporting

@@ -15,6 +15,9 @@ Twenty should be configured with multiple mortgage workflow boards rather than a
 - Support stage order numbers so boards can stay stable and scannable.
 - Use compact card metadata for owner, source/brand, key due dates, and blocker indicators.
 - Where the platform allows it, support collapsed low-activity columns so long boards remain usable.
+- Default kanban boards to expand only stages that contain cards/opportunities.
+- Collapse empty stages by default, while keeping stage number, stage name, record count, and aggregate amount visible.
+- Provide expand all, collapse all, and individual stage expand/collapse controls.
 
 ## BrokerEngine Reference Patterns
 
@@ -27,8 +30,56 @@ The supplied BrokerEngine screenshots show useful patterns for the Brandroll boa
 - Lead cards showing owner, broker/lender/brand marker, status dots, and chips for Finance, Settlement, and Stage Due dates.
 - Toolbar actions for search, filtering, display controls, and list/board switching.
 - A guarded bulk-edit modal for operational fields.
+- List view with editable column settings and export.
+- Bulk edit for board/deal/application operations including stage, broker, assigned team, loan processor, workflow on/off, and archive actions.
 
 Brandroll should use these as workflow requirements, not as UI-copy requirements. The implementation should feel familiar to BrokerEngine users while remaining native to Twenty.
+
+## List And Kanban View Requirements
+
+Each major operational board should have both list and kanban views where possible.
+
+List view requirements:
+
+- Show configurable columns.
+- Support sorting by visible columns.
+- Support saved/default filters.
+- Support row selection for bulk edit.
+- Support export where role permissions allow it.
+- Support active/inactive filtering where the object has archive or inactive status.
+
+Kanban view requirements:
+
+- Group records by board stage.
+- Show compact cards instead of full row data.
+- Keep active stages expanded and empty stages collapsed by default.
+- Allow users to expand/collapse each stage.
+- Allow users to expand all or collapse all stages.
+- Show stage count and aggregate loan amount where applicable.
+- Preserve the user's current filter when switching between list and kanban.
+
+Default lead/deal list columns:
+
+- Deal Stage.
+- Name.
+- Status.
+- Lender.
+- Loan Amount.
+- Finance Date.
+- Settlement Date.
+- Stage Due Date.
+- Referred By.
+
+Default kanban card fields:
+
+- Name.
+- Broker owner.
+- Lender or brand marker.
+- Loan amount if space allows.
+- Finance date.
+- Settlement date.
+- Stage due date.
+- Status/priority tags.
 
 ## Recommended Boards
 

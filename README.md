@@ -69,6 +69,8 @@ The BrokerEngine contact workbook supplied for planning contains the contact col
 
 The BrokerEngine board screenshots supplied for planning show useful operational patterns to reproduce in Brandroll: grouped board navigation, stage-numbered lead boards, collapsed columns, card-level owner/source/due-date indicators, and guarded bulk edits for review date, source, role, brand, broker, and referred-by fields.
 
+The latest list-view and column-settings screenshots add another requirement: list view should expose configurable deal/application/referral/role fields, while kanban view should show a compact card. Kanban stages should default to expanded only when they contain cards/opportunities, with empty stages collapsed so active work remains visible.
+
 ## Board Strategy
 
 Twenty should be configured with multiple boards/views so each team works from a focused queue:
@@ -89,6 +91,7 @@ Twenty should be configured with multiple boards/views so each team works from a
 This is intentionally closer to BrokerEngine-style operational boards than a single generic sales pipeline. Each board should have clear ownership, entry criteria, exit criteria, task automation, and reporting.
 
 Bulk edit should be available only for approved operational fields and must include explicit field selection, confirmation, permission checks, audit logging, and a separate `Allow empty to clear this field` safeguard.
+Stage-changing bulk edits must also ask whether to trigger workflows in bulk, because moving many board records can create tasks, reminders, and downstream status changes.
 
 ## Implementation Roadmap
 

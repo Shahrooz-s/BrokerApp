@@ -43,6 +43,10 @@ This backlog prepares the Brandroll broker CRM for a self-hosted Twenty deployme
 - Ensure a loan can be active on multiple operational boards without losing its single normalized lifecycle stage.
 - Add roll-up reporting fields for current board, current stage, blockers, SLA breach, and next action.
 - Configure BrokerEngine-inspired lead board stages, collapsed-column behavior where supported, card fields, and board group navigation from `brokerengine-board-and-bulk-edit-reference.md`.
+- Configure list/kanban paired views for boards so list view exposes configurable fields and kanban view shows compact cards.
+- Configure kanban defaults so stages with cards/opportunities are expanded and empty stages are collapsed.
+- Add expand all, collapse all, and per-stage expand/collapse controls where Twenty supports it or document the product gap.
+- Build default column settings for Deal Stage, Name, Status, Lender, Loan Amount, Finance Date, Settlement Date, Stage Due Date, and Referred By.
 
 ## Milestone 4A: Controlled Bulk Edit
 
@@ -50,6 +54,8 @@ This backlog prepares the Brandroll broker CRM for a self-hosted Twenty deployme
 - If native behavior is sufficient, restrict bulk edit to approved operational fields.
 - If native behavior is not sufficient, build a controlled admin bulk-edit action through the integration layer.
 - Support first-release bulk edits for Next Review On, Lead Source, Contact Role, Broker Brand, Broker, Referred By, Tags, Stage Due Date, Processor Owner, and Priority.
+- Support board/deal/application/referral/lead bulk edits for Board Stage, Broker, Assigned Team, Loan Processor, Workflow On/Off, Archive Application, and Archive FinanceVault where provider rules allow it.
+- Require an explicit `Trigger workflows in bulk after Board Stage changes` choice before stage-change automations run.
 - Require explicit selected fields, confirmation, permission checks, and audit logging.
 - Require a separate `Allow empty to clear this field` confirmation before clearing values.
 - Block bulk overwrite of external IDs, raw external statuses, source-created dates, consent evidence, verification outcomes, open banking summaries, and restricted compliance fields.

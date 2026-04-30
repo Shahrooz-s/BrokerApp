@@ -132,6 +132,37 @@ Recommended board/card fields:
 - Blocker indicator.
 - Aggregate reporting amount.
 
+Recommended lead/deal list-view fields:
+
+- Deal Stage.
+- Name.
+- Application ID.
+- Contact.
+- Status.
+- Lender.
+- Lender Reference.
+- Security Property.
+- Loan Amount.
+- Post Cap LVR.
+- Finance Date.
+- Settlement Date.
+- Stage Due Date.
+- Broker Handover Date.
+- Expected Lodged Date.
+- Lodged with FI Date.
+- Pre Approved Date.
+- Formal Approval Date.
+- Expected Settlement Date.
+- Assigned Team.
+- Broker.
+- Loan Processor.
+- Funding Template.
+- Referred By.
+- Referrer Manager.
+- Lead Source.
+- Created On.
+- Last Note.
+
 Ownership: `Twenty-owned` for sales/process visibility; `bidirectional` for stage/status only if API support exists.
 
 ## Core Mortgage Objects
@@ -158,6 +189,18 @@ Fields:
 - Formal approval date.
 - Settlement date.
 - Decline/withdraw reason.
+- Broker handover date.
+- Expected lodgement date.
+- Lodged with finance institution date.
+- Expected settlement date.
+- Settlement refinance text/reference.
+- Settlement purchase text/reference.
+- Funding template.
+- Assigned team.
+- Security property display.
+- Lender reference.
+- Post-cap LVR.
+- Last note summary.
 
 Relationships:
 
