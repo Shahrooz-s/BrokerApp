@@ -50,6 +50,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - [AFG ZAP Confluence Access Plan](./afg-zap-confluence-access-plan.md)
 - [AFG ZAP / BrokerEngine Zapier Review](./afg-zap-review.md)
 - [Licence and Readiness Checklist](./licence-and-readiness-checklist.md)
+- [Repository Review and Readiness](./repository-review-and-readiness.md)
 - [Implementation Backlog](./implementation-backlog.md)
 
 ## Application Shape

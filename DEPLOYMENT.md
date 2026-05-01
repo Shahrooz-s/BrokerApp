@@ -13,6 +13,8 @@ This is a first deployment baseline. The application source is now present in `t
 - The client portal, ApplyOnline/AFG Flex adapters, BrokerEngine/AFG adapters, and specialist-tool integrations will be added after the base CRM is running.
 - Custom source builds should be prepared from `twenty-source/` in a later deployment phase.
 
+For development, `TAG=latest` is acceptable while the instance is disposable. Before staging or production, replace `latest` with a tested Twenty release tag or a tested Brandroll custom image tag.
+
 ## Prerequisites
 
 - Docker installed.

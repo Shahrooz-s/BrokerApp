@@ -6,6 +6,7 @@
 backups/
 tmp/
 *.log
+patches-*/
 
 # OS/editor files
 .DS_Store
