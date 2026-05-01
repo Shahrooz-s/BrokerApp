@@ -2,7 +2,7 @@
 
 ## Goal
 
-Deploy the BrokerApp mortgage configuration app into the running Twenty instance at:
+Deploy the BrokerApp mortgage configuration into the running Twenty instance at:
 
 ```text
 https://app.lendaloan.com.au
@@ -88,7 +88,7 @@ After `install` succeeds:
 
 1. Refresh Twenty in the browser.
 2. Go to Settings > Apps / Applications.
-3. Confirm `BrokerApp Mortgage` is installed.
+3. Confirm `BrokerApp` is installed.
 4. Check the sidebar for mortgage entries.
 5. Confirm the new objects/views are present.
 6. Create a dummy contact and dummy mortgage application to verify record creation.

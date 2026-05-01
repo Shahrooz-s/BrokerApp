@@ -1,6 +1,6 @@
-# BrokerApp Mortgage App for Twenty
+# BrokerApp App for Twenty
 
-This Twenty app defines the first LIXI-aware mortgage broking data model for the BrokerApp / Lend A Loan CRM deployment.
+This Twenty app defines the first LIXI-aware mortgage broking data model for the BrokerApp CRM deployment.
 
 It does not include restricted LIXI schemas, sample payloads, lender guidebooks, or production lodgement logic. It uses public LIXI concepts as a reference model and keeps ApplyOnline, AFG Flex, AFG/BrokerEngine, and specialist-provider integration references as configurable CRM records.
 
