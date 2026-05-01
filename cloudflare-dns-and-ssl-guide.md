@@ -8,6 +8,14 @@ Use this public URL for the first BrokerApp deployment:
 https://app.lendaloan.com.au
 ```
 
+The main/root website remains separate:
+
+```text
+lendaloan.com.au -> CyberPanel instance on Vultr
+www.lendaloan.com.au -> CyberPanel instance on Vultr
+app.lendaloan.com.au -> Dockge/BrokerApp through Cloudflare Tunnel
+```
+
 The Twenty environment should use:
 
 ```env
@@ -26,30 +34,32 @@ https://app.lendaloan.com.au:3000
 
 Instead, use one of these patterns:
 
-- Recommended: Cloudflare DNS -> reverse proxy on `443` -> Twenty container on `3000`.
-- Alternative: Cloudflare Tunnel -> `http://localhost:3000` on the Dockge host.
+- Current plan: Cloudflare Tunnel -> `http://localhost:3000` on the Dockge host.
+- Alternative later: Cloudflare DNS -> reverse proxy on `443` -> Twenty container on `3000`.
 
-## Recommended DNS Record
+## DNS Records
 
-In Cloudflare DNS for `lendaloan.com.au`, create:
+Keep the existing root-domain DNS records pointed to the CyberPanel/Vultr server:
 
 ```text
 Type: A
-Name: app
-Content: <your Dockge server public IPv4>
+Name: @
+Content: <CyberPanel/Vultr public IPv4>
 Proxy status: Proxied
 TTL: Auto
 ```
 
-If the server has IPv6, optionally add:
+For `www`, use either an A record to the CyberPanel/Vultr IP or a CNAME to the root, depending on the existing CyberPanel setup.
+
+For the app, use Cloudflare Tunnel routing rather than an A record to Dockge:
 
 ```text
-Type: AAAA
-Name: app
-Content: <your Dockge server public IPv6>
-Proxy status: Proxied
-TTL: Auto
+Hostname: app.lendaloan.com.au
+Service: http://localhost:3000
+Target host: Dockge server running brokerapp-v1
 ```
+
+Cloudflare Tunnel will create/manage the proxied DNS route for `app.lendaloan.com.au`.
 
 Only proxy records used for web traffic. Keep mail records and verification records DNS-only unless a vendor specifically supports Cloudflare proxying.
 
@@ -70,9 +80,39 @@ Use `Full (strict)` only when the origin/reverse proxy has a valid certificate. 
 
 Avoid `Flexible` mode. It encrypts browser-to-Cloudflare traffic but not Cloudflare-to-origin traffic, which is not appropriate for a CRM handling client information.
 
+## Cloudflare Tunnel Pattern
+
+This is the current plan for BrokerApp.
+
+Run `brokerapp-v1` on the Dockge host with Twenty listening on local port `3000`, then route Cloudflare Tunnel to:
+
+```text
+http://localhost:3000
+```
+
+Public users should visit:
+
+```text
+https://app.lendaloan.com.au
+```
+
+Set the Dockge `.env` value:
+
+```env
+SERVER_URL=https://app.lendaloan.com.au
+```
+
+The root domain should not route to BrokerApp:
+
+```text
+https://lendaloan.com.au -> CyberPanel/Vultr
+https://www.lendaloan.com.au -> CyberPanel/Vultr
+https://app.lendaloan.com.au -> Dockge/BrokerApp
+```
+
 ## Reverse Proxy Pattern
 
-Keep the Docker Compose service listening internally on `3000`:
+If you later stop using Cloudflare Tunnel, keep the Docker Compose service listening internally on `3000`:
 
 ```yaml
 ports:
@@ -97,22 +137,11 @@ not:
 http://server-ip:3000
 ```
 
-## Cloudflare Tunnel Alternative
-
-If you do not want to open ports `80` and `443` on the server, use Cloudflare Tunnel.
-
-Tunnel route:
-
-```text
-app.lendaloan.com.au -> http://localhost:3000
-```
-
-This removes the need to expose the Dockge host directly, but it adds Cloudflare Tunnel as another service to run and monitor.
-
 ## Minimum Cloudflare Settings
 
-- DNS `app` record is Proxied.
-- SSL/TLS mode is `Full (strict)` after an origin certificate is installed.
+- Root and `www` records continue pointing to CyberPanel/Vultr.
+- `app.lendaloan.com.au` is routed through Cloudflare Tunnel to the Dockge host.
+- SSL/TLS mode is `Full (strict)` for normal proxied origins after origin certificates are installed. Cloudflare Tunnel does not require opening public `80/443` on the Dockge host.
 - Always Use HTTPS is enabled.
 - Do not cache CRM application pages aggressively.
 - Keep WebSockets enabled if using real-time app features.
@@ -122,12 +151,19 @@ This removes the need to expose the Dockge host directly, but it adds Cloudflare
 
 Cloudflare recommends configuring the origin server so proxied web traffic reaches the server only from Cloudflare IP addresses. This matters because if someone discovers the server IP, they could otherwise bypass Cloudflare and hit the origin directly.
 
-After the reverse proxy is working:
+For the CyberPanel/Vultr origin, after the proxied website is working:
 
 1. Allow Cloudflare IP ranges to reach ports `80` and `443`.
 2. Allow trusted administrator IPs for SSH/Dockge access.
 3. Block other direct inbound traffic to ports `80` and `443`.
 4. Do not expose Postgres, Redis, or the internal Twenty container port publicly.
+
+For the Dockge/BrokerApp host using Cloudflare Tunnel:
+
+- Do not expose public port `3000`.
+- Keep Postgres and Redis internal to Docker.
+- Restrict Dockge admin access to trusted IPs or a private/VPN/Zero Trust route where possible.
+- Keep `cloudflared` running and monitored on the Dockge host.
 
 Cloudflare publishes the current IP ranges here:
 
@@ -156,10 +192,10 @@ Only apply firewall rules from a server console or a session you can recover fro
 
 ## Deployment Order
 
-1. Deploy `brokerapp-v1` in Dockge.
-2. Confirm the app is reachable from the server on `http://localhost:3000`.
-3. Configure reverse proxy or Cloudflare Tunnel.
-4. Add the Cloudflare DNS record for `app.lendaloan.com.au`.
+1. Keep root and `www` DNS records pointed to the CyberPanel/Vultr website.
+2. Deploy `brokerapp-v1` in Dockge.
+3. Confirm the app is reachable from the Dockge host on `http://localhost:3000`.
+4. Create a Cloudflare Tunnel route for `app.lendaloan.com.au -> http://localhost:3000`.
 5. Set `SERVER_URL=https://app.lendaloan.com.au`.
 6. Restart the Dockge stack.
 7. Test `https://app.lendaloan.com.au/healthz`.
