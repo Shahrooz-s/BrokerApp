@@ -2,7 +2,7 @@
 
 ## Objective
 
-This repository is the setup and implementation pack for a self-hosted Twenty CRM configured for Australian mortgage broking. It treats LIXI as the reference lending data model, positions Twenty as the internal broker operations application, and plans a chat-style client portal plus dashboard as the borrower-facing experience.
+This repository is the setup and implementation pack for a self-hosted Twenty CRM configured for Australian mortgage broking. It includes the Brandroll deployment/docs layer plus the imported Twenty application source code under `twenty-source/`. It treats LIXI as the reference lending data model, positions Twenty as the internal broker operations application, and plans a chat-style client portal plus dashboard as the borrower-facing experience.
 
 The application should feel operationally closer to a mortgage broking platform than a generic CRM. The staff-facing vocabulary should use `Contacts` rather than `People`, and the workspace should be configured around multiple boards for lead management, fact find, documents, credit proposal, lodgement, conditions, settlement, reviews, and integration exceptions.
 
@@ -33,6 +33,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 ## Documentation Index
 
 - [Twenty CRM First Docker Deployment](./DEPLOYMENT.md)
+- [Imported Twenty Application Source](./twenty-source/README.md)
 - [Application Configuration Guide](./application-configuration-guide.md)
 - [BrokerEngine Board and Bulk Edit Reference](./brokerengine-board-and-bulk-edit-reference.md)
 - [BrokerEngine Contact Import Mapping](./brokerengine-contact-import-mapping.md)
@@ -52,6 +53,16 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - [Implementation Backlog](./implementation-backlog.md)
 
 ## Application Shape
+
+## Repository Layout
+
+- Root documentation and deployment layer: Brandroll-specific setup, LIXI mapping, BrokerEngine references, Docker first-run files, and implementation backlog.
+- `twenty-source/`: imported Twenty monorepo source code with Brandroll mortgage CRM changes and reference docs.
+- `docker-compose.yml`: first deployment baseline using the official `twentycrm/twenty` image.
+- `twenty-source/deploy/brandroll-twenty/`: source-side Brandroll deployment overlay from the Twenty source work.
+- `twenty-source/docs/brandroll-mortgage-crm/`: source-side Brandroll mortgage CRM implementation notes.
+
+The current root Docker compose remains the fastest first deployment path. A later deployment step should build and publish a Brandroll custom Twenty image from `twenty-source/` once source customisations are ready to run in production.
 
 The first usable internal application should include:
 

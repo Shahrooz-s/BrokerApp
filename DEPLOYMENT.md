@@ -1,16 +1,17 @@
 # Twenty CRM First Docker Deployment
 
-This repository now includes a Docker-first deployment layer for a self-hosted Twenty CRM instance. The first deployment uses the official Twenty Docker image with Postgres and Redis.
+This repository now includes a Docker-first deployment layer for a self-hosted Twenty CRM instance and the imported Twenty application source under `twenty-source/`. The first deployment uses the official Twenty Docker image with Postgres and Redis.
 
 ## Current Scope
 
-This is a first deployment baseline, not the mortgage customisation build yet.
+This is a first deployment baseline. The application source is now present in `twenty-source/`, but the root `docker-compose.yml` still runs the official published Twenty image until a Brandroll custom image is built and approved.
 
 - Twenty runs as the CRM backend and internal broker workspace.
 - Postgres stores CRM data.
 - Redis supports background jobs.
 - Local Docker volumes persist database and uploaded/local Twenty storage.
 - The client portal, ApplyOnline/AFG Flex adapters, BrokerEngine/AFG adapters, and specialist-tool integrations will be added after the base CRM is running.
+- Custom source builds should be prepared from `twenty-source/` in a later deployment phase.
 
 ## Prerequisites
 
@@ -103,6 +104,23 @@ After first login, configure:
 - API key or service account for future portal and integration work.
 - Custom objects and fields from `twenty-crm-data-model.md`.
 - Pipelines, views, and workflow stages from `twenty-crm-setup-plan.md`.
+
+## Source Build Track
+
+The full Twenty monorepo source is imported at:
+
+```text
+twenty-source/
+```
+
+Use this source tree for Brandroll application customisation work. The current first-run Docker compose does not build this source tree directly. Before switching production to a source-built image:
+
+- Lock the Twenty upstream version.
+- Confirm Brandroll source changes compile and pass the relevant tests.
+- Build a custom Docker image from `twenty-source/`.
+- Push the image to an approved registry.
+- Update `TAG` or the compose image reference to the approved Brandroll image.
+- Run migration and rollback testing in staging.
 
 ## Production Gates
 
