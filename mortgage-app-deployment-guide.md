@@ -74,11 +74,14 @@ Inside the Node 24 container:
 
 ```bash
 corepack enable
+touch yarn.lock
 yarn install
 yarn twenty remote add --api-url https://app.lendaloan.com.au --as brokerapp-v1
 yarn twenty deploy --remote brokerapp-v1
 yarn twenty install --remote brokerapp-v1
 ```
+
+The `touch yarn.lock` line makes Yarn treat the mortgage app directory as its own standalone package instead of trying to resolve it as part of the parent Twenty monorepo.
 
 When prompted during `remote add`, paste the Twenty API key from the live workspace.
 
