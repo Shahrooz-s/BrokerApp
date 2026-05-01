@@ -42,7 +42,7 @@ Do not deploy from `twenty-source/` yet. The imported source tree is for customi
 3. Name the stack:
 
 ```text
-brandroll-twenty-crm
+brokerapp-v1
 ```
 
 4. Paste the contents of the repository root `docker-compose.yml`.
@@ -78,8 +78,8 @@ Use this if you prefer to keep the stack file under Git on the server.
 
 ```bash
 cd /opt/stacks
-git clone --branch codex/review-ready-deployment git@github.com:Shahrooz-s/BrokerApp.git brandroll-twenty-crm
-cd brandroll-twenty-crm
+git clone --branch codex/review-ready-deployment git@github.com:Shahrooz-s/BrokerApp.git brokerapp-v1
+cd brokerapp-v1
 cp .env.example .env
 openssl rand -base64 32
 ```
