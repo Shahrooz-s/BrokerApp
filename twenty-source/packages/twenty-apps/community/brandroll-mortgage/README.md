@@ -1,6 +1,6 @@
-# Brandroll Mortgage App for Twenty
+# BrokerApp Mortgage App for Twenty
 
-This Twenty app defines the first LIXI-aligned mortgage broking data model for the Brandroll CRM deployment.
+This Twenty app defines the first LIXI-aware mortgage broking data model for the BrokerApp / Lend A Loan CRM deployment.
 
 It does not include restricted LIXI schemas, sample payloads, lender guidebooks, or production lodgement logic. It uses public LIXI concepts as a reference model and keeps ApplyOnline, AFG Flex, AFG/BrokerEngine, and specialist-provider integration references as configurable CRM records.
 
@@ -42,13 +42,16 @@ Recommended first manual workflow configuration:
 
 ## Deployment
 
-After the Docker stack is running, connect the Twenty CLI to the workspace and deploy this app:
+After the Docker stack is running and the first workspace/admin user exists, connect the Twenty CLI to the workspace and deploy this app:
 
 ```bash
 cd packages/twenty-apps/community/brandroll-mortgage
 yarn install
-yarn twenty build
-yarn twenty deploy
+yarn twenty remote add --api-url https://app.lendaloan.com.au --as brokerapp-v1
+yarn twenty deploy --remote brokerapp-v1
+yarn twenty install --remote brokerapp-v1
 ```
+
+Use `deploy` and `install` for the live Docker server. `dev` mode is intended for development-mode Twenty servers.
 
 Use a development/staging workspace first. Do not deploy against production borrower data until roles, permissions, storage, backups, and privacy controls are approved.
