@@ -35,6 +35,8 @@ Do not deploy from `twenty-source/` yet. The imported source tree is for customi
 - Port `3000` is available or a reverse proxy is configured.
 - A public domain and HTTPS are configured before real borrower data is entered.
 
+For `app.lendaloan.com.au`, use Cloudflare in front of a reverse proxy on `443`, or use Cloudflare Tunnel. Do not rely on Cloudflare proxied DNS to serve the CRM directly on public port `3000`.
+
 ## Option A: Deploy From Dockge UI
 
 1. Log into Dockge as `dockroll@brandroll.com.au`.
