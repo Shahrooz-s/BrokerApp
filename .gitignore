@@ -37,3 +37,11 @@ patches-*/
 licensed-lixi/
 sample-payloads/
 client-data/
+
+# BrokerEngine/private operational captures must stay local or encrypted.
+.brokerapp-private/
+brokerengine-private/
+private-template-imports/
+private-screenshots/
+*.private.json
+*.private.ndjson

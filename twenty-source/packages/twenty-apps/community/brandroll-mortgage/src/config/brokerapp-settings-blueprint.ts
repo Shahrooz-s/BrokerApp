@@ -207,4 +207,6 @@ export const brokerAppSettingsRecommendations = [
   'Use AFG product matrix/API imports for product data instead of scraping BrokerEngine product rows.',
   'Make every stage movement auditable and optionally gated by document completeness, consent status, fact-find review, serviceability, policy fit, and broker approval.',
   'Use OpnForm for borrower-facing forms now, but persist normalized answer rows in BrokerApp so the client portal and broker cockpit can share one data model.',
+  'For the first pilot, avoid Twilio/SMS OTP dependency. Use email magic links plus passkeys for the borrower portal, and reserve SMS only for later notification workflows if licensing and consent rules are confirmed.',
+  'Keep BrokerEngine bodies, screenshots, private field captures, and live-account exports out of GitHub. Import them into workspace-private records or encrypted local artifacts only after approval.',
 ] as const;

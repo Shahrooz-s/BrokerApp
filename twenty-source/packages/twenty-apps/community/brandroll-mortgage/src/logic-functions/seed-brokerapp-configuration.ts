@@ -10,6 +10,11 @@ import {
   brokerEngineReportTemplates,
   brokerEngineDealWorkspaceTools,
 } from 'src/config/brokerengine-workspace-tools';
+import {
+  brokerAppChecklistTemplateSeeds,
+  brokerAppIntegrationProviderSeeds,
+  brokerAppWhiteLabelSettingSeeds,
+} from 'src/config/brokerapp-pilot-seeds';
 import { brokerAppSettingsAreaSeeds } from 'src/config/brokerapp-settings-blueprint';
 import { brokerEngineTemplateSeeds } from 'src/config/brokerengine-template-library';
 
@@ -228,6 +233,27 @@ const handler = async (): Promise<Record<string, number>> => {
     'settingName',
     brokerAppSettingsAreaSeeds as unknown as SeedRecord[],
   );
+  const checklistTemplates = await seedRecords(
+    client,
+    'brokerChecklistTemplates',
+    'createBrokerChecklistTemplates',
+    'sourceChecklistId',
+    brokerAppChecklistTemplateSeeds as unknown as SeedRecord[],
+  );
+  const integrationProviders = await seedRecords(
+    client,
+    'integrationProviders',
+    'createIntegrationProviders',
+    'providerName',
+    brokerAppIntegrationProviderSeeds as unknown as SeedRecord[],
+  );
+  const whiteLabelSettings = await seedRecords(
+    client,
+    'whiteLabelSettings',
+    'createWhiteLabelSettings',
+    'settingName',
+    brokerAppWhiteLabelSettingSeeds as unknown as SeedRecord[],
+  );
 
   const counts = {
     boardTemplates,
@@ -235,6 +261,9 @@ const handler = async (): Promise<Record<string, number>> => {
     brokerTemplates,
     workspaceTools,
     settingsAreas,
+    checklistTemplates,
+    integrationProviders,
+    whiteLabelSettings,
   };
 
   console.log('Seeded BrokerApp configuration records', counts);

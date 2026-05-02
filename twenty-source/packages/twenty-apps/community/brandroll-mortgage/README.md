@@ -18,6 +18,22 @@ BrokerApp treats native Twenty Opportunities as the broker board/deal/opportunit
 - Credit proposals explaining the selected product, comparison set, BID rationale, and policy fit.
 - Valuation, LMI, conditions, lender contacts, and integration events.
 
+## v0.14 BrokerApp Pilot Layer
+
+BrokerApp now includes the pilot layer needed before live workflow testing:
+
+- Staff roles for Master Admin, Compliance, Broker, Loan Processor/Assistant, and Client Portal marker access.
+- Client Portal Sessions and Client Portal Tasks for borrower fact find, KYC, document requests, bank data, safe messages, and next actions.
+- KYC/CDD Profile, KYC Verification Event, KYC Consent, AML Escalation, and Evidence Pack objects.
+- Broker Checklist Template, Broker Checklist Item Template, Deal Checklist, and Deal Checklist Item objects.
+- Integration Provider records for passkeys, email magic links, IDV/KYC, open banking, bank statements, AFG product imports, ApplyOnline, AFG Flex, and BrokerEngine compatibility.
+- Product Import Run records for AFG product matrix/API update tracking.
+- White-label Setting records for brand, domain, portal, auth, tenant isolation, and security-header defaults.
+- Navigation entries under Broker Settings for the new pilot modules.
+- Post-install seed data for checklist templates, integration provider placeholders, and white-label defaults.
+
+Private BrokerEngine template bodies, screenshots, checklist wording, live account captures, and customer data must not be committed to GitHub. Use private workspace imports or encrypted local artifacts after explicit approval.
+
 ## v0.13 BrokerEngine Settings Capture
 
 BrokerApp now includes a BrokerEngine-style workflow and settings capture layer:

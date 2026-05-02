@@ -6,7 +6,7 @@ export default defineApplication({
   universalIdentifier: '6b6d0000-0000-4000-8000-000000000001',
   displayName: 'BrokerApp',
   description:
-    'Deal-centric, LIXI-aware mortgage broking objects, settings, templates, fields, and views for BrokerApp.',
+    'White-labelled, LIXI-aware mortgage broking workspace with BrokerEngine-style deal boards, client portal foundations, product research, checklists, and AML/KYC controls.',
   icon: 'IconHomeDollar',
   defaultRoleUniversalIdentifier: DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
 });

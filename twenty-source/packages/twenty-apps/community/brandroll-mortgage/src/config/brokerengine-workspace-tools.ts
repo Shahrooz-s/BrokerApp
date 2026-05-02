@@ -32,6 +32,8 @@ export const brokerEngineDealWorkspaceTools = [
   { workspaceArea: 'RIGHT_RAIL', position: 60, toolName: 'Key Dates', toolType: 'DRAWER', recordOwner: 'Opportunity dates and mortgage application dates', shownInsideDeal: true },
   { workspaceArea: 'RIGHT_RAIL', position: 70, toolName: 'Reports', toolType: 'DRAWER', recordOwner: 'Broker templates and document generation', shownInsideDeal: true },
   { workspaceArea: 'RIGHT_RAIL', position: 80, toolName: '1-Click Workflows', toolType: 'DRAWER', recordOwner: 'Workflow templates', shownInsideDeal: true },
+  { workspaceArea: 'RIGHT_RAIL', position: 90, toolName: 'Client Portal', toolType: 'DRAWER', recordOwner: 'Client portal sessions and portal tasks', shownInsideDeal: true },
+  { workspaceArea: 'RIGHT_RAIL', position: 100, toolName: 'KYC/CDD', toolType: 'DRAWER', recordOwner: 'KYC/CDD profiles, consents, verification events, AML escalations, and evidence packs', shownInsideDeal: true },
 
   { workspaceArea: 'BROKER_SETTINGS', position: 10, toolName: 'Lender Details', toolType: 'SETTING', recordOwner: 'Broker lenders', shownInSettings: true },
   { workspaceArea: 'BROKER_SETTINGS', position: 20, toolName: 'Products', toolType: 'SETTING', recordOwner: 'Lender products', shownInSettings: true },
@@ -46,6 +48,12 @@ export const brokerEngineDealWorkspaceTools = [
   { workspaceArea: 'BROKER_SETTINGS', position: 110, toolName: 'Fact Find New', toolType: 'SETTING', recordOwner: 'Broker form templates', shownInSettings: true },
   { workspaceArea: 'BROKER_SETTINGS', position: 120, toolName: 'Loan Smart Docs', toolType: 'SETTING', recordOwner: 'Broker templates', shownInSettings: true },
   { workspaceArea: 'BROKER_SETTINGS', position: 130, toolName: 'Smart Doc Templates', toolType: 'SETTING', recordOwner: 'Broker templates', shownInSettings: true },
+  { workspaceArea: 'BROKER_SETTINGS', position: 140, toolName: 'Checklists', toolType: 'SETTING', recordOwner: 'Broker checklist templates, deal checklists, and checklist item templates', shownInSettings: true },
+  { workspaceArea: 'BROKER_SETTINGS', position: 150, toolName: 'Client Portal', toolType: 'SETTING', recordOwner: 'Client portal sessions, portal tasks, portal authentication, and safe client-visible status messages', shownInSettings: true },
+  { workspaceArea: 'BROKER_SETTINGS', position: 160, toolName: 'AML/CTF and KYC', toolType: 'SETTING', recordOwner: 'KYC/CDD profiles, consents, verification events, AML escalations, evidence packs, and lender rule sets', shownInSettings: true },
+  { workspaceArea: 'BROKER_SETTINGS', position: 170, toolName: 'Product Imports', toolType: 'SETTING', recordOwner: 'Product import runs and lender product updates from AFG matrix/API files', shownInSettings: true },
+  { workspaceArea: 'BROKER_SETTINGS', position: 180, toolName: 'Integration Providers', toolType: 'SETTING', recordOwner: 'Provider registry for IDV, open banking, product data, lodgement, email, storage, and BrokerEngine compatibility', shownInSettings: true },
+  { workspaceArea: 'BROKER_SETTINGS', position: 190, toolName: 'White-label', toolType: 'SETTING', recordOwner: 'Brand, domain, portal, auth, SaaS tenant, and security defaults', shownInSettings: true },
 ] as const;
 
 export const brokerEngineReportTemplates = [
