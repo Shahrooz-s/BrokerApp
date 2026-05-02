@@ -292,6 +292,103 @@ Relationships:
 
 Ownership: `Twenty-owned` configuration record. OpnForm may own the visual form definition; Twenty stores the approved template reference, version, status, and mapping metadata.
 
+### Broker Lender
+
+Represents the Broker Settings profile for a lender. This is the lender setup layer used by the deal tools, product search, serviceability, policy checks, document requests, and future lodgement mapping.
+
+Fields:
+
+- Lender name.
+- Internal lender code.
+- Lender category: big four, major bank, regional bank, mutual/credit union, non-bank, specialist, private, commercial, other.
+- Status: active, watchlist, limited use, inactive, archived.
+- Panel status: on panel, accredited, pending, restricted, off panel.
+- Lodgement channel: ApplyOnline, AFG Flex, AFG, BrokerEngine, manual, other.
+- LIXI party reference.
+- ApplyOnline lender code.
+- AFG lender code.
+- BrokerEngine lender code.
+- Product matrix source.
+- Broker portal links.
+- Calculator links.
+- Policy links.
+- Document checklist links.
+- Default document category set.
+- Policy review due date.
+- Last product matrix review date.
+- Lender notes.
+
+Relationships:
+
+- Lender calculators.
+- Lender policy references.
+- Lender document categories.
+- Lender products.
+- Lender contacts.
+
+Ownership: `Twenty-owned` configuration record. Imported AFG/BrokerEngine/product-research data should map to this record by code/name review instead of creating duplicate lender concepts.
+
+### Lender Calculator
+
+Represents calculator references for a lender: serviceability, borrowing power, repayment, LMI, fees/costs, and policy calculators.
+
+Fields:
+
+- Calculator name.
+- Calculator type.
+- Status.
+- Source type: web portal, Excel workbook, API, PDF, manual.
+- Calculator link.
+- Workbook reference.
+- Calculator version.
+- Effective date.
+- Review due date.
+- Input mapping profile.
+- Output mapping profile.
+- Calculator notes.
+
+Ownership: `Twenty-owned` reference/configuration record. Lender workbooks and proprietary formulas should not be embedded in the app unless rights and storage controls are confirmed.
+
+### Lender Policy Reference
+
+Represents lender policy references for employment, income, expenses, liabilities, LVR, security/property, construction, refinance, LMI, document, and exception rules.
+
+Fields:
+
+- Policy name.
+- Policy category.
+- Status.
+- Policy link.
+- Source reference.
+- Policy version.
+- Effective date.
+- Review due date.
+- Policy summary.
+- LIXI mapping notes.
+- AFG/BrokerEngine mapping notes.
+
+Ownership: `Twenty-owned` reference/configuration record. LIXI concepts remain the primary semantic model; AFG, BrokerEngine, ApplyOnline, and AFG Flex fields are integration aliases.
+
+### Lender Document Category
+
+Represents scenario-specific lender evidence/document categories for document collection and lodgement readiness.
+
+Fields:
+
+- Category name.
+- Scenario.
+- Status.
+- Applicant role.
+- Evidence type.
+- Portal display name.
+- Required by default flag.
+- Source checklist reference.
+- LIXI mapping reference.
+- ApplyOnline mapping reference.
+- Category notes.
+
+Ownership: `Twenty-owned` configuration record. Document files should remain in the approved portal/document store; Twenty tracks categories, requirements, and external references.
+
 ### Fact Find Section
 
 Tracks completion, autosave status, mapping state, and review state of each fact-find section.

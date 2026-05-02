@@ -2,7 +2,9 @@
 
 ## Purpose
 
-The fact find should be configured as a structured, section-based mortgage workflow similar in operational feel to BrokerEngine, while remaining platform-neutral for the future client portal, ApplyOnline, AFG Flex, AFG, BrokerEngine, and LIXI-aligned mapping.
+The fact find should be configured as a structured, section-based mortgage workflow similar in operational feel to BrokerEngine, while remaining platform-neutral for the future client portal, ApplyOnline, AFG Flex, AFG, and BrokerEngine.
+
+Use LIXI concepts as the primary field-design language first. BrokerEngine, AFG, ApplyOnline, and AFG Flex names should be stored as aliases or mapping metadata where those integrations need different naming.
 
 The fact find is not a single form, note, or PDF. It is a living record that tracks borrower completion, staff review, evidence, missing information, consent, and readiness for credit assessment.
 

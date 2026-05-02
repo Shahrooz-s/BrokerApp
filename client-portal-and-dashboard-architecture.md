@@ -110,6 +110,8 @@ Portal behaviour:
 
 Structured fields should map to Twenty objects first, then later to LIXI-informed payloads or ApplyOnline/AFG Flex fields where permitted.
 
+Field naming should be LIXI-first for the core lending concepts. BrokerEngine, AFG, ApplyOnline, and AFG Flex field names should be retained as aliases on mapping profiles so the portal can render familiar broker labels without making those systems the primary data model.
+
 ## Document Collection
 
 The portal can manage document requests and upload handoffs, but the default design should avoid making Twenty the binary document store.

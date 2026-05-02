@@ -4,7 +4,7 @@ This Twenty app defines the LIXI-aware mortgage broking data model for the Broke
 
 It does not include restricted LIXI schemas, sample payloads, lender guidebooks, or production lodgement logic. It uses public LIXI concepts as a reference model and keeps ApplyOnline, AFG Flex, AFG/BrokerEngine, and specialist-provider integration references as configurable CRM records.
 
-## v0.7 Direction
+## v0.8 Direction
 
 BrokerApp treats native Twenty Opportunities as the broker board/deal/opportunity record. Contacts and Companies remain in the sidebar because they are reusable relationship records. Mortgage work happens from the Opportunity through direct fields and related deal tools:
 
@@ -26,10 +26,15 @@ The fact-find model now supports an OpnForm-first form-builder workflow. Form-bu
 
 Fact-find capture is now split into session, section, and field-answer records. The portal or embedded OpnForm experience can autosave every answer into Fact Find Field Answer rows, grouped by Fact Find Section, before the backend normalizes approved answers into Contacts, Applicant Profiles, Loan Requirements, Property Securities, Document Requests, Compliance Acknowledgements, and Serviceability inputs. The Opportunity should display readiness and summaries rather than carrying hundreds of raw fact-find fields.
 
+Broker Settings now includes a Lenders area. Broker Lender records are the lender setup layer for categories, panel status, lodgement channel, LIXI party reference, ApplyOnline/AFG/BrokerEngine codes, product matrix source, calculator links, policy links, document checklist links, and related calculators, policy references, document categories, lender products, and lender contacts.
+
+Field naming should stay LIXI-first where a lending concept is known. BrokerEngine, AFG, ApplyOnline, and AFG Flex names should be treated as aliases or integration mapping fields, not the primary design language.
+
 ## What This App Adds
 
 - Broker workflow fields directly on native Twenty Opportunities.
 - Broker Form Templates under Broker Settings for fact find, consent, document request, and portal form administration.
+- Broker Lenders under Broker Settings for lender categories, calculator references, policy references, document categories, lender contacts, and product matrix relationships.
 - Mortgage applications for structured CAL-style application summary when needed.
 - Links from mortgage applications to native Twenty Contacts and Opportunities.
 - Applicant profiles linked to Contacts and Opportunities.
@@ -43,6 +48,9 @@ Fact-find capture is now split into session, section, and field-answer records. 
 - Serviceability assessments.
 - Product search runs.
 - Lender products.
+- Lender calculators.
+- Lender policy references.
+- Lender document categories.
 - Product shortlist options.
 - Lender contacts.
 - Document requests.
