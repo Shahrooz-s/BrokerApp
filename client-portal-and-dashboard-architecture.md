@@ -16,7 +16,7 @@ Recommended flow:
 
 1. Client interacts with portal chat, dashboard, fact-find sections, document checklist, and task requests.
 2. Portal backend validates and normalizes client inputs.
-3. Backend writes structured Contacts, Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Document Metadata, and status records into Twenty through the API.
+3. Backend writes structured Contacts, Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Fact Find Field Answers, Document Metadata, and status records into Twenty through the API.
 4. Twenty manages broker workflow, boards, origination pipeline, credit proposal work, tasks, statuses, ownership, reporting, and operational notes.
 5. Specialist tools handle ID verification, open banking, product research, serviceability, valuations, LMI, and related functions.
 6. Future lodgement integration injects approved application data into ApplyOnline first, or AFG Flex if ApplyOnline direct injection is not available.
@@ -73,6 +73,14 @@ Recommended form-builder approach:
 - Convert every client answer into structured Twenty records or explicit review tasks. Do not leave decision-grade data only inside the form submission.
 - Use server-side validation and mapping in the portal backend before writing into Twenty.
 - Keep internal notes, credit-risk commentary, and unapproved recommendation notes out of the client form JSON.
+
+Embedding model:
+
+- The portal should embed or render the OpnForm fact find for the borrower.
+- Twenty should show the selected form/template, section completion, mapping state, and review state from related records.
+- A later Twenty page/widget can open the form preview or portal session, but the operational source of truth remains the Twenty Fact Find Session, Fact Find Sections, Fact Find Field Answers, and normalized mortgage records.
+- Every autosave/submission event should update field-answer rows first, then update normalized records only when validation and mapping pass.
+- The Opportunity should keep workflow summaries and readiness indicators rather than storing every fact-find answer directly on the deal record.
 
 Required sections:
 
@@ -159,7 +167,7 @@ Implementation stance:
 | --- | --- | --- | --- |
 | Contact profile | Twenty | Yes | Portal edits sync to Twenty after validation. |
 | Chat messages | Portal/messaging service plus Twenty summary | Yes | Store broker-relevant notes in Twenty. |
-| Fact find answers | Twenty | Yes | Structured data, section status, and audit trail. |
+| Fact find answers | Portal capture, Twenty autosave/review tables, then normalized Twenty objects | Yes | OpnForm renders the form; Twenty stores Fact Find Sections, Field Answers, mapping/review state, and normalized records. |
 | Fact find staff review | Twenty | No by default | Internal review status and notes. |
 | Consent/disclosures | Twenty plus document/e-sign provider | Yes | Store timestamp, version, and evidence reference. |
 | Document files | Document provider/portal storage | Yes | Twenty stores metadata only by default. |

@@ -28,6 +28,28 @@ Recommended operating rules:
 - Avoid storing raw identity documents, open-banking data, or uploaded binary documents in the form builder unless that storage provider is explicitly approved.
 - Keep internal broker notes, policy exception notes, fraud/risk flags, and unapproved credit proposal notes outside client-facing forms.
 
+## Capture, Autosave, and Normalized Data
+
+The best architecture is not to choose between embedded forms and Twenty tables. Use both, with clear ownership.
+
+OpnForm or the future portal form builder should render the borrower-facing fact find. The portal backend should autosave every meaningful form event into Twenty as structured records linked to the active Deal/Opportunity:
+
+- Fact Find Session: one active session for the client-facing fact find.
+- Fact Find Section: one row per section, such as applicant details, income, assets, liabilities, securities, documents, and consent.
+- Fact Find Field Answer: one row per captured answer, with source field ID, source component type, value preview, mapping target, mapping status, review status, and snapshot reference.
+
+Twenty should not become the raw JSON form store. Store only display-safe previews, mapping metadata, status, review notes, and references to immutable snapshots held by the approved portal evidence store. Sensitive raw payloads, uploaded files, ID documents, open-banking payloads, and binary evidence should stay in the authorised provider or portal storage layer.
+
+The autosave pipeline should be:
+
+1. Client enters or changes data in the embedded/portal fact find.
+2. Portal backend validates the field and section context.
+3. Backend upserts Fact Find Section and Fact Find Field Answer records in Twenty.
+4. Backend maps approved answers into normalized Twenty records such as Contacts, Applicant Profiles, Loan Requirements, Properties/Securities, Document Requests, Serviceability inputs, and Compliance Acknowledgements.
+5. Twenty updates the Deal/Opportunity readiness fields, task queues, and board stages only when required gates are satisfied.
+
+The Opportunity should hold summaries and workflow status, not hundreds of raw fact-find fields. Staff should review section and field-answer tables from the Opportunity, then approve or request clarification before data becomes lodgement-ready.
+
 Recommended component use:
 
 | Fact-find need | OpnForm implementation pattern | Twenty destination |
@@ -115,6 +137,39 @@ Recommended fields:
 - Missing information summary.
 - Related document requests.
 - Staff review status.
+
+Relationships:
+
+- Fact Find Session.
+- Fact Find Field Answers.
+
+### Fact Find Field Answer
+
+Tracks each autosaved answer from the portal or OpnForm before and after it is normalized into the broker CRM records.
+
+Recommended fields:
+
+- Answer name.
+- Field key.
+- Source field ID.
+- Source component type.
+- Value preview.
+- Value snapshot reference.
+- Normalized target.
+- Mapping status.
+- Mapping errors.
+- Review status.
+- Clarification required flag.
+- Last autosaved at.
+- Last normalized at.
+- Staff note.
+
+Rules:
+
+- Use value preview for display-safe text only.
+- Keep raw sensitive values in the approved portal evidence store and reference them from Twenty.
+- Treat mapping errors as processor review work, not as silent failures.
+- Do not mark a session ready for product research or lodgement while required answers remain unmapped or unreviewed.
 
 Recommended section statuses:
 

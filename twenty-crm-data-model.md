@@ -255,6 +255,7 @@ Relationships:
 - Co-applicant Contacts.
 - Household.
 - Fact Find Sections.
+- Fact Find Field Answers.
 - Document Metadata.
 - Tasks.
 
@@ -293,7 +294,7 @@ Ownership: `Twenty-owned` configuration record. OpnForm may own the visual form 
 
 ### Fact Find Section
 
-Tracks completion and review of each fact-find section.
+Tracks completion, autosave status, mapping state, and review state of each fact-find section.
 
 Recommended section names:
 
@@ -312,15 +313,54 @@ Recommended section names:
 
 Fields:
 
+- Section name.
+- Section key.
 - Section status: not started, in progress, submitted, needs clarification, under review, complete, waived/not applicable.
 - Required flag.
 - Completion percentage.
 - Assigned owner.
 - Missing information summary.
+- Last autosaved date/time.
+- Client submitted date/time.
+- Mapping status.
+- Mapping errors.
 - Staff review status.
 - Related document requests.
 
-Ownership: `Twenty-owned`.
+Relationships:
+
+- Fact Find Session.
+- Fact Find Field Answers.
+
+Ownership: `Twenty-owned` autosave/review record.
+
+### Fact Find Field Answer
+
+Represents one autosaved answer captured from OpnForm or the portal before and after it is normalized into the main mortgage data model.
+
+Fields:
+
+- Answer name.
+- Field key.
+- Source field ID.
+- Source component type.
+- Value preview.
+- Value snapshot reference.
+- Normalized target.
+- Mapping status: not mapped, autosaved, normalized, review required, mapping errors.
+- Review status: not reviewed, ready for review, approved, needs clarification, waived/not applicable.
+- Mapping errors.
+- Clarification required flag.
+- Last autosaved date/time.
+- Last normalized date/time.
+- Staff note.
+
+Relationships:
+
+- Fact Find Session.
+- Fact Find Section.
+
+Ownership: `Twenty-owned` autosave/review record. Raw sensitive values should stay in the approved portal evidence store; Twenty should store display-safe previews and immutable snapshot references.
 
 ### Household
 

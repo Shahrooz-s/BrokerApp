@@ -4,7 +4,7 @@ This Twenty app defines the LIXI-aware mortgage broking data model for the Broke
 
 It does not include restricted LIXI schemas, sample payloads, lender guidebooks, or production lodgement logic. It uses public LIXI concepts as a reference model and keeps ApplyOnline, AFG Flex, AFG/BrokerEngine, and specialist-provider integration references as configurable CRM records.
 
-## v0.6 Direction
+## v0.7 Direction
 
 BrokerApp treats native Twenty Opportunities as the broker board/deal/opportunity record. Contacts and Companies remain in the sidebar because they are reusable relationship records. Mortgage work happens from the Opportunity through direct fields and related deal tools:
 
@@ -24,6 +24,8 @@ The serviceability model now reflects the supplied ANZ and WBC calculator review
 
 The fact-find model now supports an OpnForm-first form-builder workflow. Form-builder administration belongs in Broker Settings through Broker Form Template records. Fact Find Session records link back to the published template used for the borrower session and track the provider, definition ID, immutable form version, submission reference, portal session reference, mapping status, mapping errors, section status summary, clarification summary, review timestamps, and schema/submission snapshot references. OpnForm should render the borrower-facing fact find; Twenty should hold the normalized application, review, compliance, and workflow records.
 
+Fact-find capture is now split into session, section, and field-answer records. The portal or embedded OpnForm experience can autosave every answer into Fact Find Field Answer rows, grouped by Fact Find Section, before the backend normalizes approved answers into Contacts, Applicant Profiles, Loan Requirements, Property Securities, Document Requests, Compliance Acknowledgements, and Serviceability inputs. The Opportunity should display readiness and summaries rather than carrying hundreds of raw fact-find fields.
+
 ## What This App Adds
 
 - Broker workflow fields directly on native Twenty Opportunities.
@@ -33,6 +35,8 @@ The fact-find model now supports an OpnForm-first form-builder workflow. Form-bu
 - Applicant profiles linked to Contacts and Opportunities.
 - Compliance acknowledgements.
 - Fact find sessions.
+- Fact find sections.
+- Fact find field answers.
 - Loan requirements.
 - Property securities.
 - Credit proposals.
