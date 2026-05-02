@@ -1,4 +1,4 @@
-# BrokerApp v0.2 Deal-Centric Mortgage Configuration
+# BrokerApp Deal-Centric Mortgage Configuration
 
 ## Operating Model
 
@@ -64,18 +64,37 @@ Each Opportunity can link to:
 
 ## Spreadsheet Mapping
 
-`Broker Servicing Calculator.xlsm` maps into serviceability assessments:
+`Broker Servicing Calculator.xlsm`, `WBC-BrokerServiceabilityCalculator (1).xlsm`, and `ANZ-Home-Loan-Calculator (1).xlsm` map into serviceability assessments:
 
 - Lender or calculator source.
+- Calculator workbook reference and version.
 - Assessment type.
+- Assessment date and assumption effective date.
 - Total annual income.
+- Total monthly income.
+- Sensitised income monthly.
+- Tax expense monthly.
 - HEM and declared expenses.
+- HEM basis.
+- Existing commitments monthly.
+- New lending repayment monthly.
+- UMI or lender surplus monthly.
+- Surplus/shortfall monthly.
 - Assessment rate.
+- Assessment rate floor and interest rate buffer.
 - Net available income.
 - NSR.
+- DTI.
+- LVR.
+- LMI required and estimated premium.
 - Max borrowing estimate.
 - Pass/refer/fail outcome.
+- Income shading summary.
+- Policy gate summary.
+- Input and result snapshot references.
 - Policy notes.
+
+The supplied ANZ and WBC workbooks are macro-enabled and rely on hidden/very-hidden worksheets, named ranges, and VBA/UDF logic. BrokerApp should not copy workbook formulas or hidden lender content into Git or Twenty. The practical first release should capture serviceability evidence and structured outputs inside the Opportunity. Automated calculator execution should be handled by lender-specific adapters only where lender terms, licensing, and compliance approval permit it.
 
 `Product-Information-Matrix-23-April-2026.xlsx` maps into lender products and product search runs:
 

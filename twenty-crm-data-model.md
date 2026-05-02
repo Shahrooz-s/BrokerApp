@@ -572,7 +572,36 @@ Tracks provider reference, product shortlist, broker-approved summary, policy fi
 
 ### Serviceability Assessment
 
-Tracks provider/calculator, scenario name, requested amount, assessment status, pass/fail/refer summary, surplus/shortfall where permitted, report reference, and assessment date.
+Tracks lender/serviceability calculator evidence and result snapshots inside the Opportunity. This is a deal tool, not a standalone sidebar destination.
+
+Core fields:
+
+- Provider/calculator and lender.
+- Assessment method: ANZ UMI, WBC serviceability, aggregator SVC, manual review, or other lender calculator.
+- Calculator workbook reference and version.
+- Assessment date and assumption effective date.
+- Scenario name and requested amount.
+- Total annual income and total monthly income.
+- Sensitised income monthly.
+- Tax expense monthly.
+- HEM expense monthly and HEM basis.
+- Declared expense monthly.
+- Existing commitments monthly.
+- New lending repayment monthly.
+- UMI/surplus monthly where the lender exposes it.
+- Surplus/shortfall monthly.
+- NSR where used.
+- Max borrowing estimate.
+- Assessment rate, assessment floor, and interest rate buffer.
+- DTI, LVR, LMI required, and LMI estimate.
+- Assessment status: not started, requested, pass, refer, fail.
+- Income shading summary.
+- Policy gate summary.
+- Input snapshot reference.
+- Result snapshot.
+- Report reference and policy notes.
+
+The supplied ANZ and WBC serviceability calculators are macro-enabled workbooks with hidden/very-hidden calculation sheets, named ranges, and VBA/UDF logic. Do not commit lender workbooks, hidden sheet exports, macro code, or copied formula dumps. The first implementation should capture structured inputs/results and link evidence. Any automated execution should use a versioned lender adapter and a controlled calculation runner only where licensing and lender terms permit it.
 
 ### Valuation
 
