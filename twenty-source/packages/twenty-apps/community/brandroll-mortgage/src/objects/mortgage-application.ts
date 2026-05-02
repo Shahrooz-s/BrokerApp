@@ -261,5 +261,14 @@ export default defineObject({
       label: 'Policy and exception summary',
       icon: 'IconShieldCheck',
     },
+    {
+      universalIdentifier: '6b6d0000-1000-4000-8000-000000000033',
+      type: FieldType.NUMBER,
+      name: 'applicantCount',
+      label: 'Applicant count',
+      description:
+        'Residential application applicant count, supporting one primary applicant plus up to three co-applicants.',
+      icon: 'IconUsers',
+    },
   ],
 });

@@ -8,6 +8,8 @@ Use LIXI concepts as the primary field-design language first. BrokerEngine, AFG,
 
 The fact find is not a single form, note, or PDF. It is a living record that tracks borrower completion, staff review, evidence, missing information, consent, and readiness for credit assessment.
 
+The current BrokerEngine fact-find builder capture is documented in [BrokerEngine Fact Find Template Reference](./brokerengine-fact-find-template-reference.md). The build-ready OpnForm version is documented in [OpnForm Residential Fact Find Specification](./opnform-residential-fact-find-spec.md). Treat both as practical style and field inventories for BrokerApp/OpnForm implementation, not as the primary data model. LIXI-style applicant, income, asset, liability, expense, loan requirement, compliance, and serviceability concepts remain the normalized source design.
+
 ## OpnForm-First Form Builder Strategy
 
 BrokerEngine appears to use a schema-driven form-builder pattern. BrokerApp should use OpnForm as the preferred borrower-facing form renderer because it is already working in the current environment and supports the required pattern: no-code form building, multiple input types, hidden fields, partial/editable submissions, webhooks, API access, and form logic. Form.io remains a useful reference for component patterns, but it is not the target dependency.
@@ -47,7 +49,7 @@ The autosave pipeline should be:
 1. Client enters or changes data in the embedded/portal fact find.
 2. Portal backend validates the field and section context.
 3. Backend upserts Fact Find Section and Fact Find Field Answer records in Twenty.
-4. Backend maps approved answers into normalized Twenty records such as Contacts, Applicant Profiles, Loan Requirements, Properties/Securities, Document Requests, Serviceability inputs, and Compliance Acknowledgements.
+4. Backend maps approved answers into normalized Twenty records such as Contacts, Applicant Profiles, Loan Requirements, Properties/Securities, Document Requests, Serviceability inputs, Product Search Run filters, and Compliance Acknowledgements.
 5. Twenty updates the Deal/Opportunity readiness fields, task queues, and board stages only when required gates are satisfied.
 
 The Opportunity should hold summaries and workflow status, not hundreds of raw fact-find fields. Staff should review section and field-answer tables from the Opportunity, then approve or request clarification before data becomes lodgement-ready.
@@ -70,7 +72,7 @@ Recommended component use:
 
 Conditional logic should drive scenario questions:
 
-- Show co-applicant sections only when another applicant is involved.
+- Show co-applicant sections only when another applicant is involved. Residential should support one primary applicant plus up to three co-applicants using the same applicant section template and applicant index metadata.
 - Show guarantor questions only when a guarantor is selected.
 - Show self-employed/business fields for self-employed applicants.
 - Show rental income and investment expense questions for investment properties.
@@ -78,6 +80,7 @@ Conditional logic should drive scenario questions:
 - Show refinance/discharge fields for refinance scenarios.
 - Show credit-card closure/refinance questions when cards or loans are being refinanced.
 - Show visa/residency/FIRB prompts only when required by applicant status and policy.
+- Feed desired loan features into product-search filters and product-shortlist scoring, including fixed/variable/split preference, repayment preference, offset, redraw, package, no-fee, portability, line of credit, branch access, additional repayment, and lender preference/exclusion fields.
 
 ## Core Objects
 
@@ -209,7 +212,7 @@ Maps to:
 
 Capture:
 
-- Additional applicant Contacts.
+- Additional applicant Contacts, up to three residential co-applicants by default.
 - Guarantor Contacts.
 - Applicant role: borrower, co-borrower, guarantor, non-borrowing spouse/contact.
 - Relationship to primary applicant.
@@ -218,6 +221,7 @@ Capture:
 Rule:
 
 - Do not duplicate the same person as multiple records. Use one Contact with role relationships.
+- Use applicant index and role labels such as Primary, Co-Applicant 1, Co-Applicant 2, and Co-Applicant 3 instead of separate objects for each applicant slot.
 
 ### 3. Household and Dependants
 

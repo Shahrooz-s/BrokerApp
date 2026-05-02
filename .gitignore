@@ -8,6 +8,16 @@ tmp/
 *.log
 patches-*/
 
+# Generated Node/Yarn/Twenty local state
+**/node_modules/
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/releases
+!**/.yarn/sdks
+!**/.yarn/versions
+**/.twenty/output/
+
 # OS/editor files
 .DS_Store
 .idea/

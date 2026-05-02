@@ -235,5 +235,50 @@ export default defineObject({
       label: 'Applicant tags',
       icon: 'IconTags',
     },
+    {
+      universalIdentifier: '6b6d0000-1100-4000-8000-000000000028',
+      type: FieldType.NUMBER,
+      name: 'applicantIndex',
+      label: 'Applicant index',
+      description:
+        'Residential applicant sequence: 1 primary, 2 co-applicant 1, 3 co-applicant 2, 4 co-applicant 3.',
+      icon: 'IconListNumbers',
+    },
+    {
+      universalIdentifier: '6b6d0000-1100-4000-8000-000000000029',
+      type: FieldType.TEXT,
+      name: 'roleLabel',
+      label: 'Role label',
+      description:
+        'Display label such as Primary, Co-Applicant 1, Co-Applicant 2, or Co-Applicant 3.',
+      icon: 'IconUsers',
+    },
+    {
+      universalIdentifier: '6b6d0000-1100-4000-8000-000000000030',
+      type: FieldType.SELECT,
+      name: 'applicantType',
+      label: 'Applicant type',
+      icon: 'IconUserSquare',
+      options: [
+        { value: 'PERSON', label: 'Person', position: 0, color: 'green' },
+        { value: 'COMPANY', label: 'Company', position: 1, color: 'blue' },
+        { value: 'TRUST', label: 'Trust', position: 2, color: 'purple' },
+        { value: 'OTHER_ENTITY', label: 'Other entity', position: 3, color: 'gray' },
+      ],
+    },
+    {
+      universalIdentifier: '6b6d0000-1100-4000-8000-000000000031',
+      type: FieldType.TEXT,
+      name: 'relationshipToPrimaryApplicant',
+      label: 'Relationship to primary applicant',
+      icon: 'IconUsersGroup',
+    },
+    {
+      universalIdentifier: '6b6d0000-1100-4000-8000-000000000032',
+      type: FieldType.BOOLEAN,
+      name: 'sameAsPrimaryApplicantAddress',
+      label: 'Same as primary applicant address',
+      icon: 'IconHomeCheck',
+    },
   ],
 });

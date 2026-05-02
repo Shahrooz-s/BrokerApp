@@ -262,6 +262,7 @@ The product filter tool should not run before serviceability. Product search sho
 - repayment preferences,
 - rate type preference,
 - offset/redraw requirements,
+- desired loan features from the fact find, including additional repayments, package/no-fee preference, loan variation, portability, line of credit, interest-in-advance/capitalisation, branch access, and electronic banking,
 - construction/refinance/purchase flags,
 - serviceability outcome,
 - DTI/LVR/LMI policy flags,

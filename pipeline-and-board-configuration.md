@@ -281,6 +281,49 @@ Automation candidates:
 - Create blocker task for missing required fields.
 - Record chosen lodgement target: ApplyOnline, AFG Flex, AFG, BrokerEngine, or manual.
 
+### 6A. BrokerEngine-Style Active Deal Board
+
+Primary object: Deals/Opportunities.
+
+Use this board when the team wants a single active-file view similar to BrokerEngine's Deal board. It should sit above the more specialized boards as the broker/processor daily operating board, while related objects still hold fact find, documents, serviceability, product search, credit proposal, conditions, valuation, LMI, and settlement details.
+
+Observed BrokerEngine deal stages:
+
+1. Outstanding supporting documents.
+2. Prepare for submission.
+3. App docs with client.
+4. Signed app docs returned.
+5. Application lodged.
+6. AIP issued.
+7. AIP > full conversion.
+8. Conditional/MIRs.
+9. Conditions/MIRs with client.
+10. Conditions/MIRs with lender.
+11. Formal approval.
+12. Mortgage docs issued.
+13. Mortgage docs returned.
+14. Ready to settle.
+15. Settlement booked.
+16. Settlement.
+17. Lost/declined.
+
+Required creation fields:
+
+- Deal name.
+- Initial stage.
+- Applicants.
+- Primary applicant.
+- Broker.
+- Lender, including an unknown/other path.
+- Loan processor.
+
+BrokerApp implementation:
+
+- The Opportunity remains the working file and board card.
+- The active deal board should show compact card metadata: broker, processor, lender, finance date, settlement date, stage due date, loan amount, and blocker flags.
+- Specialized boards should still exist for Fact Find, Documents, Credit Proposal, Lodgement, Conditions, Valuation/LMI, Settlement, and Integration Exceptions so each team can work from a focused queue.
+- Stage updates from ApplyOnline, AFG Flex, AFG, BrokerEngine, or manual entry should append an Integration Event and then update the normalized Opportunity stage only after mapping rules approve the status.
+
 ### 7. Lodged Application Status Board
 
 Primary object: Mortgage Application or Status Event summary.

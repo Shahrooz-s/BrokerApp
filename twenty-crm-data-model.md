@@ -221,6 +221,36 @@ Relationships:
 
 Ownership: `Twenty-owned` before lodgement; lodgement and raw status may become `external-owned` after submission through ApplyOnline, AFG Flex, AFG, or BrokerEngine.
 
+### Applicant Profile
+
+Represents a Contact's role inside a Deal, Fact Find Session, and Mortgage Application. Residential files should support one primary applicant plus up to three co-applicants without creating separate hard-coded objects per applicant slot.
+
+Fields:
+
+- Applicant name.
+- Applicant index: 1 primary, 2 co-applicant 1, 3 co-applicant 2, 4 co-applicant 3.
+- Applicant role: primary, co-applicant, guarantor, borrowing entity.
+- Role label: Primary, Co-Applicant 1, Co-Applicant 2, Co-Applicant 3.
+- Applicant type: person, company, trust, other entity.
+- Relationship to primary applicant.
+- Same-as-primary-address flag.
+- Contact details copied from the linked Contact where useful for board/list display.
+- Residency/citizenship status.
+- ID verification status.
+- Open banking consent status.
+- Employment, income, expense, asset, liability, and requirements summaries.
+
+Relationships:
+
+- Contact.
+- Deal.
+- Mortgage Application.
+- Fact Find Session.
+- Compliance Acknowledgements.
+- Document Metadata.
+
+Ownership: `Twenty-owned`, with borrower-entered values arriving from the portal and normalized back to the linked Contact where appropriate.
+
 ### Fact Find Session
 
 Represents a structured fact find linked to the Deal, Mortgage Application, Contacts, and Household. This is a first-class workflow object, not just a form response.
@@ -235,6 +265,9 @@ Fields:
 - Last client activity date/time.
 - Last staff activity date/time.
 - Missing information count.
+- Applicant count.
+- Maximum applicant count for the selected template version.
+- Applicant role summary.
 - Form provider.
 - Form definition ID.
 - Form definition version.
@@ -567,8 +600,14 @@ Fields:
 - Interest type.
 - Fixed/variable preference.
 - Offset/redraw requirements.
+- Desired loan features from the fact find.
+- Other requirements.
+- Preferred lenders.
+- Lenders to avoid.
 - Product preference.
 - Loan split group.
+- Preferred loan splits.
+- Branch, package, no-fee, portability, additional repayment, electronic banking, line-of-credit, interest-in-advance, and interest-capitalisation requirements where relevant.
 
 Ownership: `Twenty-owned` before submission; `external-owned` after lodgement if external system is authoritative.
 
@@ -653,10 +692,45 @@ Fields:
 - Repayment type.
 - Owner-occupied/investment availability.
 - Offset/redraw features.
+- Additional repayment, package, no-fee, loan variation, portability, line-of-credit, interest-in-advance/capitalisation, branch access, and electronic banking features where available from the product source.
 - External product ID.
 - Active/inactive status.
 
 Ownership: `reference-only` if sourced from AFG/BrokerEngine, ApplyOnline, AFG Flex, product research providers, or lender feeds; `Twenty-owned` for manually maintained shortlist/reference products.
+
+### Product Search Run
+
+Represents a deal-level lender/product filtering and comparison run. This is a tool record inside the Opportunity, not a main sidebar workflow.
+
+Fields:
+
+- Search status.
+- Selected product matrix sheets.
+- Target loan amount and LVR.
+- Purpose/occupancy filter.
+- Rate and repayment filter.
+- Desired loan feature selections copied from the fact find.
+- Required feature booleans for fixed, variable, split, principal-and-interest, interest-only, offset, redraw, additional repayments, package, no monthly/annual fees, loan variations, portability, line of credit, interest capitalisation, interest in advance, branch access, and electronic banking.
+- Included lenders.
+- Excluded lenders.
+- Preferred loan splits.
+- Serviceability gate status.
+- Policy research prompt.
+- Products considered.
+- Products shortlisted.
+- Result summary.
+- Feature override reason.
+
+Relationships:
+
+- Deal/Opportunity.
+- Loan Requirement.
+- Serviceability Assessment.
+- Lender Products.
+- Product Shortlist Options.
+- Credit Proposal.
+
+Ownership: `Twenty-owned`; imported product matrix and specialist research data remain `reference-only` inputs.
 
 ## Operational Objects
 

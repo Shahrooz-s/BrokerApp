@@ -77,6 +77,58 @@ Recommended Twenty implementation:
 - Show card metadata for owner, finance due date, settlement target, stage due date, broker brand, lead source, referral source, and blocker count.
 - Keep the board compact enough for broker/admin use; avoid turning cards into full application summaries.
 
+## Observed Deal Board Pattern
+
+The live BrokerEngine Deal board uses a separate post-lead workflow for active loan origination. This confirms that Brandroll should not treat every mortgage file as one long lead board. Lead conversion and deal/application management need different boards or saved views.
+
+Observed deal board summary:
+
+- Top action for `New`.
+- Board-level count and aggregate loan amount.
+- Search and display controls.
+- Board/list switch.
+- Stage-numbered kanban columns.
+- Empty stages collapsed into narrow vertical headers.
+- Active stages expanded with cards showing owner, finance date, settlement date, and stage due date.
+
+Observed Deal board stages:
+
+1. Outstanding Supporting Documents.
+2. Prepare for Submission.
+3. App Docs With Client.
+4. Signed App Docs Returned.
+5. Application Lodged.
+6. AIP Issued.
+7. AIP > Full Conversion.
+8. Conditional/MIRs.
+9. Conditions/MIRs With Client.
+10. Conditions/MIRs With Lender.
+11. Formal Approval.
+12. Mortgage Docs Issued.
+13. Mortgage Docs Returned.
+14. Ready To Settle.
+15. Settlement Booked.
+16. Settlement.
+17. Lost/Declined.
+
+The New Deal modal also confirms the minimum creation fields that need a clean BrokerApp equivalent:
+
+- Deal name.
+- Initial stage.
+- Applicants.
+- Primary applicant.
+- Broker.
+- Lender, with an `Other/unknown` option.
+- Loan processor.
+
+Recommended Twenty implementation:
+
+- Use native Opportunities as the staff-facing Deal/Opportunity record.
+- Keep the lead intake board separate from the active deal board.
+- Add related tools inside the Opportunity for fact find, documents, serviceability, product search, credit proposal, lodgement readiness, conditions, mortgage docs, settlement, and integration events.
+- Keep Contacts/Companies in the sidebar as reusable records, but make the Opportunity the working file.
+- Treat `Application Lodged`, `AIP Issued`, `Conditional/MIRs`, `Formal Approval`, and settlement stages as normalized internal stages that can be fed by ApplyOnline, AFG Flex, AFG, BrokerEngine, or manual updates.
+
 ## List View And Kanban View Behavior
 
 The screenshots show that BrokerEngine supports both list/table view and board/kanban view for the same lead/deal data.
@@ -162,6 +214,11 @@ The supplied field list and column-settings screenshot show a broad deal/lead fi
 - Co-Applicant 1 Home Address.
 - Co-Applicant 1 Postal Address.
 - Co-Applicant 1 Tags.
+
+BrokerApp residential extension:
+
+- Repeat the same list-view aliases for Co-Applicant 2 and Co-Applicant 3 when a file has three or four applicants.
+- Internally use Applicant Profile records with applicant index `3` and `4`; do not create separate duplicated CRM objects for each co-applicant slot.
 
 ### Role Fields
 

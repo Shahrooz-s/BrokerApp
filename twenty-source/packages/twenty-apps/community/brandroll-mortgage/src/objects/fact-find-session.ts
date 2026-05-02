@@ -212,5 +212,32 @@ export default defineObject({
       description:
         'Reference to the original client submission snapshot stored in the approved portal evidence store.',
     },
+    {
+      universalIdentifier: '6b6d0000-1d00-4000-8000-000000000025',
+      type: FieldType.NUMBER,
+      name: 'applicantCount',
+      label: 'Applicant count',
+      description:
+        'Residential fact-find applicant count. BrokerApp supports one primary applicant plus up to three co-applicants.',
+      icon: 'IconUsers',
+    },
+    {
+      universalIdentifier: '6b6d0000-1d00-4000-8000-000000000026',
+      type: FieldType.NUMBER,
+      name: 'maxApplicantCount',
+      label: 'Max applicant count',
+      description:
+        'Maximum applicant slots available for the selected template version. Residential default is 4.',
+      icon: 'IconUsersGroup',
+    },
+    {
+      universalIdentifier: '6b6d0000-1d00-4000-8000-000000000027',
+      type: FieldType.TEXT,
+      name: 'applicantRoleSummary',
+      label: 'Applicant role summary',
+      description:
+        'Display-safe summary such as Primary, Co-Applicant 1, Co-Applicant 2, Co-Applicant 3.',
+      icon: 'IconListDetails',
+    },
   ],
 });

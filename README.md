@@ -24,10 +24,12 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - Twenty will be the internal application for loan origination management, credit proposal work, compliance tasks, application packaging, status tracking, settlement, and post-settlement review.
 - A custom client portal will provide chat, dashboard, guided fact find, document requests, status updates, consent capture, and specialist-tool handoffs.
 - The fact find should be modelled as a structured, section-based process similar in operational feel to BrokerEngine: applicants, household, objectives, employment, income, expenses, assets, liabilities, property/security, loan requirements, consent, and documents.
+- Residential fact finds should support one primary applicant plus up to three co-applicants through conditional logic and applicant index metadata.
 - The borrower fact find should use OpnForm as the preferred portal form renderer, using a schema-driven form-builder pattern with conditional sections, validation, hidden workflow metadata, partial/editable submissions, webhooks, and immutable form versions. Twenty remains the normalized source of truth after portal submission mapping.
 - Form-builder administration belongs in Broker Settings. Deals should launch or consume published templates, not become the place where staff design or publish form templates.
 - Fact-find form events should autosave into Twenty Fact Find Sessions, Fact Find Sections, and Fact Find Field Answers before being normalized into Contacts, Applicant Profiles, Loan Requirements, Properties/Securities, Document Requests, Compliance Acknowledgements, Serviceability inputs, and later lodgement payloads.
 - Field naming and mapping should be LIXI-first, then hold BrokerEngine, AFG, ApplyOnline, and AFG Flex aliases or external codes where those systems need different names.
+- Desired loan features captured in the residential fact find should feed Loan Requirement records, Product Search Run filters, lender/product shortlist scoring, and credit proposal rationale.
 - The workspace needs multiple board-style work queues, not a single linear pipeline.
 - Specialist external tools will be used for ID verification, open banking, product research, serviceability, valuation, LMI, credit checks, title/property searches, and other mortgage workflow functions where appropriate.
 - Zapier is not preferred for the target architecture. BrokerEngine Zapier/ZAP documentation can still inform field names, board concepts, event concepts, status handling, and temporary workaround design while direct API access is confirmed.
@@ -45,7 +47,10 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - [Imported Twenty Application Source](./twenty-source/README.md)
 - [Application Configuration Guide](./application-configuration-guide.md)
 - [BrokerEngine Board and Bulk Edit Reference](./brokerengine-board-and-bulk-edit-reference.md)
+- [BrokerEngine Sidebar and Workflow Template Reference](./brokerengine-sidebar-workflow-template-reference.md)
 - [BrokerEngine Contact Import Mapping](./brokerengine-contact-import-mapping.md)
+- [BrokerEngine Fact Find Template Reference](./brokerengine-fact-find-template-reference.md)
+- [OpnForm Residential Fact Find Specification](./opnform-residential-fact-find-spec.md)
 - [Pipeline and Board Configuration](./pipeline-and-board-configuration.md)
 - [Fact Find Configuration](./fact-find-configuration.md)
 - [Twenty CRM Data Model](./twenty-crm-data-model.md)
@@ -82,9 +87,12 @@ The first usable internal application should include:
 - Mortgage Applications: the structured CAL-style application package tied to a deal when required.
 - Fact Find Sessions: section-based applicant and household capture with completion scoring and review status.
 - Fact Find Sections and Field Answers: autosave/review tables for embedded OpnForm or portal fact-find responses, linked back to the Deal/Opportunity.
-- Product Search Runs: AFG product matrix filtering, policy research notes, and selected sheet flags.
+- Product Search Runs: AFG product matrix filtering, desired loan feature filters, policy research notes, selected sheet flags, and broker override rationale.
 - Product Shortlist Options: compared lender/product candidates with serviceability, policy, fit, and recommendation reasons.
 - Broker Form Templates: Broker Settings records for OpnForm templates, default template selection, versions, webhook status, and mapping references.
+- Broker Templates: reusable email, SMS, task, checklist, report, workflow, and smart-document template records with merge-variable mapping and private body import controls.
+- Broker Board and Stage Templates: BrokerEngine-style lead/deal boards, stage due thresholds, warning thresholds, and workflow gate metadata.
+- Deal Workspace Tools: the deal sidebar, right-rail drawers, and Broker Settings structure captured as configurable records.
 - Broker Lenders: Broker Settings lender records for LIXI/AFG/ApplyOnline/BrokerEngine codes, lender categories, panel status, calculator links, policy references, document categories, and product/contact relationships.
 - Credit Proposals: internal recommendation, product selection, policy exception, risk, mitigant, and approval work.
 - Document Metadata: checklist, request, received, verified, expired, waived, and external-storage references.

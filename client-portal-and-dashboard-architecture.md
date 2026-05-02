@@ -67,6 +67,7 @@ Recommended form-builder approach:
 
 - Use OpnForm fields for the portal fact find: text/long-text fields for simple answers and objectives, email/phone/date/number/select/multi-select fields for structured borrower data, hidden fields for workflow metadata, and multi-page or linked section forms for the larger fact-find flow.
 - Use form logic for co-applicant, guarantor, self-employed, refinance, investment, construction, residency, open-banking, and document scenarios.
+- Residential applicant logic should allow one primary applicant plus up to three co-applicants. The portal should show only the applicant sections required by the selected applicant count and should save each person into a separate Contact/Applicant Profile.
 - Treat OpnForm form versions as immutable after a client starts or submits a fact find.
 - Store only references in Twenty for the form provider, form definition ID, form version, form submission reference, portal session reference, schema snapshot, and submission snapshot.
 - Prefer OpnForm webhooks for submission and partial-submission events, with API polling as a reconciliation fallback.

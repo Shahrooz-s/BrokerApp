@@ -14,7 +14,7 @@ This version is LIXI-aware, not a production LIXI lodgement implementation. Fiel
 4. Open a portal fact-find session once compliance acknowledgements are ready.
 5. Collect applicant identity, open banking, income, expenses, assets, liabilities, securities, documents, and objectives.
 6. Run serviceability before product filtering.
-7. Run product search against selected AFG product matrix sheets and policy notes.
+7. Run product search against selected AFG product matrix sheets, desired loan features, lender preferences/exclusions, and policy notes.
 8. Shortlist lender/product options with serviceability and policy-fit reasons.
 9. Generate the credit proposal with the comparison set, selected lender/product, rejected options, BID rationale, and policy checks.
 10. Lodge through ApplyOnline or AFG Flex once API access and production readiness are confirmed.
@@ -62,6 +62,24 @@ Each Opportunity can link to:
 - Lender contacts.
 - Integration events.
 
+## BrokerEngine-Inspired Deal Dashboard Pattern
+
+The observed BrokerEngine test application confirms the right architecture for BrokerApp: the Deal/Opportunity is the working file, and mortgage tools sit inside the deal dashboard. Contacts, Companies, Tasks, and settings can remain in the main sidebar, but loan origination tools should be launched from the Opportunity.
+
+BrokerApp should reproduce these operating surfaces inside the Twenty Opportunity template:
+
+- Top compliance alert for Credit Guide and Privacy Consent readiness, with clear action buttons.
+- Deal header with name, stage selector, stage due date, sync/status actions, tags, owner/team, and quick links.
+- Left in-deal navigation grouped by Overview, Fact Find, Strategy, and Lodgement.
+- Overview cards for Deal, Recent Activity, Client Portal, Applicants, Credit Guide and Privacy Consent, Team, Lender, Related Parties, Funding Position, Security, Valuation, Selected Products, Broker Details, and application tasks.
+- Fact Find navigation for Goals, Applicants, Dependants, Assets, Other Income, Liabilities, Living Expenses, and Financial Security.
+- Right-side activity/tools rail for notes, checklists, tasks, emails, texts, key dates, reports, and one-click workflows.
+- Applicants card showing Primary plus Co-Applicant 1, Co-Applicant 2, and Co-Applicant 3 where present.
+- Credit Guide and Privacy Consent card showing per-applicant status and upload/evidence actions.
+- Product and funding cards embedded inside the deal, not separate top-level sidebar modules.
+
+Implementation rule: do not copy BrokerEngine raw JSON or proprietary schema into the repository. Use the licensed UI as workflow reference, then implement native BrokerApp field keys, LIXI-first mapping, and BrokerEngine/AFG aliases where they are needed for integration.
+
 ## Spreadsheet Mapping
 
 `Broker Servicing Calculator.xlsm`, `WBC-BrokerServiceabilityCalculator (1).xlsm`, and `ANZ-Home-Loan-Calculator (1).xlsm` map into serviceability assessments:
@@ -108,6 +126,7 @@ The supplied ANZ and WBC workbooks are macro-enabled and rely on hidden/very-hid
 - Variable/fixed/assessment rates.
 - Fees.
 - Offset, redraw, construction, LMI, and rate-lock availability.
+- Desired feature matching for electronic banking, additional repayments, package/no-fee products, loan variations, portability, line of credit, interest-in-advance/capitalisation, and branch access where the matrix/provider exposes them.
 
 `Residential-Lender-Contacts-23-April-2026.xlsx` maps into lender contacts:
 
