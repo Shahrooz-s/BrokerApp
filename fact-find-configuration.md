@@ -6,6 +6,50 @@ The fact find should be configured as a structured, section-based mortgage workf
 
 The fact find is not a single form, note, or PDF. It is a living record that tracks borrower completion, staff review, evidence, missing information, consent, and readiness for credit assessment.
 
+## Form Builder Strategy
+
+BrokerEngine appears to use a form-builder pattern similar to Form.io. BrokerApp should adopt the same useful pattern for the borrower-facing portal: schema-driven forms, conditional sections, validation, repeatable field groups, and hidden workflow metadata.
+
+Form.io-style JSON forms should be used as the client rendering and capture layer, not as the final system of record. Twenty remains the normalized operational record for Contacts, Opportunities/Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Document Metadata, Credit Proposals, Serviceability Assessments, Product Search Runs, and integration events.
+
+Recommended operating rules:
+
+- Treat each form definition as versioned and immutable once issued to a client.
+- Store the form provider, form definition ID, form version, submission reference, portal session reference, mapping status, mapping errors, schema snapshot reference, and submission snapshot reference on the Fact Find Session.
+- Use hidden fields for Opportunity ID, Mortgage Application ID, Contact IDs, Household ID, Fact Find Session ID, schema version, and portal session reference.
+- Route every submission through the portal backend before writing to Twenty.
+- Normalize applicant, household, income, expense, asset, liability, property/security, consent, and document metadata into Twenty records.
+- Keep original submission snapshots in the approved portal evidence store, with references in Twenty for audit and reconciliation.
+- Avoid storing raw identity documents, open-banking data, or uploaded binary documents in the form builder unless that storage provider is explicitly approved.
+- Keep internal broker notes, policy exception notes, fraud/risk flags, and unapproved credit proposal notes outside client-facing forms.
+
+Recommended component use:
+
+| Fact-find need | Form.io-style component pattern | Twenty destination |
+| --- | --- | --- |
+| Names, reference IDs, short answers | Text field with masks/validation where useful | Contact, Fact Find Session, Mortgage Application |
+| Long goals/objectives and explanations | Text area | Loan Requirement, Credit Proposal notes |
+| Phone/email | Phone and email components | Contact |
+| DOB, employment start, milestone dates | Date, day, or date-time component depending on precision | Contact, Employment, Deal dates |
+| Yes/no flags | Checkbox | Scenario flags, consent gates, workflow gates |
+| Enumerations | Select, select boxes, or radio | Status, role, purpose, residency, employment type |
+| Money, limits, balances, percentages | Number or currency component | Income, Expense, Asset, Liability, Loan Requirement |
+| Repeatable rows | Data grid or edit grid | Employment, Income, Expenses, Assets, Liabilities, Securities |
+| Sectioned form flow | Panel, tabs, wizard, or page-like sections | Fact Find Section status |
+| Document requests | Checklist/selects plus file handoff where approved | Document Metadata, external storage reference |
+| System metadata | Hidden components | Integration/audit references |
+
+Conditional logic should drive scenario questions:
+
+- Show co-applicant sections only when another applicant is involved.
+- Show guarantor questions only when a guarantor is selected.
+- Show self-employed/business fields for self-employed applicants.
+- Show rental income and investment expense questions for investment properties.
+- Show construction fields for construction loans.
+- Show refinance/discharge fields for refinance scenarios.
+- Show credit-card closure/refinance questions when cards or loans are being refinanced.
+- Show visa/residency/FIRB prompts only when required by applicant status and policy.
+
 ## Core Objects
 
 ### Fact Find Session
@@ -28,7 +72,15 @@ Recommended fields:
 - Last client activity at.
 - Last staff activity at.
 - Missing information count.
+- Form provider.
+- Form definition ID.
+- Form definition version.
+- Form submission reference.
 - Portal session/reference ID.
+- Form mapping status.
+- Form mapping errors.
+- Schema snapshot reference.
+- Submission snapshot reference.
 - Version or revision number.
 
 Recommended statuses:

@@ -59,6 +59,18 @@ Avoid exposing internal lender notes, credit exceptions, fraud/risk flags, raw e
 
 The portal fact find should be section-based and similar in operating pattern to BrokerEngine: the client sees clear sections, can save progress, and staff can review completion by section in Twenty.
 
+BrokerEngine's form builder pattern appears close to Form.io's schema-driven forms. BrokerApp should use the same architectural idea for the portal: a versioned JSON form definition renders the client experience, while the portal backend validates and maps the submission into normalized Twenty records.
+
+Recommended form-builder approach:
+
+- Use Form.io-style components for the portal fact find: basic fields for simple answers, advanced fields for email/phone/address/date/currency/signature-like inputs, data grid/edit grid components for repeatable applicant employment/income/asset/liability/security rows, layout components for panels/tabs/wizard-style sections, and hidden components for workflow metadata.
+- Use conditional logic for co-applicant, guarantor, self-employed, refinance, investment, construction, residency, open-banking, and document scenarios.
+- Treat form schema versions as immutable after a client starts or submits a fact find.
+- Store only references in Twenty for the form provider, form definition ID, form version, form submission reference, portal session reference, schema snapshot, and submission snapshot.
+- Convert every client answer into structured Twenty records or explicit review tasks. Do not leave decision-grade data only inside the form submission.
+- Use server-side validation and mapping in the portal backend before writing into Twenty.
+- Keep internal notes, credit-risk commentary, and unapproved recommendation notes out of the client form JSON.
+
 Required sections:
 
 1. Applicant details.
@@ -82,6 +94,7 @@ Portal behaviour:
 - Allow staff to request clarification on a section.
 - Write completion percentage and section status back to Twenty.
 - Create or update Document Metadata when a section requires evidence.
+- Record mapping errors and unclear answers as Twenty review tasks instead of silently accepting bad data.
 - Keep internal staff notes separate from client-facing messages.
 
 Structured fields should map to Twenty objects first, then later to LIXI-informed payloads or ApplyOnline/AFG Flex fields where permitted.

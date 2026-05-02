@@ -24,6 +24,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - Twenty will be the internal application for loan origination management, credit proposal work, compliance tasks, application packaging, status tracking, settlement, and post-settlement review.
 - A custom client portal will provide chat, dashboard, guided fact find, document requests, status updates, consent capture, and specialist-tool handoffs.
 - The fact find should be modelled as a structured, section-based process similar in operational feel to BrokerEngine: applicants, household, objectives, employment, income, expenses, assets, liabilities, property/security, loan requirements, consent, and documents.
+- The borrower fact find should use a Form.io-style schema-driven form-builder pattern: conditional sections, validation, repeatable grids, hidden workflow metadata, and immutable form versions. Twenty remains the normalized source of truth after portal submission mapping.
 - The workspace needs multiple board-style work queues, not a single linear pipeline.
 - Specialist external tools will be used for ID verification, open banking, product research, serviceability, valuation, LMI, credit checks, title/property searches, and other mortgage workflow functions where appropriate.
 - Zapier is not preferred for the target architecture. BrokerEngine Zapier/ZAP documentation can still inform field names, board concepts, event concepts, status handling, and temporary workaround design while direct API access is confirmed.
@@ -173,6 +174,11 @@ Public source material used to frame this pack:
 - Twenty key features: https://docs.twenty.com/getting-started/key-features
 - BrokerEngine public product information: https://brokerengine.com.au/
 - BrokerEngine feature information: https://brokerengine.com.au/features/
+- Form.io form components: https://help.form.io/userguide/forms/form-building/form-components
+- Form.io basic components: https://help.form.io/userguide/forms/form-building/form-components/basic-components
+- Form.io component settings: https://help.form.io/userguide/forms/form-building/form-components/component-settings
+- Form.io data components: https://help.form.io/userguide/forms/form-building/form-components/data-components
+- Form.io layout components: https://help.form.io/userguide/forms/form-building/form-components/layout-components
 - BrokerEngine contact workbook supplied by Brandroll: `contact.xlsx` header structure only.
 - ApplyOnline / NextGen digital lodgement: https://nextgen.net/digital-lodgement/
 - ApplyOnline platform overview: https://nextgen.net/applyonline/
