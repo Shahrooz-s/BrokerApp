@@ -18,6 +18,20 @@ BrokerApp treats native Twenty Opportunities as the broker board/deal/opportunit
 - Credit proposals explaining the selected product, comparison set, BID rationale, and policy fit.
 - Valuation, LMI, conditions, lender contacts, and integration events.
 
+## v0.15 BrokerEngine Feature Parity Register
+
+BrokerApp now includes an internal BrokerEngine feature parity register under Broker Settings. It is a seeded operational checklist, not a public copy of BrokerEngine content. The register maps every major feature area discussed for the pilot:
+
+- Boards, list/Kanban behavior, column settings, bulk edit, stage collapse, and board stages.
+- DealDash, sidebar sections, right rail tools, key dates, reports, and 1-click workflows.
+- Residential fact find, applicant expansion, OpnForm/native form direction, desired loan features, and autosave.
+- Strategy tools, serviceability, product comparison, lender policy, funding position, and credit proposal.
+- Lodgement preparation for ApplyOnline and AFG Flex.
+- Broker settings for lenders, products, calculators, policies, document categories, workflow templates, task/email/SMS/report templates, checklists, integrations, and white-label controls.
+- Client portal, passkeys/email magic links, document stack, open banking, bank statements, AML/KYC/CDD, evidence packs, and compliance separation.
+
+Each record tracks whether the feature is already seeded/modelled, requires a private content import, needs provider API credentials, needs workspace login/configuration, needs a custom UI/front component, or belongs to a later phase. Private BrokerEngine template bodies, screenshots, checklist wording, live account captures, customer data, lender calculators, and licensed LIXI assets remain excluded from GitHub.
+
 ## v0.14 BrokerApp Pilot Layer
 
 BrokerApp now includes the pilot layer needed before live workflow testing:
@@ -73,6 +87,7 @@ Field naming should stay LIXI-first where a lending concept is known. BrokerEngi
 - Broker Settings Areas under Broker Settings for the overall settings map.
 - Broker Board Templates and Broker Stage Templates under Broker Settings for all captured boards.
 - Deal Workspace Tools under Broker Settings for the deal sidebar and right rail inventory.
+- BrokerEngine Feature Parity under Broker Settings for the pilot coverage register.
 - Broker Lenders under Broker Settings for lender categories, calculator references, policy references, document categories, lender contacts, and product matrix relationships.
 - Mortgage applications for structured CAL-style application summary when needed.
 - Links from mortgage applications to native Twenty Contacts and Opportunities.
@@ -140,6 +155,6 @@ yarn twenty remote switch brokerapp-v1
 yarn twenty exec --postInstall
 ```
 
-Use `deploy`, `install`, and then `exec --postInstall` for the live Docker server. The post-install step seeds BrokerApp board, stage, template, deal workspace, and settings-map records. It is idempotent by source reference/name and will skip records it already seeded. The `exec` command uses the default remote, so switch to `brokerapp-v1` before running it. `dev` mode is intended for development-mode Twenty servers.
+Use `deploy`, `install`, and then `exec --postInstall` for the live Docker server. The post-install step seeds BrokerApp board, stage, template, deal workspace, settings-map, feature-parity, checklist, integration-provider, and white-label records. It is idempotent by source reference/name and will skip records it already seeded. The `exec` command uses the default remote, so switch to `brokerapp-v1` before running it. `dev` mode is intended for development-mode Twenty servers.
 
 Use a development/staging workspace first. Do not deploy against production borrower data until roles, permissions, storage, backups, and privacy controls are approved.

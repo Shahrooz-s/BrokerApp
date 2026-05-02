@@ -97,6 +97,7 @@ The first usable internal application should include:
 - Broker Templates: reusable email, SMS, task, checklist, report, workflow, and smart-document template records with merge-variable mapping and private body import controls.
 - Broker Board and Stage Templates: BrokerEngine-style lead/deal boards, stage due thresholds, warning thresholds, and workflow gate metadata.
 - Deal Workspace Tools: the deal sidebar, right-rail drawers, and Broker Settings structure captured as configurable records.
+- BrokerEngine Feature Parity: an internal pilot coverage register for every BrokerEngine-style feature area discussed, including what is seeded/modelled, what needs private import, what needs provider APIs, and what still needs custom UI/workspace configuration.
 - Broker Lenders: Broker Settings lender records for LIXI/AFG/ApplyOnline/BrokerEngine codes, lender categories, panel status, calculator links, policy references, document categories, and product/contact relationships.
 - Credit Proposals: internal recommendation, product selection, policy exception, risk, mitigant, and approval work.
 - Document Metadata: checklist, request, received, verified, expired, waived, and external-storage references.

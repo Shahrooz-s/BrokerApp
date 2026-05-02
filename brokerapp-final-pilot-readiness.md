@@ -6,10 +6,11 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.14
+## Included In v0.15
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
+- BrokerEngine feature parity register for boards, DealDash, fact find, Strategy, serviceability, products, lodgement, templates, checklists, documents, settings, client portal, AML/KYC, integrations, and white-label controls.
 - Broker settings records for lenders, products, workflow templates, email/task/SMS/report/template metadata, boards/stages, fact-find templates, smart docs, security, integrations, client portal, AI, and compliance.
 - Broker template metadata records for emails, SMS, tasks, reports, workflows, and smart documents.
 - Checklist module objects: reusable checklist templates, item templates, deal checklist instances, and deal checklist items.
@@ -32,6 +33,12 @@ Do not commit these items:
 - API keys, webhook secrets, private deploy keys, or provider credentials.
 
 Use `.brokerapp-private/`, `brokerengine-private/`, `private-template-imports/`, or encrypted storage for private operational imports.
+
+## Feature Parity Register
+
+BrokerApp now seeds a Broker Settings view called `Feature parity`. This is the internal pilot checklist for the BrokerEngine-style functionality discussed in this project. It tracks whether each feature is seeded/modelled, needs private content import, needs provider API credentials, needs workspace login/configuration, needs custom UI/front-component work, or belongs to a later phase.
+
+The register intentionally stores sanitized feature coverage only. Full copied email/template bodies, checklist wording, screenshots, live account captures, lender calculator content, customer data, and licensed LIXI assets must remain private workspace imports or encrypted artifacts, not GitHub source.
 
 ## Pilot Install Sequence
 

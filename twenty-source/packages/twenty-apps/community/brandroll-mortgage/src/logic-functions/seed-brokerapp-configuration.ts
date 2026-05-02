@@ -16,6 +16,7 @@ import {
   brokerAppWhiteLabelSettingSeeds,
 } from 'src/config/brokerapp-pilot-seeds';
 import { brokerAppSettingsAreaSeeds } from 'src/config/brokerapp-settings-blueprint';
+import { brokerEngineFeatureParitySeeds } from 'src/config/brokerengine-feature-parity-map';
 import { brokerEngineTemplateSeeds } from 'src/config/brokerengine-template-library';
 
 type SeedRecord = Record<string, unknown>;
@@ -233,6 +234,13 @@ const handler = async (): Promise<Record<string, number>> => {
     'settingName',
     brokerAppSettingsAreaSeeds as unknown as SeedRecord[],
   );
+  const featureParity = await seedRecords(
+    client,
+    'brokerEngineFeatureParities',
+    'createBrokerEngineFeatureParities',
+    'featureName',
+    brokerEngineFeatureParitySeeds as unknown as SeedRecord[],
+  );
   const checklistTemplates = await seedRecords(
     client,
     'brokerChecklistTemplates',
@@ -261,6 +269,7 @@ const handler = async (): Promise<Record<string, number>> => {
     brokerTemplates,
     workspaceTools,
     settingsAreas,
+    featureParity,
     checklistTemplates,
     integrationProviders,
     whiteLabelSettings,
