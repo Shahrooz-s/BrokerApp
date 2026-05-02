@@ -36,6 +36,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - [Dockge Deployment Guide](./dockge-deployment-guide.md)
 - [Cloudflare DNS and SSL Guide](./cloudflare-dns-and-ssl-guide.md)
 - [Mortgage App Deployment Guide](./mortgage-app-deployment-guide.md)
+- [BrokerApp v0.2 Deal-Centric Mortgage Configuration](./deal-centric-brokerapp-v0.2.md)
 - [Imported Twenty Application Source](./twenty-source/README.md)
 - [Application Configuration Guide](./application-configuration-guide.md)
 - [BrokerEngine Board and Bulk Edit Reference](./brokerengine-board-and-bulk-edit-reference.md)
@@ -72,9 +73,11 @@ The first usable internal application should include:
 
 - Contacts: borrowers, co-borrowers, guarantors, referrers, professional contacts, lender contacts, and broker contacts.
 - Organisations: employers, self-employed businesses, trusts, lenders, referral firms, accounting firms, conveyancers, and broker entities.
-- Opportunities/Deals: the top-level commercial opportunity and sales pipeline record.
-- Mortgage Applications: the structured application package tied to a deal.
+- Opportunities/Deals: the top-level broker board record and loan origination workspace.
+- Mortgage Applications: the structured CAL-style application package tied to a deal when required.
 - Fact Find Sessions: section-based applicant and household capture with completion scoring and review status.
+- Product Search Runs: AFG product matrix filtering, policy research notes, and selected sheet flags.
+- Product Shortlist Options: compared lender/product candidates with serviceability, policy, fit, and recommendation reasons.
 - Credit Proposals: internal recommendation, product selection, policy exception, risk, mitigant, and approval work.
 - Document Metadata: checklist, request, received, verified, expired, waived, and external-storage references.
 - Specialist Tool Records: ID verification, open banking, product research, serviceability, valuation, LMI, credit check, and title/property search status references.

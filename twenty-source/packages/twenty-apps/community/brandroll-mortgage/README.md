@@ -1,39 +1,69 @@
 # BrokerApp App for Twenty
 
-This Twenty app defines the first LIXI-aware mortgage broking data model for the BrokerApp CRM deployment.
+This Twenty app defines the LIXI-aware mortgage broking data model for the BrokerApp CRM deployment.
 
 It does not include restricted LIXI schemas, sample payloads, lender guidebooks, or production lodgement logic. It uses public LIXI concepts as a reference model and keeps ApplyOnline, AFG Flex, AFG/BrokerEngine, and specialist-provider integration references as configurable CRM records.
 
+## v0.2 Direction
+
+BrokerApp treats native Twenty Opportunities as the broker board/deal/opportunity record. Contacts and Companies remain in the sidebar because they are reusable relationship records. Mortgage work happens from the Opportunity through direct fields and related deal tools:
+
+- Applicant profiles linked to Contacts and Opportunities.
+- Compliance acknowledgements for credit guide, privacy consent, BID, and fee documents.
+- Portal fact-find sessions.
+- Document requests and review notes.
+- Serviceability assessments based on lender or aggregator calculators.
+- Product search runs based on the AFG product matrix sheets.
+- Product shortlist options with policy, serviceability, fit, and recommendation reasons.
+- Credit proposals explaining the selected product, comparison set, BID rationale, and policy fit.
+- Valuation, LMI, conditions, lender contacts, and integration events.
+
+The app uses public LIXI concepts as a field-design reference. It does not copy restricted LIXI schemas or sample payloads. Production LIXI lodgement, lender certification, ApplyOnline submission, and AFG Flex submission remain integration work until the relevant API documentation, credentials, and licensing are confirmed.
+
 ## What This App Adds
 
-- Mortgage applications.
-- Links from mortgage applications to native Twenty People and Opportunities.
-- Applicant profiles.
+- Broker workflow fields directly on native Twenty Opportunities.
+- Mortgage applications for structured CAL-style application summary when needed.
+- Links from mortgage applications to native Twenty Contacts and Opportunities.
+- Applicant profiles linked to Contacts and Opportunities.
+- Compliance acknowledgements.
+- Fact find sessions.
 - Loan requirements.
 - Property securities.
 - Credit proposals.
 - Serviceability assessments.
+- Product search runs.
+- Lender products.
+- Product shortlist options.
+- Lender contacts.
 - Document requests.
 - Application conditions.
 - Valuation orders.
 - LMI assessments.
 - Integration events.
-- Saved views and sidebar entries for the main broker workflow.
+- Saved views for operational tables, without forcing the tools into the main sidebar.
 
 ## What Still Needs Configuration
 
-Twenty's built-in People, Companies, Opportunities, Tasks, Notes, and timeline are available out of the box. This app links Mortgage applications to native People and Opportunities, then adds the mortgage-specific data model and starter views. Workflow automations still need to be configured after the workspace is running because this Twenty SDK version does not expose workflow definitions as app entities.
+Twenty's built-in Contacts, Companies, Opportunities, Tasks, Notes, and timeline are available out of the box. This app links mortgage-specific records to native Opportunities so the deal dashboard is the working file. Workflow automations still need to be configured after the workspace is running because this Twenty SDK version does not expose workflow definitions as app entities.
 
 Recommended first manual workflow configuration:
 
 - Lead received.
+- Credit guide and privacy consent sent.
+- Credit guide and privacy consent acknowledged.
 - Fact find started.
+- Fact find submitted.
+- Fact find reviewed.
 - Documents requested.
 - BID/compliance in progress.
+- Serviceability checked.
+- Product search and policy research completed.
 - Credit proposal drafting.
 - Credit proposal review.
+- Credit proposal presented and accepted.
 - Ready for lodgement.
-- Submitted.
+- Submitted to ApplyOnline or AFG Flex.
 - Conditional approval.
 - Formal approval.
 - Settlement booked.

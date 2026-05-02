@@ -8,22 +8,29 @@ Deploy the BrokerApp mortgage configuration into the running Twenty instance at:
 https://app.lendaloan.com.au
 ```
 
-This app adds mortgage-specific custom objects, fields, relationships, starter views, and navigation entries. It does not configure every operational board, workflow automation, or BrokerEngine-style bulk edit rule. Those still need manual/product configuration after the app install.
+This app adds mortgage-specific custom objects, Opportunity fields, relationships, and starter views. v0.2 is deal-centric: the native Twenty Opportunity is the broker board/deal record, and mortgage tools are related to the Opportunity rather than being pushed into the main sidebar.
 
 ## What The App Adds
 
+- Broker workflow fields directly on Opportunities.
 - Mortgage applications.
-- Applicant profiles.
+- Applicant profiles linked to Contacts and Opportunities.
+- Compliance acknowledgements.
+- Fact find sessions.
 - Loan requirements.
 - Property securities.
-- Credit proposals.
 - Serviceability assessments.
+- Product search runs.
+- Lender products imported from the AFG product matrix.
+- Product shortlist options for comparison, policy fit, and recommendation reasons.
+- Credit proposals.
 - Document requests.
 - Application conditions.
 - Valuation orders.
 - LMI assessments.
+- Lender contacts imported from the AFG lender contacts workbook.
 - Integration events.
-- Starter views and sidebar navigation entries.
+- Starter views.
 
 ## Prerequisites
 
@@ -55,11 +62,18 @@ Run this on the Dockge/Vultr server, not inside the Twenty container.
 mkdir -p /opt/brokerapp
 cd /opt/brokerapp
 
-git clone --branch codex/review-ready-deployment git@github.com:Shahrooz-s/BrokerApp.git brokerapp-source
+git clone --branch codex/review-ready-deployment https://github.com/Shahrooz-s/BrokerApp.git brokerapp-source
 cd brokerapp-source
 ```
 
 If the GitHub repository is private and the server does not have GitHub SSH access, clone with an approved deploy key or upload the repository by another secure method.
+
+For an existing clone:
+
+```bash
+cd /opt/brokerapp/brokerapp-source
+git pull
+```
 
 Then run the app deployment from a Node 24 container:
 
@@ -92,9 +106,9 @@ After `install` succeeds:
 1. Refresh Twenty in the browser.
 2. Go to Settings > Apps / Applications.
 3. Confirm `BrokerApp` is installed.
-4. Check the sidebar for mortgage entries.
-5. Confirm the new objects/views are present.
-6. Create a dummy contact and dummy mortgage application to verify record creation.
+4. Open Opportunities and confirm the BrokerApp mortgage fields are available.
+5. Create a dummy Contact, Opportunity, applicant profile, fact-find session, serviceability assessment, product search run, shortlist option, and credit proposal.
+6. Confirm each related record can be linked back to the same Opportunity.
 
 ## If Install Fails
 
@@ -112,14 +126,14 @@ Common causes:
 After the app installs, configure these manually in Twenty:
 
 - Staff-facing labels/views using `Contacts`.
-- Lead board.
-- Fact find board.
-- Document collection board.
-- Credit proposal board.
-- Lodgement board.
-- Conditions board.
-- Settlement board.
-- Post-settlement review board.
+- Opportunity board stages matching the BrokerApp workflow stage field.
+- List and board views for active deals, submitted deals, settlements, reviews, and lost opportunities.
+- Fact-find portal workflow and document request templates.
+- Compliance document generation for credit guide, privacy consent, BID disclosure, and credit proposal.
+- Serviceability import/check steps from lender or aggregator calculators.
+- Product matrix import jobs for the AFG product workbook.
+- Product comparison and shortlist review process.
+- ApplyOnline/AFG Flex lodgement jobs once API access is confirmed.
 - Workflow automations and task templates.
 - BrokerEngine-style bulk edit safeguards where Twenty supports them.
 
