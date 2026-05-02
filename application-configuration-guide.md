@@ -37,6 +37,9 @@ Recommended left navigation structure:
 10. Reviews
 11. Integration Exceptions
 12. Reports
+13. Broker Settings
+
+Broker Settings should contain configuration, not active loan work. The first Broker Settings area should be `Form templates`, used to manage OpnForm templates for fact finds, credit guide/privacy consent acknowledgements, document request forms, serviceability intake forms, and review forms. Deals should launch or consume a published template; users should not design or publish forms from an individual Deal.
 
 Avoid making users hunt through generic CRM sections for mortgage work. Mortgage-specific boards should be visible as first-class workspace areas.
 
@@ -96,6 +99,20 @@ Must support:
 - Version or review timestamp.
 
 Detailed setup is defined in `fact-find-configuration.md`.
+
+### Broker Settings
+
+Broker Settings should hold workspace-level mortgage configuration.
+
+Must support:
+
+- Form templates and default form selection.
+- OpnForm workspace ID, form ID/slug, builder URL, and portal embed URL.
+- Published/draft/testing/retired lifecycle.
+- Immutable version tracking.
+- Webhook configured flag.
+- Mapping profile reference used by the portal backend to write normalized records into Twenty.
+- Permission restriction so only principal/admin or approved operations users can change templates.
 
 ### Credit Proposals
 

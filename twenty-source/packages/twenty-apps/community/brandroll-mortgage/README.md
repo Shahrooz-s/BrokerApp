@@ -4,7 +4,7 @@ This Twenty app defines the LIXI-aware mortgage broking data model for the Broke
 
 It does not include restricted LIXI schemas, sample payloads, lender guidebooks, or production lodgement logic. It uses public LIXI concepts as a reference model and keeps ApplyOnline, AFG Flex, AFG/BrokerEngine, and specialist-provider integration references as configurable CRM records.
 
-## v0.5 Direction
+## v0.6 Direction
 
 BrokerApp treats native Twenty Opportunities as the broker board/deal/opportunity record. Contacts and Companies remain in the sidebar because they are reusable relationship records. Mortgage work happens from the Opportunity through direct fields and related deal tools:
 
@@ -22,11 +22,12 @@ The app uses public LIXI concepts as a field-design reference. It does not copy 
 
 The serviceability model now reflects the supplied ANZ and WBC calculator review. Serviceability Assessment records can hold lender-calculator metadata, assumption dates, HEM/tax/expense/debt/UMI/DTI/LVR/LMI outputs, policy gate notes, input snapshots, and result snapshots. The app still does not embed lender workbooks, macros, hidden sheets, or proprietary formulas.
 
-The fact-find model now supports an OpnForm-first form-builder workflow. Fact Find Session records track the form provider, definition ID, immutable form version, submission reference, portal session reference, mapping status, mapping errors, section status summary, clarification summary, review timestamps, and schema/submission snapshot references. OpnForm should render the borrower-facing fact find; Twenty should hold the normalized application, review, compliance, and workflow records.
+The fact-find model now supports an OpnForm-first form-builder workflow. Form-builder administration belongs in Broker Settings through Broker Form Template records. Fact Find Session records link back to the published template used for the borrower session and track the provider, definition ID, immutable form version, submission reference, portal session reference, mapping status, mapping errors, section status summary, clarification summary, review timestamps, and schema/submission snapshot references. OpnForm should render the borrower-facing fact find; Twenty should hold the normalized application, review, compliance, and workflow records.
 
 ## What This App Adds
 
 - Broker workflow fields directly on native Twenty Opportunities.
+- Broker Form Templates under Broker Settings for fact find, consent, document request, and portal form administration.
 - Mortgage applications for structured CAL-style application summary when needed.
 - Links from mortgage applications to native Twenty Contacts and Opportunities.
 - Applicant profiles linked to Contacts and Opportunities.

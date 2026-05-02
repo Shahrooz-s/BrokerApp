@@ -235,11 +235,20 @@ Fields:
 - Last client activity date/time.
 - Last staff activity date/time.
 - Missing information count.
+- Form provider.
+- Form definition ID.
+- Form definition version.
+- Form submission reference.
+- Form mapping status.
+- Form mapping errors.
 - Portal session/reference ID.
+- Schema snapshot reference.
+- Submission snapshot reference.
 - Version/revision number.
 
 Relationships:
 
+- Broker Form Template.
 - Deal.
 - Mortgage Application.
 - Primary Contact.
@@ -250,6 +259,37 @@ Relationships:
 - Tasks.
 
 Ownership: `Twenty-owned`, with client-entered values arriving from the portal.
+
+### Broker Form Template
+
+Represents a Broker Settings form template used by OpnForm, the client portal, or another approved form provider. This is configuration, not active loan work.
+
+Fields:
+
+- Template name.
+- Template type: fact find, credit guide consent, privacy consent, document request, serviceability intake, review, other.
+- Status: draft, testing, published, retired, archived.
+- Form provider: OpnForm, custom portal, Form.io, BrokerEngine, other.
+- OpnForm workspace ID.
+- External form ID.
+- External form slug.
+- Form version.
+- Builder URL.
+- Portal embed URL.
+- Default-for-type flag.
+- Partial submission support flag.
+- Editable submission support flag.
+- Webhook configured flag.
+- Mapping profile reference.
+- Schema snapshot reference.
+- Published date/time.
+- Retired date/time.
+
+Relationships:
+
+- Fact Find Sessions that used the template.
+
+Ownership: `Twenty-owned` configuration record. OpnForm may own the visual form definition; Twenty stores the approved template reference, version, status, and mapping metadata.
 
 ### Fact Find Section
 

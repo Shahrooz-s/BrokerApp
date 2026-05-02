@@ -61,6 +61,8 @@ The portal fact find should be section-based and similar in operating pattern to
 
 BrokerApp should use OpnForm as the preferred portal form renderer because it already works in the current environment and supports the required schema-driven form-builder pattern. Form.io remains a useful reference for component and conditional-logic concepts, but OpnForm should be treated as the practical implementation target unless later testing proves a blocker.
 
+Form-builder administration should live in Broker Settings. Admins should maintain form templates, default templates, OpnForm form IDs/slugs, builder URLs, embed URLs, versioning, webhook status, and mapping profiles there. A Deal should not be where staff design or publish forms; a Deal should only launch a selected published template and show that session's completion, mapping, and review status.
+
 Recommended form-builder approach:
 
 - Use OpnForm fields for the portal fact find: text/long-text fields for simple answers and objectives, email/phone/date/number/select/multi-select fields for structured borrower data, hidden fields for workflow metadata, and multi-page or linked section forms for the larger fact-find flow.

@@ -12,10 +12,14 @@ BrokerEngine appears to use a schema-driven form-builder pattern. BrokerApp shou
 
 OpnForm forms should be used as the client rendering and capture layer, not as the final system of record. Twenty remains the normalized operational record for Contacts, Opportunities/Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Document Metadata, Credit Proposals, Serviceability Assessments, Product Search Runs, and integration events.
 
+Form builder administration belongs in **Broker Settings**, not inside an individual Deal. Brokers and admins should manage form templates, versions, default templates, OpnForm IDs/slugs, builder URLs, embed URLs, webhook status, and mapping profiles from Broker Settings. Deals and Fact Find Sessions should only consume a selected published template and record which version was used.
+
 Recommended operating rules:
 
 - Treat each form definition as versioned and immutable once issued to a client.
+- Only published Broker Settings form templates should be available for new borrower sessions.
 - Store `OpnForm` as the form provider, plus form slug/ID, form version, submission reference, portal session reference, mapping status, mapping errors, schema snapshot reference, and submission snapshot reference on the Fact Find Session.
+- Link the Fact Find Session to the Broker Form Template record used for that client session.
 - Use hidden fields for Opportunity ID, Mortgage Application ID, Contact IDs, Household ID, Fact Find Session ID, schema version, and portal session reference.
 - Route every submission through the portal backend before writing to Twenty.
 - Prefer OpnForm webhooks for submission events, with API polling as a reconciliation fallback.

@@ -25,6 +25,7 @@ The preferred future lodgement path remains direct injection into ApplyOnline, w
 - A custom client portal will provide chat, dashboard, guided fact find, document requests, status updates, consent capture, and specialist-tool handoffs.
 - The fact find should be modelled as a structured, section-based process similar in operational feel to BrokerEngine: applicants, household, objectives, employment, income, expenses, assets, liabilities, property/security, loan requirements, consent, and documents.
 - The borrower fact find should use OpnForm as the preferred portal form renderer, using a schema-driven form-builder pattern with conditional sections, validation, hidden workflow metadata, partial/editable submissions, webhooks, and immutable form versions. Twenty remains the normalized source of truth after portal submission mapping.
+- Form-builder administration belongs in Broker Settings. Deals should launch or consume published templates, not become the place where staff design or publish form templates.
 - The workspace needs multiple board-style work queues, not a single linear pipeline.
 - Specialist external tools will be used for ID verification, open banking, product research, serviceability, valuation, LMI, credit checks, title/property searches, and other mortgage workflow functions where appropriate.
 - Zapier is not preferred for the target architecture. BrokerEngine Zapier/ZAP documentation can still inform field names, board concepts, event concepts, status handling, and temporary workaround design while direct API access is confirmed.
@@ -80,6 +81,7 @@ The first usable internal application should include:
 - Fact Find Sessions: section-based applicant and household capture with completion scoring and review status.
 - Product Search Runs: AFG product matrix filtering, policy research notes, and selected sheet flags.
 - Product Shortlist Options: compared lender/product candidates with serviceability, policy, fit, and recommendation reasons.
+- Broker Form Templates: Broker Settings records for OpnForm templates, default template selection, versions, webhook status, and mapping references.
 - Credit Proposals: internal recommendation, product selection, policy exception, risk, mitigant, and approval work.
 - Document Metadata: checklist, request, received, verified, expired, waived, and external-storage references.
 - Specialist Tool Records: ID verification, open banking, product research, serviceability, valuation, LMI, credit check, and title/property search status references.
