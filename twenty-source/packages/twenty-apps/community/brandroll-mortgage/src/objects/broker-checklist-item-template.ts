@@ -40,7 +40,7 @@ export default defineObject({
     {
       universalIdentifier: '6b6d0000-4710-4000-8000-000000000004',
       type: FieldType.NUMBER,
-      name: 'position',
+      name: 'sortOrder',
       label: 'Position',
       icon: 'IconSortAscending',
     },

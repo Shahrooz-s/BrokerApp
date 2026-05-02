@@ -65,7 +65,7 @@ export default defineObject({
     {
       universalIdentifier: DEAL_WORKSPACE_TOOL_POSITION_FIELD_ID,
       type: FieldType.NUMBER,
-      name: 'position',
+      name: 'sortOrder',
       label: 'Position',
       icon: 'IconSortAscending',
     },

@@ -221,8 +221,9 @@ const handler = async (): Promise<Record<string, number>> => {
     'dealWorkspaceTools',
     'createDealWorkspaceTools',
     'sourceReference',
-    brokerEngineDealWorkspaceTools.map((tool) => ({
+    brokerEngineDealWorkspaceTools.map(({ position, ...tool }) => ({
       ...tool,
+      sortOrder: position,
       toolStatus: 'DESIGNED',
       sourceReference: `brokerengine:${tool.workspaceArea}:${tool.toolName}`,
     })),
@@ -232,7 +233,10 @@ const handler = async (): Promise<Record<string, number>> => {
     'brokerSettingsAreas',
     'createBrokerSettingsAreas',
     'settingName',
-    brokerAppSettingsAreaSeeds as unknown as SeedRecord[],
+    brokerAppSettingsAreaSeeds.map(({ position, ...settingArea }) => ({
+      ...settingArea,
+      sortOrder: position,
+    })) as unknown as SeedRecord[],
   );
   const featureParity = await seedRecords(
     client,

@@ -148,7 +148,7 @@ After the Docker stack is running and the first workspace/admin user exists, con
 ```bash
 cd packages/twenty-apps/community/brandroll-mortgage
 yarn install
-yarn twenty remote add --api-url https://app.lendaloan.com.au --as brokerapp-v1
+npx -y node@24 node_modules/.bin/twenty remote add --api-url https://app.lendaloan.com.au --as brokerapp-v1 --api-key "$TWENTY_API_KEY"
 yarn twenty deploy --remote brokerapp-v1
 yarn twenty install --remote brokerapp-v1
 yarn twenty remote switch brokerapp-v1
@@ -156,5 +156,15 @@ yarn twenty exec --postInstall
 ```
 
 Use `deploy`, `install`, and then `exec --postInstall` for the live Docker server. The post-install step seeds BrokerApp board, stage, template, deal workspace, settings-map, feature-parity, checklist, integration-provider, and white-label records. It is idempotent by source reference/name and will skip records it already seeded. The `exec` command uses the default remote, so switch to `brokerapp-v1` before running it. `dev` mode is intended for development-mode Twenty servers.
+
+If the Docker stack has logic functions disabled, `exec --postInstall` returns `Logic function execution is disabled`. Either set `LOGIC_FUNCTION_TYPE=LOCAL` or run the API seed helper from this package:
+
+```bash
+TWENTY_API_KEY="..." \
+TWENTY_API_URL="https://app.lendaloan.com.au/graphql" \
+npx -y tsx scripts/seed-live-brokerapp.ts
+```
+
+Do not commit API keys, copied BrokerEngine template bodies, screenshots, borrower data, or lender-private calculator content.
 
 Use a development/staging workspace first. Do not deploy against production borrower data until roles, permissions, storage, backups, and privacy controls are approved.

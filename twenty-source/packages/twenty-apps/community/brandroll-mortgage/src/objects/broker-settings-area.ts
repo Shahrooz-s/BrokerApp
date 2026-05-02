@@ -69,7 +69,7 @@ export default defineObject({
     {
       universalIdentifier: BROKER_SETTINGS_AREA_POSITION_FIELD_ID,
       type: FieldType.NUMBER,
-      name: 'position',
+      name: 'sortOrder',
       label: 'Position',
       icon: 'IconSortAscending',
     },
