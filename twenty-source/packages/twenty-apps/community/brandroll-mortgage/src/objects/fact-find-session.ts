@@ -83,11 +83,12 @@ export default defineObject({
       label: 'Form provider',
       icon: 'IconForms',
       options: [
-        { value: 'FORM_IO', label: 'Form.io', position: 0, color: 'blue' },
-        { value: 'CUSTOM_PORTAL', label: 'Custom portal', position: 1, color: 'purple' },
-        { value: 'BROKERENGINE', label: 'BrokerEngine', position: 2, color: 'orange' },
-        { value: 'APPLYONLINE', label: 'ApplyOnline', position: 3, color: 'green' },
-        { value: 'OTHER', label: 'Other', position: 4, color: 'gray' },
+        { value: 'OPNFORM', label: 'OpnForm', position: 0, color: 'green' },
+        { value: 'FORM_IO', label: 'Form.io', position: 1, color: 'blue' },
+        { value: 'CUSTOM_PORTAL', label: 'Custom portal', position: 2, color: 'purple' },
+        { value: 'BROKERENGINE', label: 'BrokerEngine', position: 3, color: 'orange' },
+        { value: 'APPLYONLINE', label: 'ApplyOnline', position: 4, color: 'green' },
+        { value: 'OTHER', label: 'Other', position: 5, color: 'gray' },
       ],
     },
     {

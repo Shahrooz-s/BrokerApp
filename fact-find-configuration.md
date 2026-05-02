@@ -6,18 +6,19 @@ The fact find should be configured as a structured, section-based mortgage workf
 
 The fact find is not a single form, note, or PDF. It is a living record that tracks borrower completion, staff review, evidence, missing information, consent, and readiness for credit assessment.
 
-## Form Builder Strategy
+## OpnForm-First Form Builder Strategy
 
-BrokerEngine appears to use a form-builder pattern similar to Form.io. BrokerApp should adopt the same useful pattern for the borrower-facing portal: schema-driven forms, conditional sections, validation, repeatable field groups, and hidden workflow metadata.
+BrokerEngine appears to use a schema-driven form-builder pattern. BrokerApp should use OpnForm as the preferred borrower-facing form renderer because it is already working in the current environment and supports the required pattern: no-code form building, multiple input types, hidden fields, partial/editable submissions, webhooks, API access, and form logic. Form.io remains a useful reference for component patterns, but it is not the target dependency.
 
-Form.io-style JSON forms should be used as the client rendering and capture layer, not as the final system of record. Twenty remains the normalized operational record for Contacts, Opportunities/Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Document Metadata, Credit Proposals, Serviceability Assessments, Product Search Runs, and integration events.
+OpnForm forms should be used as the client rendering and capture layer, not as the final system of record. Twenty remains the normalized operational record for Contacts, Opportunities/Deals, Mortgage Applications, Fact Find Sessions, Fact Find Sections, Document Metadata, Credit Proposals, Serviceability Assessments, Product Search Runs, and integration events.
 
 Recommended operating rules:
 
 - Treat each form definition as versioned and immutable once issued to a client.
-- Store the form provider, form definition ID, form version, submission reference, portal session reference, mapping status, mapping errors, schema snapshot reference, and submission snapshot reference on the Fact Find Session.
+- Store `OpnForm` as the form provider, plus form slug/ID, form version, submission reference, portal session reference, mapping status, mapping errors, schema snapshot reference, and submission snapshot reference on the Fact Find Session.
 - Use hidden fields for Opportunity ID, Mortgage Application ID, Contact IDs, Household ID, Fact Find Session ID, schema version, and portal session reference.
 - Route every submission through the portal backend before writing to Twenty.
+- Prefer OpnForm webhooks for submission events, with API polling as a reconciliation fallback.
 - Normalize applicant, household, income, expense, asset, liability, property/security, consent, and document metadata into Twenty records.
 - Keep original submission snapshots in the approved portal evidence store, with references in Twenty for audit and reconciliation.
 - Avoid storing raw identity documents, open-banking data, or uploaded binary documents in the form builder unless that storage provider is explicitly approved.
@@ -25,17 +26,17 @@ Recommended operating rules:
 
 Recommended component use:
 
-| Fact-find need | Form.io-style component pattern | Twenty destination |
+| Fact-find need | OpnForm implementation pattern | Twenty destination |
 | --- | --- | --- |
-| Names, reference IDs, short answers | Text field with masks/validation where useful | Contact, Fact Find Session, Mortgage Application |
-| Long goals/objectives and explanations | Text area | Loan Requirement, Credit Proposal notes |
-| Phone/email | Phone and email components | Contact |
-| DOB, employment start, milestone dates | Date, day, or date-time component depending on precision | Contact, Employment, Deal dates |
-| Yes/no flags | Checkbox | Scenario flags, consent gates, workflow gates |
-| Enumerations | Select, select boxes, or radio | Status, role, purpose, residency, employment type |
-| Money, limits, balances, percentages | Number or currency component | Income, Expense, Asset, Liability, Loan Requirement |
-| Repeatable rows | Data grid or edit grid | Employment, Income, Expenses, Assets, Liabilities, Securities |
-| Sectioned form flow | Panel, tabs, wizard, or page-like sections | Fact Find Section status |
+| Names, reference IDs, short answers | OpnForm text fields with validation where useful | Contact, Fact Find Session, Mortgage Application |
+| Long goals/objectives and explanations | Long text fields | Loan Requirement, Credit Proposal notes |
+| Phone/email | Phone and email fields | Contact |
+| DOB, employment start, milestone dates | Date fields | Contact, Employment, Deal dates |
+| Yes/no flags | Checkbox fields | Scenario flags, consent gates, workflow gates |
+| Enumerations | Select or multi-select fields | Status, role, purpose, residency, employment type |
+| Money, limits, balances, percentages | Number fields with currency/percentage labels and backend validation | Income, Expense, Asset, Liability, Loan Requirement |
+| Repeatable rows | Repeatable form sections or separate linked OpnForm section forms | Employment, Income, Expenses, Assets, Liabilities, Securities |
+| Sectioned form flow | Multi-page forms or one form per section | Fact Find Section status |
 | Document requests | Checklist/selects plus file handoff where approved | Document Metadata, external storage reference |
 | System metadata | Hidden components | Integration/audit references |
 

@@ -59,14 +59,15 @@ Avoid exposing internal lender notes, credit exceptions, fraud/risk flags, raw e
 
 The portal fact find should be section-based and similar in operating pattern to BrokerEngine: the client sees clear sections, can save progress, and staff can review completion by section in Twenty.
 
-BrokerEngine's form builder pattern appears close to Form.io's schema-driven forms. BrokerApp should use the same architectural idea for the portal: a versioned JSON form definition renders the client experience, while the portal backend validates and maps the submission into normalized Twenty records.
+BrokerApp should use OpnForm as the preferred portal form renderer because it already works in the current environment and supports the required schema-driven form-builder pattern. Form.io remains a useful reference for component and conditional-logic concepts, but OpnForm should be treated as the practical implementation target unless later testing proves a blocker.
 
 Recommended form-builder approach:
 
-- Use Form.io-style components for the portal fact find: basic fields for simple answers, advanced fields for email/phone/address/date/currency/signature-like inputs, data grid/edit grid components for repeatable applicant employment/income/asset/liability/security rows, layout components for panels/tabs/wizard-style sections, and hidden components for workflow metadata.
-- Use conditional logic for co-applicant, guarantor, self-employed, refinance, investment, construction, residency, open-banking, and document scenarios.
-- Treat form schema versions as immutable after a client starts or submits a fact find.
+- Use OpnForm fields for the portal fact find: text/long-text fields for simple answers and objectives, email/phone/date/number/select/multi-select fields for structured borrower data, hidden fields for workflow metadata, and multi-page or linked section forms for the larger fact-find flow.
+- Use form logic for co-applicant, guarantor, self-employed, refinance, investment, construction, residency, open-banking, and document scenarios.
+- Treat OpnForm form versions as immutable after a client starts or submits a fact find.
 - Store only references in Twenty for the form provider, form definition ID, form version, form submission reference, portal session reference, schema snapshot, and submission snapshot.
+- Prefer OpnForm webhooks for submission and partial-submission events, with API polling as a reconciliation fallback.
 - Convert every client answer into structured Twenty records or explicit review tasks. Do not leave decision-grade data only inside the form submission.
 - Use server-side validation and mapping in the portal backend before writing into Twenty.
 - Keep internal notes, credit-risk commentary, and unapproved recommendation notes out of the client form JSON.

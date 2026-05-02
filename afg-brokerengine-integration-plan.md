@@ -160,6 +160,10 @@ Do not hard-code credentials. Use environment variables or secret manager entrie
 - `BROKERENGINE_API_BASE_URL`
 - `BROKERENGINE_API_KEY`
 - `BROKERENGINE_WEBHOOK_SECRET`
+- `OPNFORM_API_BASE_URL`
+- `OPNFORM_API_KEY`
+- `OPNFORM_WEBHOOK_SECRET`
+- `OPNFORM_WORKSPACE_ID`
 - `APPLYONLINE_API_BASE_URL`
 - `APPLYONLINE_CLIENT_ID` or approved credential equivalent
 - `APPLYONLINE_CLIENT_SECRET` or token equivalent
