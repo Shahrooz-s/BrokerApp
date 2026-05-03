@@ -414,6 +414,8 @@ type WorkspacePage = {
   sections: WorkspaceSection[];
 };
 
+type FactFindAnswerValue = boolean | string;
+
 const field = (
   label: string,
   type: WorkspaceFieldType = 'text',
@@ -1961,6 +1963,41 @@ const styles = {
     gap: '8px',
     justifyContent: 'flex-end',
   },
+  stageStrip: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '8px',
+    padding: '12px',
+  },
+  stageChip: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 600,
+    minHeight: '30px',
+    padding: '0 10px',
+  },
+  stageChipActive: {
+    background: 'var(--t-accent-quaternary, #f7f8ff)',
+    border: '1px solid var(--t-border-color-blue, #aebcff)',
+    color: 'var(--t-accent-accent11, #415abf)',
+  },
+  conditionalPanel: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    padding: '12px',
+  },
+  validationPanel: {
+    background: 'rgba(196, 49, 45, 0.06)',
+    border: '1px solid rgba(196, 49, 45, 0.24)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-primary, #333333)',
+    padding: '12px',
+  },
 } as const;
 
 export const BrokerAppWorkspace = () => {
@@ -1982,6 +2019,16 @@ export const BrokerAppWorkspace = () => {
   const [generatedTasks, setGeneratedTasks] = useState<
     GeneratedAssistantTask[]
   >(initialGeneratedTasks);
+  const [factFindAnswers, setFactFindAnswers] = useState<
+    Record<string, FactFindAnswerValue>
+  >({
+    'Applicants:Applicant Count': '2',
+    'Other Income:Do any applicants have other income sources?': 'No',
+  });
+  const [saveStatus, setSaveStatus] = useState<
+    'Idle' | 'Saving' | 'Saved' | 'Error'
+  >('Idle');
+  const [lastSavedPage, setLastSavedPage] = useState<string | null>(null);
   const [taskFilter, setTaskFilter] = useState<'Pending' | 'Completed'>(
     'Pending',
   );
@@ -2008,6 +2055,10 @@ export const BrokerAppWorkspace = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setIsWorkspaceOpen(true);
+  }, [opportunityRecordId]);
 
   const moveOpportunityToStage = async (
     stageValue: string,
@@ -2130,6 +2181,11 @@ export const BrokerAppWorkspace = () => {
     'Co-Applicant 3',
   ].slice(0, applicantCount);
   const activePage = workspacePages[activePageName] ?? workspacePages.LoanDash;
+  const activeStageOption =
+    boardStageOptions.find((option) => option.value === loanStageValue) ??
+    firstDealStage;
+  const visibleWorkflowStages =
+    loanBoard === 'Deal' ? dealWorkflowStageOptions : leadWorkflowStageOptions;
   const loanTitle = opportunityRecordId
     ? `Opportunity ${opportunityRecordId.slice(0, 8)}`
     : 'Opened Opportunity';
@@ -2200,12 +2256,136 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
+  const getFieldKey = (workspaceField: WorkspaceField) =>
+    `${activePage.title}:${workspaceField.label.replace(/^\*/, '').trim()}`;
+
+  const getFieldValue = (workspaceField: WorkspaceField) => {
+    const fieldKey = getFieldKey(workspaceField);
+    const savedValue = factFindAnswers[fieldKey];
+
+    if (savedValue !== undefined) {
+      return savedValue;
+    }
+
+    if (workspaceField.label.replace(/^\*/, '').trim() === 'Applicant Count') {
+      return String(applicantCount);
+    }
+
+    if (workspaceField.type === 'checkbox') {
+      return false;
+    }
+
+    return '';
+  };
+
+  const updateFieldValue = (
+    workspaceField: WorkspaceField,
+    value: FactFindAnswerValue,
+  ) => {
+    const fieldLabel = workspaceField.label.replace(/^\*/, '').trim();
+
+    setFactFindAnswers((current) => ({
+      ...current,
+      [getFieldKey(workspaceField)]: value,
+    }));
+    setSaveStatus('Idle');
+
+    if (fieldLabel === 'Applicant Count' && typeof value === 'string') {
+      const nextCount = Number(value);
+
+      if (Number.isInteger(nextCount)) {
+        setApplicantCount(Math.min(4, Math.max(1, nextCount)));
+      }
+    }
+  };
+
+  const saveWorkspacePage = async () => {
+    const completedAnswerCount = Object.values(factFindAnswers).filter(
+      (value) => value !== '' && value !== false,
+    ).length;
+
+    setSaveStatus('Saving');
+
+    if (!opportunityRecordId) {
+      setSaveStatus('Saved');
+      setLastSavedPage(activePage.title);
+      await enqueueSnackbar({
+        message: `${activePage.title} saved in preview (${completedAnswerCount} answer${completedAnswerCount === 1 ? '' : 's'})`,
+        variant: 'info',
+      });
+      return;
+    }
+
+    try {
+      const client = new CoreApiClient();
+
+      await client.mutation({
+        updateOpportunity: {
+          __args: {
+            id: opportunityRecordId,
+            data: {
+              factFindStatus: 'BROKER_REVIEW',
+              nextBrokerAction: `Fact-find page saved: ${activePage.title}. ${completedAnswerCount} captured answer${completedAnswerCount === 1 ? '' : 's'} in the loan workspace.`,
+            },
+          },
+          id: true,
+          factFindStatus: true,
+          nextBrokerAction: true,
+        },
+      });
+
+      setSaveStatus('Saved');
+      setLastSavedPage(activePage.title);
+      await enqueueSnackbar({
+        message: `${activePage.title} saved to this Opportunity`,
+        variant: 'success',
+      });
+    } catch (error) {
+      setSaveStatus('Error');
+      await enqueueSnackbar({
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Could not save the fact-find page',
+        variant: 'error',
+      });
+    }
+  };
+
+  const handleWorkspaceAction = async (action: string) => {
+    if (action === 'Add Applicant') {
+      setApplicantCount((count) => {
+        const nextCount = Math.min(4, count + 1);
+
+        setFactFindAnswers((current) => ({
+          ...current,
+          'Applicants:Applicant Count': String(nextCount),
+        }));
+
+        return nextCount;
+      });
+      setSaveStatus('Idle');
+      return;
+    }
+
+    if (action.includes('Validate') || action.includes('checklist')) {
+      setActiveTool('Checklists');
+      setIsToolboxCollapsed(false);
+    }
+
+    await enqueueSnackbar({
+      message: `${action} is ready as a gated BrokerApp action. Provider sends, lender submissions and external checks remain disabled until credentials are approved.`,
+      variant: 'info',
+    });
+  };
+
   const renderWorkspaceField = (workspaceField: WorkspaceField) => {
     const label = workspaceField.required
       ? workspaceField.label.replace(/^\*/, '').trim()
       : workspaceField.label;
     const commonInputStyle =
       workspaceField.type === 'textarea' ? styles.textArea : styles.input;
+    const fieldValue = getFieldValue(workspaceField);
 
     if (workspaceField.type === 'checkbox') {
       return (
@@ -2213,7 +2393,13 @@ export const BrokerAppWorkspace = () => {
           <span style={styles.label}>{label}</span>
           <span style={styles.rowButton}>
             <span>{workspaceField.help ?? 'Available'}</span>
-            <input type="checkbox" />
+            <input
+              checked={fieldValue === true}
+              onChange={(event) =>
+                updateFieldValue(workspaceField, event.currentTarget.checked)
+              }
+              type="checkbox"
+            />
           </span>
         </label>
       );
@@ -2226,7 +2412,13 @@ export const BrokerAppWorkspace = () => {
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {(workspaceField.options ?? ['Yes', 'No']).map((option) => (
               <label key={option} style={styles.rowButton}>
-                <input name={workspaceField.label} type="radio" /> {option}
+                <input
+                  checked={fieldValue === option}
+                  name={getFieldKey(workspaceField)}
+                  onChange={() => updateFieldValue(workspaceField, option)}
+                  type="radio"
+                />{' '}
+                {option}
               </label>
             ))}
           </div>
@@ -2238,7 +2430,13 @@ export const BrokerAppWorkspace = () => {
       return (
         <label key={workspaceField.label} style={styles.fieldShell}>
           <span style={styles.label}>{label}</span>
-          <select defaultValue="" style={styles.input}>
+          <select
+            onChange={(event) =>
+              updateFieldValue(workspaceField, event.currentTarget.value)
+            }
+            style={styles.input}
+            value={String(fieldValue)}
+          >
             <option value="">Select {label.toLowerCase()}</option>
             {(workspaceField.options ?? []).map((option) => (
               <option key={option} value={option}>
@@ -2261,7 +2459,19 @@ export const BrokerAppWorkspace = () => {
             <div style={{ ...styles.small, marginBottom: '8px' }}>
               Paragraph · B · I · U · bullets · numbers · table
             </div>
-            <div style={{ color: '#8b929d' }}>Type something...</div>
+            <textarea
+              onChange={(event) =>
+                updateFieldValue(workspaceField, event.currentTarget.value)
+              }
+              placeholder="Type something..."
+              style={{
+                ...styles.textArea,
+                border: '0',
+                minHeight: '86px',
+                padding: 0,
+              }}
+              value={String(fieldValue)}
+            />
           </div>
         </label>
       );
@@ -2292,11 +2502,18 @@ export const BrokerAppWorkspace = () => {
         <span style={styles.label}>{label}</span>
         {workspaceField.type === 'textarea' ? (
           <textarea
+            onChange={(event) =>
+              updateFieldValue(workspaceField, event.currentTarget.value)
+            }
             placeholder="Type something..."
             style={commonInputStyle}
+            value={String(fieldValue)}
           />
         ) : (
           <input
+            onChange={(event) =>
+              updateFieldValue(workspaceField, event.currentTarget.value)
+            }
             placeholder={
               workspaceField.type === 'money'
                 ? '$0.00'
@@ -2306,11 +2523,33 @@ export const BrokerAppWorkspace = () => {
             }
             style={commonInputStyle}
             type={workspaceField.type === 'date' ? 'text' : 'text'}
+            value={String(fieldValue)}
           />
         )}
       </label>
     );
   };
+
+  const shouldShowSection = (section: WorkspaceSection) => {
+    if (activePage.title === 'Other Income' && section.title === 'Income Sources') {
+      return (
+        factFindAnswers[
+          'Other Income:Do any applicants have other income sources?'
+        ] === 'Yes'
+      );
+    }
+
+    return true;
+  };
+
+  const pageSections = activePage.sections.filter(shouldShowSection);
+  const hasZeroLivingExpense = livingExpenseFields
+    .filter((expenseField) => expenseField.type === 'money')
+    .some((expenseField) => {
+      const value = factFindAnswers[`Living Expenses:${expenseField.label}`];
+
+      return value === undefined || value === '' || value === '$0.00' || value === '0';
+    });
 
   const renderWorkspacePage = () => (
     <div style={styles.pageLayout}>
@@ -2323,9 +2562,28 @@ export const BrokerAppWorkspace = () => {
           <p style={{ ...styles.small, maxWidth: '760px' }}>
             {activePage.summary}
           </p>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <span style={styles.pill}>Stage: {activeStageOption.label}</span>
+            <span style={styles.pill}>
+              Save:{' '}
+              {saveStatus === 'Idle'
+                ? lastSavedPage
+                  ? `Last saved ${lastSavedPage}`
+                  : 'Unsaved'
+                : saveStatus}
+            </span>
+          </div>
           <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-            <button style={styles.newButton} type="button">
-              Save
+            <button
+              disabled={saveStatus === 'Saving'}
+              onClick={() => void saveWorkspacePage()}
+              style={{
+                ...styles.newButton,
+                ...(saveStatus === 'Saving' ? styles.disabledButton : {}),
+              }}
+              type="button"
+            >
+              {saveStatus === 'Saving' ? 'Saving...' : 'Save'}
             </button>
             <button style={styles.subtleButton} type="button">
               Show page in client view
@@ -2430,6 +2688,36 @@ export const BrokerAppWorkspace = () => {
               </select>
             </div>
           </section>
+
+          <section style={styles.boardWrap}>
+            <div style={styles.sectionHeader}>
+              <div>
+                <strong>Workflow stages</strong>
+                <div style={styles.small}>
+                  Compact stage movement for this same Opportunity. Boards stay
+                  in the native Lead and Deal board views.
+                </div>
+              </div>
+              <span style={styles.pill}>{loanBoard} board</span>
+            </div>
+            <div style={styles.stageStrip}>
+              {visibleWorkflowStages.map((stage) => (
+                <button
+                  key={stage.value}
+                  onClick={() => void moveOpportunityToStage(stage.value)}
+                  style={{
+                    ...styles.stageChip,
+                    ...(stage.value === loanStageValue
+                      ? styles.stageChipActive
+                      : {}),
+                  }}
+                  type="button"
+                >
+                  {stage.label}
+                </button>
+              ))}
+            </div>
+          </section>
         </>
       )}
 
@@ -2494,7 +2782,31 @@ export const BrokerAppWorkspace = () => {
         </section>
       )}
 
-      {activePage.sections.map((section) => (
+      {activePage.title === 'Other Income' &&
+        factFindAnswers[
+          'Other Income:Do any applicants have other income sources?'
+        ] !== 'Yes' && (
+          <section style={styles.conditionalPanel}>
+            <strong>Conditional logic</strong>
+            <p style={styles.small}>
+              The income source table is hidden because the answer is No. Select
+              Yes to open repeatable income rows and evidence request actions.
+            </p>
+          </section>
+        )}
+
+      {activePage.title === 'Living Expenses' && hasZeroLivingExpense && (
+        <section style={styles.validationPanel}>
+          <strong>Living expense validation</strong>
+          <p style={styles.small}>
+            One or more expense categories are blank or zero. BrokerApp keeps
+            the page visible and requires comments before serviceability and
+            lodgement readiness can pass.
+          </p>
+        </section>
+      )}
+
+      {pageSections.map((section) => (
         <section key={section.title} style={styles.boardWrap}>
           <div style={styles.sectionHeader}>
             <div>
@@ -2527,6 +2839,7 @@ export const BrokerAppWorkspace = () => {
                   {section.actions.map((action) => (
                     <button
                       key={action}
+                      onClick={() => void handleWorkspaceAction(action)}
                       style={styles.subtleButton}
                       type="button"
                     >
@@ -2879,7 +3192,17 @@ export const BrokerAppWorkspace = () => {
                 </optgroup>
               </select>
               <button style={styles.iconButton}>Sync</button>
-              <button style={styles.newButton}>Save</button>
+              <button
+                disabled={saveStatus === 'Saving'}
+                onClick={() => void saveWorkspacePage()}
+                style={{
+                  ...styles.newButton,
+                  ...(saveStatus === 'Saving' ? styles.disabledButton : {}),
+                }}
+                type="button"
+              >
+                {saveStatus === 'Saving' ? 'Saving...' : 'Save'}
+              </button>
             </div>
           </div>
 
