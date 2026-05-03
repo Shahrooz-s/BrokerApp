@@ -6,14 +6,15 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.14
+## Included In v0.16.16
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
 - A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table. The record workspace opens as a BrokerEngine-style overlay above the default Twenty record, includes its own toolbar and Close button, and collapses the global Twenty sidebar to the icon rail while the second loan sidebar and right rail handle the broker workflow.
 - Board handover controls inside LoanDash: moving an Opportunity from Lead to Deal updates the same `brokerWorkflowStage` record field to the first Deal stage so backend staff continue the same loan record without duplication.
+- LoanDash now removes the fake embedded board/pipeline and keeps board movement as a stage/handover control only. Native Lead and Deal boards remain the pipeline entry points.
 - Clickable loan workspace pages for DealDash, Team, Lender, Related Parties, Goals, Applicants, Dependants, Assets, Other Income, Liabilities, Living Expenses, Financial Security, Interview Guide, Security, Funding Position, Products, Smart Docs, BrokerWizard, Lodgement Funding, Credit Proposal, and Submission.
-- Collapsible right-rail drawers for Notes, Checklists, Tasks, Emails, Texts, Key Dates, Reports, and 1-Click Workflows.
+- Collapsible loan sidebar groups, collapsible field sections, right-rail icon buttons for Notes, Checklists, Tasks, Emails, Texts, Key Dates, Reports, and 1-Click Workflows, and applicant expansion up to four residential applicants.
 - BrokerEngine-style lead and deal stage references with empty stages collapsed by default and clickable collapsed stages that expand inline.
 - BrokerEngine feature parity register for boards, DealDash, fact find, Strategy, serviceability, products, lodgement, templates, checklists, documents, settings, client portal, AML/KYC, integrations, and white-label controls.
 - Broker settings records for lenders, products, workflow templates, email/task/SMS/report/template metadata, boards/stages, fact-find templates, smart docs, security, integrations, client portal, AI, and compliance.

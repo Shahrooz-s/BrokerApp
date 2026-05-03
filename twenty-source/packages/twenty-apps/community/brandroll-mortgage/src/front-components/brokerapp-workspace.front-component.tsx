@@ -1,5 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
 
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { CoreApiClient } from 'twenty-client-sdk/core';
@@ -7,108 +6,6 @@ import { enqueueSnackbar, useRecordId } from 'twenty-sdk/front-component';
 
 export const BROKERAPP_LOANDASH_FRONT_COMPONENT_ID =
   '6b6d0000-4100-4000-8000-000000000001';
-
-const leadStages = [
-  { number: '1.', name: 'New Lead', count: 5, amount: '$0.56M', open: true },
-  {
-    number: '2.',
-    name: 'Attempted Contact 1',
-    count: 1,
-    amount: '$0.53M',
-    open: true,
-  },
-  {
-    number: '3.',
-    name: 'Attempted Contact 2',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  {
-    number: '4.',
-    name: 'Attempted Contact 3',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  {
-    number: '5.',
-    name: 'Initial Call Held > Get Docs',
-    count: 1,
-    amount: '$0.00M',
-    open: true,
-  },
-  {
-    number: '6.',
-    name: 'Docs Requested',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  {
-    number: '7.',
-    name: 'Research > Servicing',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  {
-    number: '8.',
-    name: 'Prepare Loan Proposal',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  {
-    number: '9.',
-    name: 'Loan Proposal Presented',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  {
-    number: '10.',
-    name: 'Client Accepted > Handover',
-    count: 0,
-    amount: '$0.00M',
-    open: false,
-  },
-  { number: '11.', name: 'On Hold', count: 0, amount: '$0.00M', open: false },
-  { number: '12.', name: 'Lost Opps', count: 0, amount: '$0.00M', open: false },
-];
-
-const leadCards = [
-  {
-    lender: 'WBC',
-    name: 'Home Improvement - Sample Applicant',
-    owner: 'Broker',
-    amount: '$534,850',
-    financeDate: '-',
-    settlementDate: '23/06/2025',
-    stageDueDate: '24/09/2025',
-    urgent: true,
-  },
-  {
-    lender: 'ANZ',
-    name: 'Renovation - Refinance',
-    owner: 'Broker',
-    amount: '$562,975',
-    financeDate: '-',
-    settlementDate: '23/06/2025',
-    stageDueDate: '17/03/2026',
-    urgent: true,
-  },
-  {
-    lender: 'AFG',
-    name: 'Sample Applicant 2',
-    owner: 'Broker',
-    amount: '$0',
-    financeDate: '-',
-    settlementDate: '-',
-    stageDueDate: '08/01/2026',
-    urgent: false,
-  },
-];
 
 const dealStages = [
   'Outstanding Supporting Documents',
@@ -222,12 +119,6 @@ const boardStageOptions = [
   ...dealWorkflowStageOptions,
 ];
 
-const defaultExpandedDealStages = [
-  'Outstanding Supporting Documents',
-  'Prepare for Submission',
-  'Settlement',
-];
-
 const firstDealStage = dealWorkflowStageOptions[0];
 const firstLeadStage = leadWorkflowStageOptions[0];
 
@@ -240,6 +131,30 @@ const rightRailTools = [
   'Key Dates',
   'Reports',
   '1-Click Workflows',
+];
+
+const rightRailToolIcons: Record<string, string> = {
+  Notes: 'N',
+  Checklists: 'CL',
+  Tasks: 'T',
+  Emails: '@',
+  Texts: 'SMS',
+  'Key Dates': 'KD',
+  Reports: 'R',
+  '1-Click Workflows': 'WF',
+};
+
+const completedWorkspacePages = new Set([
+  'LoanDash',
+  'Team',
+  'Goals',
+]);
+
+const loanDashboardMetricCards = [
+  ['Loan Amount', '$0.00'],
+  ['Fact Find', '62%'],
+  ['Serviceability', 'Blocked'],
+  ['Board', 'Deal'],
 ];
 
 type BrokerWorkflowTemplate = {
@@ -398,33 +313,6 @@ const initialGeneratedTasks: GeneratedAssistantTask[] = [
     status: 'Pending',
     title: 'Request Outstanding Documents',
   },
-];
-
-const brokerSettingsControls = [
-  [
-    'Boards and Stages',
-    'Controls lead/deal stages, stage due offsets, empty-stage collapse and movement gates.',
-  ],
-  [
-    'Workflow Templates',
-    'Controls the right-rail 1-Click Workflows and the task batches they create.',
-  ],
-  [
-    'Fact Find New',
-    'Controls conditional questions, applicant expansion, 3-year address history and field aliases.',
-  ],
-  [
-    'Smart Docs and Reports',
-    'Controls PDF/Word report templates, merge fields and approval requirements.',
-  ],
-  [
-    'Compliance Gates',
-    'Controls NCCP, BID, credit guide, privacy consent, AML/CTF and KYC blocks.',
-  ],
-  [
-    'Integration Providers',
-    'Controls BrokerEngine, AFG Flex, ApplyOnline, Equifax and ID verification endpoints.',
-  ],
 ];
 
 const loanNavigationGroups = [
@@ -1517,7 +1405,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '10px 12px',
-    borderBottom: '1px solid #eceff3',
+    borderBottom: '1px solid var(--t-border-color-light, #f1f1f1)',
   },
   board: {
     display: 'flex',
@@ -1565,8 +1453,8 @@ const styles = {
     fontWeight: 800,
   },
   small: {
-    color: '#626b78',
-    fontSize: '12px',
+    color: 'var(--t-font-color-secondary, #666666)',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
   },
   card: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1636,9 +1524,9 @@ const styles = {
     marginTop: '12px',
   },
   panel: {
-    background: '#ffffff',
-    border: '1px solid #e2e6ed',
-    borderRadius: '6px',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     padding: '12px',
   },
   tabRow: {
@@ -1705,15 +1593,15 @@ const styles = {
     padding: '10px 12px',
   },
   statusOk: {
-    color: '#0d8057',
+    color: 'var(--t-color-green, #16825d)',
     fontWeight: 800,
   },
   statusWarn: {
-    color: '#b66f00',
+    color: 'var(--t-color-orange, #b66f00)',
     fontWeight: 800,
   },
   statusBlock: {
-    color: '#c9362b',
+    color: 'var(--t-color-red, #c4312d)',
     fontWeight: 800,
   },
   gate: {
@@ -1747,38 +1635,55 @@ const styles = {
     padding: '0 14px',
   },
   navGroup: {
-    borderTop: '1px solid #dfe4eb',
+    borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
     padding: '8px',
   },
   navHeader: {
     alignItems: 'center',
+    background: 'transparent',
+    border: '0',
+    color: 'var(--t-font-color-primary, #333333)',
+    cursor: 'pointer',
     display: 'flex',
-    fontSize: '16px',
-    fontWeight: 800,
+    fontSize: 'var(--t-font-size-md, 1rem)',
+    fontWeight: 700,
     justifyContent: 'space-between',
     padding: '9px 8px',
+    width: '100%',
   },
   navItem: {
     alignItems: 'center',
-    borderRadius: '6px',
-    color: '#4f5968',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-secondary, #666666)',
     display: 'grid',
-    fontSize: '13px',
-    fontWeight: 700,
+    fontSize: 'var(--t-font-size-sm, 0.95rem)',
+    fontWeight: 600,
     gap: '8px',
-    gridTemplateColumns: '8px minmax(0, 1fr)',
+    gridTemplateColumns: '18px minmax(0, 1fr)',
     minHeight: '34px',
     padding: '0 10px',
   },
   navItemActive: {
-    background: '#dbe2ec',
-    color: '#252a31',
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    color: 'var(--t-font-color-primary, #333333)',
   },
-  navDot: {
-    background: '#f3b51f',
+  navStatus: {
+    alignItems: 'center',
     borderRadius: '999px',
-    height: '6px',
-    width: '6px',
+    display: 'inline-flex',
+    fontSize: '12px',
+    fontWeight: 900,
+    height: '18px',
+    justifyContent: 'center',
+    width: '18px',
+  },
+  navStatusComplete: {
+    background: 'rgba(22, 130, 93, 0.12)',
+    color: 'var(--t-color-green, #16825d)',
+  },
+  navStatusIncomplete: {
+    background: 'rgba(196, 49, 45, 0.10)',
+    color: 'var(--t-color-red, #c4312d)',
   },
   loanMain: {
     minWidth: 0,
@@ -1787,9 +1692,9 @@ const styles = {
   },
   warningBar: {
     alignItems: 'center',
-    background: '#fff7db',
-    borderBottom: '1px solid #eadca6',
-    color: '#252a31',
+    background: 'var(--t-background-primary, #ffffff)',
+    borderBottom: '1px solid var(--t-border-color-medium, #ebebeb)',
+    color: 'var(--t-font-color-primary, #333333)',
     display: 'flex',
     fontSize: '13px',
     justifyContent: 'space-between',
@@ -1798,8 +1703,8 @@ const styles = {
   },
   loanTopbar: {
     alignItems: 'center',
-    background: '#ffffff',
-    borderBottom: '1px solid #dfe4eb',
+    background: 'var(--t-background-primary, #ffffff)',
+    borderBottom: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'grid',
     gap: '12px',
     gridTemplateColumns: 'minmax(0, 1fr) auto',
@@ -1816,9 +1721,10 @@ const styles = {
     margin: 0,
   },
   stageSelect: {
-    border: '1px solid #d8dce4',
-    borderRadius: '4px',
-    color: '#252a31',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-primary, #333333)',
     height: '32px',
     minWidth: '280px',
     padding: '0 8px',
@@ -1835,9 +1741,9 @@ const styles = {
     gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
   },
   metricCard: {
-    background: '#ffffff',
-    border: '1px solid #e2e6ed',
-    borderRadius: '6px',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     padding: '12px',
   },
   toolShell: {
@@ -1867,12 +1773,13 @@ const styles = {
     color: 'var(--t-font-color-secondary, #666666)',
     cursor: 'pointer',
     display: 'flex',
-    flexDirection: 'column' as const,
+    flexDirection: 'row' as const,
     fontSize: '11px',
     fontWeight: 700,
     gap: '4px',
-    minHeight: '54px',
-    padding: '5px 2px',
+    justifyContent: 'center',
+    minHeight: '42px',
+    padding: '5px 6px',
   },
   toolButtonActive: {
     background: 'var(--t-accent-quaternary, #f7f8ff)',
@@ -1886,7 +1793,7 @@ const styles = {
   },
   toolDrawerHeader: {
     alignItems: 'center',
-    borderBottom: '1px solid #e5e8ee',
+    borderBottom: '1px solid var(--t-border-color-light, #f1f1f1)',
     display: 'flex',
     justifyContent: 'space-between',
     minHeight: '54px',
@@ -1909,35 +1816,35 @@ const styles = {
   },
   rowButton: {
     alignItems: 'center',
-    background: '#ffffff',
-    border: '1px solid #e5e8ee',
-    borderRadius: '4px',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
     display: 'flex',
     justifyContent: 'space-between',
     minHeight: '38px',
     padding: '0 10px',
   },
   pageHero: {
-    background: '#ffffff',
-    border: '1px solid #e2e6ed',
-    borderRadius: '6px',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     display: 'grid',
     gap: '12px',
     gridTemplateColumns: 'minmax(0, 1fr) 260px',
     padding: '12px',
   },
   observedList: {
-    background: '#f6f8fb',
-    border: '1px solid #e5e8ee',
-    borderRadius: '6px',
+    background: 'var(--t-background-secondary, #fafafa)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     display: 'grid',
     gap: '6px',
     padding: '10px',
   },
   sectionHeader: {
     alignItems: 'center',
-    background: '#ffffff',
-    borderBottom: '1px solid #e5e8ee',
+    background: 'var(--t-background-primary, #ffffff)',
+    borderBottom: '1px solid var(--t-border-color-light, #f1f1f1)',
     display: 'flex',
     justifyContent: 'space-between',
     minHeight: '40px',
@@ -1955,28 +1862,28 @@ const styles = {
     minWidth: 0,
   },
   label: {
-    color: '#303846',
-    fontSize: '12px',
-    fontWeight: 800,
+    color: 'var(--t-font-color-secondary, #666666)',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 600,
   },
   input: {
-    background: '#ffffff',
-    border: '1px solid #d8dce4',
-    borderRadius: '4px',
-    color: '#252a31',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-primary, #333333)',
     minHeight: '32px',
     padding: '0 8px',
     width: '100%',
   },
   richEditor: {
-    background: '#ffffff',
-    border: '1px solid #d8dce4',
-    borderRadius: '4px',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
     minHeight: '108px',
     padding: '8px',
   },
   actionBar: {
-    borderTop: '1px solid #e5e8ee',
+    borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
     display: 'flex',
     flexWrap: 'wrap' as const,
     gap: '8px',
@@ -1999,6 +1906,38 @@ const styles = {
   pageLayout: {
     display: 'grid',
     gap: '12px',
+  },
+  toolIcon: {
+    alignItems: 'center',
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    borderRadius: '999px',
+    color: 'var(--t-font-color-primary, #333333)',
+    display: 'inline-flex',
+    fontSize: '10px',
+    fontWeight: 800,
+    height: '24px',
+    justifyContent: 'center',
+    minWidth: '24px',
+    padding: '0 4px',
+  },
+  toolLabel: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  applicantDeck: {
+    display: 'grid',
+    gap: '10px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    padding: '12px',
+  },
+  applicantCard: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'grid',
+    gap: '8px',
+    padding: '12px',
   },
   quickMove: {
     borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
@@ -2024,53 +1963,17 @@ const styles = {
   },
 } as const;
 
-const renderCard = (
-  card: (typeof leadCards)[number],
-  moveControl?: ReactNode,
-) => (
-  <div style={styles.card} key={card.name}>
-    <div style={styles.bars}>
-      <span style={styles.barRed} />
-      <span style={styles.barLime} />
-    </div>
-    <div style={styles.cardTitle}>{card.name}</div>
-    <div style={{ ...styles.small, marginTop: '4px' }}>
-      <strong>Owner:</strong> {card.owner}
-    </div>
-    <div style={styles.dots}>....</div>
-    <div style={styles.pillRow}>
-      <div>
-        <div style={styles.pill}>Finance</div>
-        <div style={{ ...styles.small, textAlign: 'center' }}>
-          {card.financeDate}
-        </div>
-      </div>
-      <div>
-        <div style={styles.pill}>Settlement</div>
-        <div style={{ ...styles.small, textAlign: 'center' }}>
-          {card.settlementDate}
-        </div>
-      </div>
-      <div>
-        <div style={styles.pillHot}>Stage Due</div>
-        <div style={{ ...styles.small, color: '#ff5f46', textAlign: 'center' }}>
-          {card.stageDueDate}
-        </div>
-      </div>
-    </div>
-    {moveControl && <div style={styles.quickMove}>{moveControl}</div>}
-  </div>
-);
-
 export const BrokerAppWorkspace = () => {
   const opportunityRecordId = useRecordId();
   const [activePageName, setActivePageName] = useState('LoanDash');
   const [activeTool, setActiveTool] = useState(rightRailTools[0]);
   const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(true);
-  const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(false);
-  const [expandedDealStageNames, setExpandedDealStageNames] = useState(
-    defaultExpandedDealStages,
+  const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(true);
+  const [collapsedNavGroups, setCollapsedNavGroups] = useState<string[]>([]);
+  const [collapsedPageSections, setCollapsedPageSections] = useState<string[]>(
+    [],
   );
+  const [applicantCount, setApplicantCount] = useState(2);
   const [loanBoard, setLoanBoard] = useState<BoardKey>('Deal');
   const [loanStageValue, setLoanStageValue] = useState(firstDealStage.value);
   const [boardMoveStatus, setBoardMoveStatus] = useState<
@@ -2179,45 +2082,6 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
-  const toggleDealStage = (stageName: string) => {
-    setExpandedDealStageNames((current) =>
-      current.includes(stageName)
-        ? current.filter((name) => name !== stageName)
-        : [...current, stageName],
-    );
-  };
-
-  const renderMoveStageSelect = (label = 'Move card') => (
-    <>
-      <span style={styles.small}>{label}</span>
-      <select
-        onChange={(event) => {
-          if (event.currentTarget.value) {
-            void moveOpportunityToStage(event.currentTarget.value);
-          }
-        }}
-        style={styles.input}
-        value=""
-      >
-        <option value="">Choose board/stage...</option>
-        <optgroup label="Lead board">
-          {leadWorkflowStageOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </optgroup>
-        <optgroup label="Deal board">
-          {dealWorkflowStageOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </optgroup>
-      </select>
-    </>
-  );
-
   const runWorkflow = (template: BrokerWorkflowTemplate) => {
     const taskBatch = template.tasks.map((task, index) => ({
       assignee:
@@ -2259,6 +2123,12 @@ export const BrokerAppWorkspace = () => {
       ? task.status === 'Completed'
       : task.status !== 'Completed',
   );
+  const applicantRoles = [
+    'Primary Applicant',
+    'Co-Applicant 1',
+    'Co-Applicant 2',
+    'Co-Applicant 3',
+  ].slice(0, applicantCount);
   const activePage = workspacePages[activePageName] ?? workspacePages.LoanDash;
   const loanTitle = opportunityRecordId
     ? `Opportunity ${opportunityRecordId.slice(0, 8)}`
@@ -2315,6 +2185,20 @@ export const BrokerAppWorkspace = () => {
       },
     },
   ];
+  const toggleNavGroup = (groupName: string) => {
+    setCollapsedNavGroups((current) =>
+      current.includes(groupName)
+        ? current.filter((name) => name !== groupName)
+        : [...current, groupName],
+    );
+  };
+  const togglePageSection = (sectionKey: string) => {
+    setCollapsedPageSections((current) =>
+      current.includes(sectionKey)
+        ? current.filter((key) => key !== sectionKey)
+        : [...current, sectionKey],
+    );
+  };
 
   const renderWorkspaceField = (workspaceField: WorkspaceField) => {
     const label = workspaceField.required
@@ -2467,16 +2351,11 @@ export const BrokerAppWorkspace = () => {
       {activePage.title === 'LoanDash' && (
         <>
           <section style={styles.metrics}>
-            {[
-              ['Loan Amount', '$0.00'],
-              ['Fact Find', '62%'],
-              ['Serviceability', 'Blocked'],
-              ['Board', loanBoard],
-            ].map(([label, value]) => (
+            {loanDashboardMetricCards.map(([label, value]) => (
               <div key={label} style={styles.metricCard}>
                 <span style={styles.small}>{label}</span>
                 <h2 style={{ margin: '6px 0 0', fontSize: '22px' }}>
-                  {value}
+                  {label === 'Board' ? loanBoard : value}
                 </h2>
               </div>
             ))}
@@ -2551,92 +2430,68 @@ export const BrokerAppWorkspace = () => {
               </select>
             </div>
           </section>
-
-          <section style={styles.boardWrap}>
-            <div style={styles.boardHeader}>
-              <div>
-                <strong>Loan Board</strong>
-                <span style={{ ...styles.small, marginLeft: '8px' }}>
-                  BrokerEngine-style stage columns with empty stages collapsed.
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  onClick={() => setExpandedDealStageNames(dealStages)}
-                  style={styles.iconButton}
-                  type="button"
-                >
-                  Expand all
-                </button>
-                <button
-                  onClick={() =>
-                    setExpandedDealStageNames(defaultExpandedDealStages)
-                  }
-                  style={styles.iconButton}
-                  type="button"
-                >
-                  Collapse empty
-                </button>
-              </div>
-            </div>
-            <div style={styles.board}>
-              {dealStages.map((stageName, index) => {
-                const stage = {
-                  amount: index === 0 ? '$0.00M' : '$0.00M',
-                  count: index === 0 ? 1 : 0,
-                  name: stageName,
-                  number: `${index + 1}.`,
-                  open: expandedDealStageNames.includes(stageName),
-                };
-
-                return stage.open ? (
-                  <div key={stage.name} style={styles.column}>
-                    <div style={styles.columnTitle}>
-                      <span>
-                        {stage.number} {stage.name}
-                      </span>
-                      <button
-                        onClick={() => toggleDealStage(stage.name)}
-                        style={styles.subtleButton}
-                        type="button"
-                      >
-                        Collapse
-                      </button>
-                    </div>
-                    <div style={styles.small}>
-                      {stage.count} Records / {stage.amount}
-                    </div>
-                    {index === 0 &&
-                      leadCards
-                        .slice(2)
-                        .map((card) => renderCard(card, renderMoveStageSelect()))}
-                    {index === 1 &&
-                      leadCards
-                        .slice(0, 1)
-                        .map((card) => renderCard(card, renderMoveStageSelect()))}
-                    {index === 15 &&
-                      leadCards
-                        .slice(1, 2)
-                        .map((card) => renderCard(card, renderMoveStageSelect()))}
-                  </div>
-                ) : (
-                  <button
-                    key={stage.name}
-                    onClick={() => toggleDealStage(stage.name)}
-                    style={styles.collapsedColumn}
-                    type="button"
-                  >
-                    <strong>{stage.number}</strong>
-                    <div style={styles.verticalText}>{stage.name}</div>
-                    <div style={styles.verticalText}>
-                      {stage.count} Records / {stage.amount}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
         </>
+      )}
+
+      {activePage.title === 'Applicants' && (
+        <section style={styles.boardWrap}>
+          <div style={styles.sectionHeader}>
+            <div>
+              <strong>Applicant stack</strong>
+              <div style={styles.small}>
+                Add up to four residential applicants without creating duplicate
+                loan records.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                disabled={applicantCount <= 1}
+                onClick={() =>
+                  setApplicantCount((count) => Math.max(1, count - 1))
+                }
+                style={{
+                  ...styles.subtleButton,
+                  ...(applicantCount <= 1 ? styles.disabledButton : {}),
+                }}
+                type="button"
+              >
+                Remove applicant
+              </button>
+              <button
+                disabled={applicantCount >= 4}
+                onClick={() =>
+                  setApplicantCount((count) => Math.min(4, count + 1))
+                }
+                style={{
+                  ...styles.newButton,
+                  ...(applicantCount >= 4 ? styles.disabledButton : {}),
+                }}
+                type="button"
+              >
+                Add applicant
+              </button>
+            </div>
+          </div>
+          <div style={styles.applicantDeck}>
+            {applicantRoles.map((role, index) => (
+              <div key={role} style={styles.applicantCard}>
+                <strong>{role}</strong>
+                <span style={styles.small}>
+                  {index === 0
+                    ? 'Required for every residential loan'
+                    : 'Conditional co-applicant / spouse / guarantor role'}
+                </span>
+                <select style={styles.input} value="Individual" disabled>
+                  <option>Individual</option>
+                </select>
+                <input
+                  placeholder="Link or create contact"
+                  style={styles.input}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {activePage.sections.map((section) => (
@@ -2646,19 +2501,41 @@ export const BrokerAppWorkspace = () => {
               <strong>{section.title}</strong>
               <div style={styles.small}>{section.description}</div>
             </div>
-            <span style={styles.statusWarn}>Autosaved locally</span>
+            <button
+              onClick={() =>
+                togglePageSection(`${activePage.title}:${section.title}`)
+              }
+              style={styles.subtleButton}
+              type="button"
+            >
+              {collapsedPageSections.includes(
+                `${activePage.title}:${section.title}`,
+              )
+                ? 'Expand'
+                : 'Collapse'}
+            </button>
           </div>
-          <div style={styles.formGrid}>
-            {section.fields.map(renderWorkspaceField)}
-          </div>
-          {section.actions && (
-            <div style={styles.actionBar}>
-              {section.actions.map((action) => (
-                <button key={action} style={styles.subtleButton} type="button">
-                  {action}
-                </button>
-              ))}
-            </div>
+          {!collapsedPageSections.includes(
+            `${activePage.title}:${section.title}`,
+          ) && (
+            <>
+              <div style={styles.formGrid}>
+                {section.fields.map(renderWorkspaceField)}
+              </div>
+              {section.actions && (
+                <div style={styles.actionBar}>
+                  {section.actions.map((action) => (
+                    <button
+                      key={action}
+                      style={styles.subtleButton}
+                      type="button"
+                    >
+                      {action}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
       ))}
@@ -2911,28 +2788,51 @@ export const BrokerAppWorkspace = () => {
           </div>
           {loanNavigationGroups.map((group) => (
             <div key={group.group} style={styles.navGroup}>
-              <div style={styles.navHeader}>
+              <button
+                onClick={() => toggleNavGroup(group.group)}
+                style={styles.navHeader}
+                type="button"
+              >
                 <span>{group.group}</span>
-                {'badge' in group && <span style={styles.statusOk}>New</span>}
-              </div>
-              {group.items.map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setActivePageName(item)}
-                  style={{
-                    ...styles.navItem,
-                    ...(item === activePageName ? styles.navItemActive : {}),
-                    border: '0',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    width: '100%',
-                  }}
-                  type="button"
-                >
-                  <span style={styles.navDot} />
-                  <span>{item}</span>
-                </button>
-              ))}
+                <span style={styles.small}>
+                  {collapsedNavGroups.includes(group.group) ? 'Expand' : 'Collapse'}
+                </span>
+              </button>
+              {!collapsedNavGroups.includes(group.group) &&
+                group.items.map((item) => {
+                  const isComplete = completedWorkspacePages.has(item);
+
+                  return (
+                    <button
+                      key={item}
+                      onClick={() => setActivePageName(item)}
+                      style={{
+                        ...styles.navItem,
+                        ...(item === activePageName
+                          ? styles.navItemActive
+                          : {}),
+                        border: '0',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        width: '100%',
+                      }}
+                      type="button"
+                    >
+                      <span
+                        aria-label={isComplete ? 'complete' : 'incomplete'}
+                        style={{
+                          ...styles.navStatus,
+                          ...(isComplete
+                            ? styles.navStatusComplete
+                            : styles.navStatusIncomplete),
+                        }}
+                      >
+                        {isComplete ? '✓' : 'x'}
+                      </span>
+                      <span>{item}</span>
+                    </button>
+                  );
+                })}
             </div>
           ))}
         </aside>
@@ -3016,94 +2916,6 @@ export const BrokerAppWorkspace = () => {
                 </p>
               </div>
             </section>
-
-            <section style={{ ...styles.boardWrap, marginTop: '12px' }}>
-              <div style={styles.boardHeader}>
-                <div>
-                  <strong>Broker Settings Control Centre</strong>
-                  <span style={{ ...styles.small, marginLeft: '8px' }}>
-                    Settings drive the tools; they are not standalone broker
-                    tables.
-                  </span>
-                </div>
-                <span style={styles.statusOk}>Configured for pilot</span>
-              </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                  gap: '8px',
-                  padding: '12px',
-                }}
-              >
-                {brokerSettingsControls.map(([label, description]) => (
-                  <div key={label} style={styles.panel}>
-                    <strong>{label}</strong>
-                    <p style={styles.small}>{description}</p>
-                    <button style={styles.newButton} type="button">
-                      Control
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section style={{ ...styles.boardWrap, marginTop: '12px' }}>
-              <div style={styles.boardHeader}>
-                <strong>Lead Board Stages</strong>
-                <span style={styles.small}>
-                  Lead intake kanban with empty-stage collapse and bulk edit.
-                </span>
-              </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                  gap: '8px',
-                  padding: '12px',
-                }}
-              >
-                {leadStages.map((stage) => (
-                  <div key={stage.name} style={styles.panel}>
-                    <strong>
-                      {stage.number} {stage.name}
-                    </strong>
-                    <div style={styles.small}>
-                      {stage.count} records / {stage.amount}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section style={{ ...styles.boardWrap, marginTop: '12px' }}>
-              <div style={styles.boardHeader}>
-                <strong>Deal Board Stages</strong>
-                <span style={styles.small}>
-                  Used for list, kanban, stage due warnings, bulk edit, and
-                  workflow triggers.
-                </span>
-              </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                  gap: '8px',
-                  padding: '12px',
-                }}
-              >
-                {dealStages.map((stage, index) => (
-                  <div key={stage} style={styles.panel}>
-                    <strong>
-                      {index + 1}. {stage}
-                    </strong>
-                    <div style={styles.small}>
-                      Stage due, task gate, checklist
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
           </div>
         </main>
 
@@ -3143,8 +2955,12 @@ export const BrokerAppWorkspace = () => {
                 }}
                 title={tool}
               >
-                <span>{tool.split(' ')[0]}</span>
-                {!isToolboxCollapsed && <span>{tool}</span>}
+                <span style={styles.toolIcon}>
+                  {rightRailToolIcons[tool] ?? tool.slice(0, 2)}
+                </span>
+                {!isToolboxCollapsed && (
+                  <span style={styles.toolLabel}>{tool}</span>
+                )}
               </button>
             ))}
           </div>
@@ -3190,9 +3006,7 @@ export const BrokerAppWorkspace = () => {
     </button>
   );
 
-  return typeof document === 'undefined'
-    ? workspaceElement
-    : createPortal(workspaceElement, document.body);
+  return workspaceElement;
 };
 
 export default defineFrontComponent({
