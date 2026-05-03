@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { CoreApiClient } from 'twenty-client-sdk/core';
@@ -1337,18 +1338,115 @@ const workspacePages: Record<string, WorkspacePage> = {
 const styles = {
   shell: {
     background: 'var(--t-background-secondary, #fafafa)',
-    bottom: 0,
     color: 'var(--t-font-color-primary, #333333)',
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column' as const,
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
-    height: 'calc(100vh - 56px)',
-    left: '40px',
+    height: '100%',
     minHeight: 'auto',
     overflow: 'hidden',
     padding: '0',
+    position: 'relative' as const,
+  },
+  overlayScrim: {
+    background: 'rgba(20, 24, 31, 0.18)',
+    bottom: 0,
+    boxSizing: 'border-box' as const,
+    left: '40px',
+    padding: '10px 12px 12px',
     position: 'fixed' as const,
     right: 0,
     top: '56px',
-    zIndex: 20,
+    zIndex: 2147480000,
+  },
+  workspaceModal: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    boxShadow: '0 18px 48px rgba(15, 23, 42, 0.22)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    height: '100%',
+    overflow: 'hidden',
+  },
+  workspaceToolbar: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    borderBottom: '1px solid var(--t-border-color-medium, #ebebeb)',
+    display: 'grid',
+    gap: '12px',
+    gridTemplateColumns: 'minmax(0, 1fr) auto',
+    minHeight: '48px',
+    padding: '0 10px 0 14px',
+  },
+  toolbarLeft: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: '12px',
+    minWidth: 0,
+  },
+  toolbarTitle: {
+    color: 'var(--t-font-color-primary, #333333)',
+    fontSize: 'var(--t-font-size-sm, 0.95rem)',
+    fontWeight: 700,
+    whiteSpace: 'nowrap',
+  },
+  toolbarTabs: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: '2px',
+    minWidth: 0,
+    overflowX: 'auto' as const,
+  },
+  toolbarTab: {
+    alignItems: 'center',
+    background: 'transparent',
+    border: '0',
+    borderBottom: '2px solid transparent',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 600,
+    gap: '6px',
+    height: '48px',
+    padding: '0 10px',
+    whiteSpace: 'nowrap',
+  },
+  toolbarTabActive: {
+    borderBottom: '2px solid var(--t-font-color-primary, #333333)',
+    color: 'var(--t-font-color-primary, #333333)',
+  },
+  toolbarActions: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: '8px',
+  },
+  closeButton: {
+    background: 'var(--t-background-primary-inverted, #333333)',
+    border: '1px solid var(--t-border-color-inverted, #333333)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-inverted, #ffffff)',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 700,
+    minHeight: '32px',
+    padding: '0 12px',
+  },
+  reopenButton: {
+    background: 'var(--t-background-primary-inverted, #333333)',
+    border: '1px solid var(--t-border-color-inverted, #333333)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    bottom: '18px',
+    boxShadow: '0 12px 36px rgba(15, 23, 42, 0.22)',
+    color: 'var(--t-font-color-inverted, #ffffff)',
+    fontSize: 'var(--t-font-size-sm, 0.95rem)',
+    fontWeight: 700,
+    left: '56px',
+    minHeight: '40px',
+    padding: '0 14px',
+    position: 'fixed' as const,
+    zIndex: 2147480000,
   },
   topbar: {
     height: '48px',
@@ -1968,6 +2066,7 @@ export const BrokerAppWorkspace = () => {
   const opportunityRecordId = useRecordId();
   const [activePageName, setActivePageName] = useState('LoanDash');
   const [activeTool, setActiveTool] = useState(rightRailTools[0]);
+  const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(true);
   const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(false);
   const [expandedDealStageNames, setExpandedDealStageNames] = useState(
     defaultExpandedDealStages,
@@ -2164,6 +2263,58 @@ export const BrokerAppWorkspace = () => {
   const loanTitle = opportunityRecordId
     ? `Opportunity ${opportunityRecordId.slice(0, 8)}`
     : 'Opened Opportunity';
+  const toolbarTabs = [
+    {
+      label: 'Home',
+      active: activePageName === 'LoanDash',
+      onClick: () => setActivePageName('LoanDash'),
+    },
+    {
+      label: 'Timeline',
+      active: activeTool === 'Notes',
+      onClick: () => {
+        setActiveTool('Notes');
+        setIsToolboxCollapsed(false);
+      },
+    },
+    {
+      label: 'Tasks',
+      active: activeTool === 'Tasks',
+      onClick: () => {
+        setActiveTool('Tasks');
+        setIsToolboxCollapsed(false);
+      },
+    },
+    {
+      label: 'Notes',
+      active: activeTool === 'Notes',
+      onClick: () => {
+        setActiveTool('Notes');
+        setIsToolboxCollapsed(false);
+      },
+    },
+    {
+      label: 'Files',
+      active: activePageName === 'Smart Docs',
+      onClick: () => setActivePageName('Smart Docs'),
+    },
+    {
+      label: 'Emails',
+      active: activeTool === 'Emails',
+      onClick: () => {
+        setActiveTool('Emails');
+        setIsToolboxCollapsed(false);
+      },
+    },
+    {
+      label: 'Calendar',
+      active: activeTool === 'Key Dates',
+      onClick: () => {
+        setActiveTool('Key Dates');
+        setIsToolboxCollapsed(false);
+      },
+    },
+  ];
 
   const renderWorkspaceField = (workspaceField: WorkspaceField) => {
     const label = workspaceField.required
@@ -2705,8 +2856,46 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
-  return (
-    <div style={styles.shell}>
+  const workspaceElement = isWorkspaceOpen ? (
+    <div style={styles.overlayScrim}>
+      <section aria-label="BrokerApp loan workspace" style={styles.workspaceModal}>
+        <div style={styles.workspaceToolbar}>
+          <div style={styles.toolbarLeft}>
+            <strong style={styles.toolbarTitle}>BrokerApp Loan Workspace</strong>
+            <nav aria-label="Loan workspace toolbar" style={styles.toolbarTabs}>
+              {toolbarTabs.map((tab) => (
+                <button
+                  key={tab.label}
+                  onClick={tab.onClick}
+                  style={{
+                    ...styles.toolbarTab,
+                    ...(tab.active ? styles.toolbarTabActive : {}),
+                  }}
+                  type="button"
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <div style={styles.toolbarActions}>
+            <button
+              onClick={() => window.location.assign('/objects/opportunities')}
+              style={styles.subtleButton}
+              type="button"
+            >
+              Back to board
+            </button>
+            <button
+              onClick={() => setIsWorkspaceOpen(false)}
+              style={styles.closeButton}
+              type="button"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+        <div style={styles.shell}>
       <div
         style={{
           ...styles.opportunityShell,
@@ -2988,8 +3177,22 @@ export const BrokerAppWorkspace = () => {
           )}
         </aside>
       </div>
+        </div>
+      </section>
     </div>
+  ) : (
+    <button
+      onClick={() => setIsWorkspaceOpen(true)}
+      style={styles.reopenButton}
+      type="button"
+    >
+      Open BrokerApp Loan Workspace
+    </button>
   );
+
+  return typeof document === 'undefined'
+    ? workspaceElement
+    : createPortal(workspaceElement, document.body);
 };
 
 export default defineFrontComponent({

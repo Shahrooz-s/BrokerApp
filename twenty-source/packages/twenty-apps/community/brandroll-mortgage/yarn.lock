@@ -21,7 +21,10 @@ __metadata:
   dependencies:
     "@types/node": "npm:^24.7.2"
     "@types/react": "npm:^19.2.2"
+    "@types/react-dom": "npm:^19.0.0"
     oxlint: "npm:^0.16.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
     twenty-client-sdk: "npm:2.2.0"
     twenty-sdk: "npm:2.2.0"
     typescript: "npm:^5.9.3"
@@ -1042,6 +1045,15 @@ __metadata:
   version: 6.15.0
   resolution: "@types/qs@npm:6.15.0"
   checksum: 10c0/1b104cac50e655fc41d7fc1de2c2aba2908c4cf833a555b6808fb4c96752662b439238f2392a15d2590a7a6ca75dbd40e42d9378ac2be0d548ee484954363688
+  languageName: node
+  linkType: hard
+
+"@types/react-dom@npm:^19.0.0":
+  version: 19.2.3
+  resolution: "@types/react-dom@npm:19.2.3"
+  peerDependencies:
+    "@types/react": ^19.2.0
+  checksum: 10c0/b486ebe0f4e2fb35e2e108df1d8fc0927ca5d6002d5771e8a739de11239fe62d0e207c50886185253c99eb9dedfeeb956ea7429e5ba17f6693c7acb4c02f8cd1
   languageName: node
   linkType: hard
 
