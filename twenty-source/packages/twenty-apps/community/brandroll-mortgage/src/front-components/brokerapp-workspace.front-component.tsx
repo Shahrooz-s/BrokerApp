@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import { defineFrontComponent } from 'twenty-sdk/define';
-import { useRecordId } from 'twenty-sdk/front-component';
+import { CoreApiClient } from 'twenty-client-sdk/core';
+import { enqueueSnackbar, useRecordId } from 'twenty-sdk/front-component';
 
 export const BROKERAPP_LOANDASH_FRONT_COMPONENT_ID =
   '6b6d0000-4100-4000-8000-000000000001';
@@ -127,6 +128,107 @@ const dealStages = [
   'Settlement',
   'Lost/Declined',
 ];
+
+type BoardKey = 'Lead' | 'Deal';
+
+type BoardStageOption = {
+  board: BoardKey;
+  label: string;
+  value: string;
+};
+
+const leadWorkflowStageOptions: BoardStageOption[] = [
+  { board: 'Lead', label: '1. New Lead', value: 'NEW_LEAD' },
+  {
+    board: 'Lead',
+    label: '2. Attempted Contact 1',
+    value: 'ATTEMPTED_CONTACT_1',
+  },
+  {
+    board: 'Lead',
+    label: '3. Attempted Contact 2',
+    value: 'ATTEMPTED_CONTACT_2',
+  },
+  {
+    board: 'Lead',
+    label: '4. Attempted Contact 3',
+    value: 'ATTEMPTED_CONTACT_3',
+  },
+  {
+    board: 'Lead',
+    label: '5. Initial Call Held > Get Docs',
+    value: 'INITIAL_CALL_GET_DOCS',
+  },
+  {
+    board: 'Lead',
+    label: '6. Docs Requested',
+    value: 'LEAD_DOCS_REQUESTED',
+  },
+  {
+    board: 'Lead',
+    label: '7. Research > Servicing',
+    value: 'RESEARCH_SERVICING',
+  },
+  {
+    board: 'Lead',
+    label: '8. Prepare Loan Proposal',
+    value: 'PREPARE_LOAN_PROPOSAL',
+  },
+  {
+    board: 'Lead',
+    label: '9. Loan Proposal Presented',
+    value: 'LOAN_PROPOSAL_PRESENTED',
+  },
+  {
+    board: 'Lead',
+    label: '10. Client Accepted > Handover',
+    value: 'CLIENT_ACCEPTED_HANDOVER',
+  },
+  { board: 'Lead', label: '11. On Hold', value: 'ON_HOLD' },
+  { board: 'Lead', label: '12. Lost Opps', value: 'LOST_OPPORTUNITY' },
+];
+
+const dealWorkflowStageValues = [
+  'OUTSTANDING_SUPPORTING_DOCUMENTS',
+  'PREPARE_FOR_SUBMISSION',
+  'APP_DOCS_WITH_CLIENT',
+  'SIGNED_APP_DOCS_RETURNED',
+  'APPLICATION_LODGED',
+  'AIP_ISSUED',
+  'AIP_FULL_CONVERSION',
+  'CONDITIONAL_MIRS',
+  'CONDITIONS_MIRS_WITH_CLIENT',
+  'CONDITIONS_MIRS_WITH_LENDER',
+  'FORMAL_APPROVAL',
+  'MORTGAGE_DOCS_ISSUED',
+  'MORTGAGE_DOCS_RETURNED',
+  'READY_TO_SETTLE',
+  'SETTLEMENT_BOOKED',
+  'SETTLEMENT',
+  'LOST_DECLINED',
+];
+
+const dealWorkflowStageOptions: BoardStageOption[] = dealStages.map(
+  (label, index) => ({
+    board: 'Deal',
+    label: `${index + 1}. ${label}`,
+    value: dealWorkflowStageValues[index] ?? 'OUTSTANDING_SUPPORTING_DOCUMENTS',
+  }),
+);
+
+const boardStageOptions = [
+  ...leadWorkflowStageOptions,
+  ...dealWorkflowStageOptions,
+];
+
+const defaultExpandedDealStages = [
+  'Outstanding Supporting Documents',
+  'Prepare for Submission',
+  'Settlement',
+];
+
+const firstDealStage = dealWorkflowStageOptions[0];
+const firstLeadStage = leadWorkflowStageOptions[0];
 
 const rightRailTools = [
   'Notes',
@@ -1234,12 +1336,19 @@ const workspacePages: Record<string, WorkspacePage> = {
 
 const styles = {
   shell: {
-    minHeight: '100%',
-    background: '#f8f9fb',
-    color: '#252a31',
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif',
+    background: 'var(--t-background-secondary, #fafafa)',
+    bottom: 0,
+    color: 'var(--t-font-color-primary, #333333)',
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    height: 'calc(100vh - 56px)',
+    left: '40px',
+    minHeight: 'auto',
+    overflow: 'hidden',
     padding: '0',
+    position: 'fixed' as const,
+    right: 0,
+    top: '56px',
+    zIndex: 20,
   },
   topbar: {
     height: '48px',
@@ -1258,12 +1367,12 @@ const styles = {
     minWidth: 0,
   },
   newButton: {
-    background: '#18a66a',
-    border: '1px solid #148d5a',
-    color: '#ffffff',
-    borderRadius: '4px',
-    fontSize: '13px',
-    fontWeight: 700,
+    background: 'var(--t-background-primary-inverted, #333333)',
+    border: '1px solid var(--t-border-color-inverted, #333333)',
+    color: 'var(--t-font-color-inverted, #ffffff)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 600,
     padding: '7px 13px',
   },
   countText: {
@@ -1281,16 +1390,17 @@ const styles = {
     background: '#ffffff',
   },
   iconButton: {
-    width: '30px',
+    minWidth: '30px',
     height: '30px',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: '1px solid #d8dce4',
-    borderRadius: '4px',
-    background: '#ffffff',
-    color: '#34425a',
-    fontWeight: 800,
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    background: 'var(--t-background-primary, #ffffff)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    fontWeight: 600,
+    padding: '0 8px',
   },
   canvas: {
     display: 'grid',
@@ -1299,9 +1409,9 @@ const styles = {
     padding: '12px',
   },
   boardWrap: {
-    background: '#ffffff',
-    border: '1px solid #e2e6ed',
-    borderRadius: '6px',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     overflow: 'hidden',
   },
   boardHeader: {
@@ -1322,15 +1432,18 @@ const styles = {
   column: {
     width: '255px',
     minWidth: '255px',
-    background: '#eef0f2',
-    borderRadius: '5px',
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     padding: '8px',
   },
   collapsedColumn: {
     width: '42px',
     minWidth: '42px',
-    background: '#eef0f2',
-    borderRadius: '5px',
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    border: '1px solid transparent',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
     padding: '8px 4px',
     display: 'flex',
     flexDirection: 'column' as const,
@@ -1358,17 +1471,17 @@ const styles = {
     fontSize: '12px',
   },
   card: {
-    background: '#ffffff',
-    border: '1px solid #ff6c64',
-    borderRadius: '5px',
-    boxShadow: '0 1px 0 rgba(20, 26, 35, 0.04)',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    boxShadow: 'var(--t-box-shadow-light, 0 1px 2px rgba(0, 0, 0, 0.04))',
     marginTop: '8px',
     padding: '9px',
   },
   cardTitle: {
-    color: '#2d72b7',
-    fontWeight: 800,
-    fontSize: '13px',
+    color: 'var(--t-font-color-primary, #333333)',
+    fontWeight: 600,
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
     lineHeight: 1.25,
   },
   bars: {
@@ -1514,15 +1627,17 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: '232px minmax(860px, 1fr) 360px',
-    minHeight: 'calc(100vh - 80px)',
-    minWidth: '1452px',
+    gridTemplateColumns: '232px minmax(760px, 1fr) 360px',
+    height: '100%',
+    minHeight: '100%',
+    minWidth: '1180px',
     overflow: 'auto',
   },
   loanSidebar: {
-    background: '#f3f5f8',
-    borderRight: '1px solid #dfe4eb',
+    background: 'var(--t-background-secondary, #fafafa)',
+    borderRight: '1px solid var(--t-border-color-medium, #ebebeb)',
     overflow: 'auto',
+    maxHeight: '100%',
   },
   sidebarHeader: {
     alignItems: 'center',
@@ -1570,6 +1685,7 @@ const styles = {
   loanMain: {
     minWidth: 0,
     overflow: 'auto',
+    maxHeight: '100%',
   },
   warningBar: {
     alignItems: 'center',
@@ -1596,8 +1712,8 @@ const styles = {
     minWidth: 0,
   },
   title: {
-    fontSize: '21px',
-    fontWeight: 850,
+    fontSize: 'var(--t-font-size-lg, 1.23rem)',
+    fontWeight: 600,
     lineHeight: 1.2,
     margin: 0,
   },
@@ -1627,14 +1743,19 @@ const styles = {
     padding: '12px',
   },
   toolShell: {
-    background: '#ffffff',
-    borderLeft: '1px solid #dfe4eb',
+    background: 'var(--t-background-primary, #ffffff)',
+    borderLeft: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'grid',
     gridTemplateColumns: '66px minmax(0, 1fr)',
     minHeight: 0,
+    maxHeight: '100%',
+  },
+  toolShellCollapsed: {
+    gridTemplateColumns: '56px',
   },
   darkToolRail: {
-    background: '#2f4668',
+    background: 'var(--t-background-primary, #ffffff)',
+    borderRight: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '8px',
@@ -1642,10 +1763,10 @@ const styles = {
   },
   toolButton: {
     alignItems: 'center',
-    background: 'transparent',
+    background: 'var(--t-background-primary, #ffffff)',
     border: '1px solid transparent',
-    borderRadius: '6px',
-    color: '#ffffff',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-secondary, #666666)',
     cursor: 'pointer',
     display: 'flex',
     flexDirection: 'column' as const,
@@ -1656,12 +1777,14 @@ const styles = {
     padding: '5px 2px',
   },
   toolButtonActive: {
-    background: 'rgba(255, 255, 255, 0.12)',
-    border: '1px solid rgba(255, 255, 255, 0.24)',
+    background: 'var(--t-accent-quaternary, #f7f8ff)',
+    border: '1px solid var(--t-border-color-blue, #aebcff)',
+    color: 'var(--t-accent-accent11, #415abf)',
   },
   toolDrawer: {
     minWidth: 0,
     overflow: 'auto',
+    maxHeight: '100%',
   },
   toolDrawerHeader: {
     alignItems: 'center',
@@ -1762,22 +1885,51 @@ const styles = {
     padding: '10px 12px',
   },
   subtleButton: {
-    background: '#ffffff',
-    border: '1px solid #d8dce4',
-    borderRadius: '4px',
-    color: '#34425a',
-    fontSize: '12px',
-    fontWeight: 800,
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 600,
     minHeight: '30px',
     padding: '0 10px',
+  },
+  disabledButton: {
+    cursor: 'not-allowed',
+    opacity: 0.56,
   },
   pageLayout: {
     display: 'grid',
     gap: '12px',
   },
+  quickMove: {
+    borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
+    display: 'grid',
+    gap: '6px',
+    marginTop: '8px',
+    paddingTop: '8px',
+  },
+  handoverPanel: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'grid',
+    gap: '10px',
+    gridTemplateColumns: 'minmax(0, 1fr) auto',
+    padding: '12px',
+  },
+  boardControls: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '8px',
+    justifyContent: 'flex-end',
+  },
 } as const;
 
-const renderCard = (card: (typeof leadCards)[number]) => (
+const renderCard = (
+  card: (typeof leadCards)[number],
+  moveControl?: ReactNode,
+) => (
   <div style={styles.card} key={card.name}>
     <div style={styles.bars}>
       <span style={styles.barRed} />
@@ -1808,6 +1960,7 @@ const renderCard = (card: (typeof leadCards)[number]) => (
         </div>
       </div>
     </div>
+    {moveControl && <div style={styles.quickMove}>{moveControl}</div>}
   </div>
 );
 
@@ -1815,6 +1968,15 @@ export const BrokerAppWorkspace = () => {
   const opportunityRecordId = useRecordId();
   const [activePageName, setActivePageName] = useState('LoanDash');
   const [activeTool, setActiveTool] = useState(rightRailTools[0]);
+  const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(false);
+  const [expandedDealStageNames, setExpandedDealStageNames] = useState(
+    defaultExpandedDealStages,
+  );
+  const [loanBoard, setLoanBoard] = useState<BoardKey>('Deal');
+  const [loanStageValue, setLoanStageValue] = useState(firstDealStage.value);
+  const [boardMoveStatus, setBoardMoveStatus] = useState<
+    'Idle' | 'Saving' | 'Saved' | 'Error'
+  >('Idle');
   const [generatedTasks, setGeneratedTasks] = useState<
     GeneratedAssistantTask[]
   >(initialGeneratedTasks);
@@ -1823,6 +1985,138 @@ export const BrokerAppWorkspace = () => {
   );
   const [lastWorkflowName, setLastWorkflowName] = useState(
     'Outstanding Supporting Documents',
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousNavigationWidth = root.style.getPropertyValue(
+      '--navigation-drawer-width',
+    );
+
+    root.style.setProperty('--navigation-drawer-width', '72px');
+
+    return () => {
+      if (previousNavigationWidth) {
+        root.style.setProperty(
+          '--navigation-drawer-width',
+          previousNavigationWidth,
+        );
+      } else {
+        root.style.removeProperty('--navigation-drawer-width');
+      }
+    };
+  }, []);
+
+  const moveOpportunityToStage = async (
+    stageValue: string,
+    nextAction?: string,
+  ) => {
+    const stageOption = boardStageOptions.find(
+      (option) => option.value === stageValue,
+    );
+
+    if (!stageOption) {
+      return;
+    }
+
+    setLoanBoard(stageOption.board);
+    setLoanStageValue(stageOption.value);
+    setBoardMoveStatus('Saving');
+
+    if (!opportunityRecordId) {
+      setBoardMoveStatus('Saved');
+      await enqueueSnackbar({
+        message: `Preview moved to ${stageOption.board} board`,
+        variant: 'info',
+      });
+      return;
+    }
+
+    try {
+      const client = new CoreApiClient();
+
+      await client.mutation({
+        updateOpportunity: {
+          __args: {
+            id: opportunityRecordId,
+            data: {
+              brokerWorkflowStage: stageOption.value,
+              nextBrokerAction:
+                nextAction ??
+                (stageOption.board === 'Deal'
+                  ? 'Assistant broker to finalise file and prepare lender submission'
+                  : 'Broker to progress lead intake and proposal'),
+            },
+          },
+          id: true,
+          brokerWorkflowStage: true,
+          nextBrokerAction: true,
+        },
+      });
+
+      setBoardMoveStatus('Saved');
+      await enqueueSnackbar({
+        message: `Moved loan to ${stageOption.board} board: ${stageOption.label}`,
+        variant: 'success',
+      });
+    } catch (error) {
+      setBoardMoveStatus('Error');
+      await enqueueSnackbar({
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Could not move this loan between boards',
+        variant: 'error',
+      });
+    }
+  };
+
+  const moveOpportunityToBoard = async (targetBoard: BoardKey) => {
+    await moveOpportunityToStage(
+      targetBoard === 'Deal' ? firstDealStage.value : firstLeadStage.value,
+      targetBoard === 'Deal'
+        ? 'Assistant broker handover: request outstanding supporting documents and prepare for submission'
+        : 'Broker lead intake: confirm objectives before handover',
+    );
+  };
+
+  const toggleDealStage = (stageName: string) => {
+    setExpandedDealStageNames((current) =>
+      current.includes(stageName)
+        ? current.filter((name) => name !== stageName)
+        : [...current, stageName],
+    );
+  };
+
+  const renderMoveStageSelect = (label = 'Move card') => (
+    <>
+      <span style={styles.small}>{label}</span>
+      <select
+        onChange={(event) => {
+          if (event.currentTarget.value) {
+            void moveOpportunityToStage(event.currentTarget.value);
+          }
+        }}
+        style={styles.input}
+        value=""
+      >
+        <option value="">Choose board/stage...</option>
+        <optgroup label="Lead board">
+          {leadWorkflowStageOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label="Deal board">
+          {dealWorkflowStageOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </optgroup>
+      </select>
+    </>
   );
 
   const runWorkflow = (template: BrokerWorkflowTemplate) => {
@@ -2026,7 +2320,7 @@ export const BrokerAppWorkspace = () => {
               ['Loan Amount', '$0.00'],
               ['Fact Find', '62%'],
               ['Serviceability', 'Blocked'],
-              ['Lodgement', 'Not ready'],
+              ['Board', loanBoard],
             ].map(([label, value]) => (
               <div key={label} style={styles.metricCard}>
                 <span style={styles.small}>{label}</span>
@@ -2035,6 +2329,76 @@ export const BrokerAppWorkspace = () => {
                 </h2>
               </div>
             ))}
+          </section>
+
+          <section style={styles.handoverPanel}>
+            <div>
+              <strong>Board Handover</strong>
+              <p style={styles.small}>
+                Moving the Opportunity from a Lead stage to a Deal stage moves
+                the same loan record into the Deal board for the assistant
+                broker and backend team. No duplicate opportunity is created.
+              </p>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <span style={styles.pill}>Current: {loanBoard}</span>
+                <span style={styles.pill}>
+                  Status: {boardMoveStatus === 'Idle' ? 'Ready' : boardMoveStatus}
+                </span>
+              </div>
+            </div>
+            <div style={styles.boardControls}>
+              <button
+                disabled={loanBoard === 'Deal' || boardMoveStatus === 'Saving'}
+                onClick={() => void moveOpportunityToBoard('Deal')}
+                style={{
+                  ...styles.newButton,
+                  ...(loanBoard === 'Deal' || boardMoveStatus === 'Saving'
+                    ? styles.disabledButton
+                    : {}),
+                }}
+                type="button"
+              >
+                Move to Deal board
+              </button>
+              <button
+                disabled={loanBoard === 'Lead' || boardMoveStatus === 'Saving'}
+                onClick={() => void moveOpportunityToBoard('Lead')}
+                style={{
+                  ...styles.subtleButton,
+                  ...(loanBoard === 'Lead' || boardMoveStatus === 'Saving'
+                    ? styles.disabledButton
+                    : {}),
+                }}
+                type="button"
+              >
+                Move back to Lead
+              </button>
+              <select
+                disabled={boardMoveStatus === 'Saving'}
+                onChange={(event) => {
+                  if (event.currentTarget.value) {
+                    void moveOpportunityToStage(event.currentTarget.value);
+                  }
+                }}
+                style={styles.input}
+                value={loanStageValue}
+              >
+                <optgroup label="Lead board">
+                  {leadWorkflowStageOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Deal board">
+                  {dealWorkflowStageOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
           </section>
 
           <section style={styles.boardWrap}>
@@ -2046,8 +2410,22 @@ export const BrokerAppWorkspace = () => {
                 </span>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button style={styles.iconButton}>Expand</button>
-                <button style={styles.iconButton}>Hide Empty</button>
+                <button
+                  onClick={() => setExpandedDealStageNames(dealStages)}
+                  style={styles.iconButton}
+                  type="button"
+                >
+                  Expand all
+                </button>
+                <button
+                  onClick={() =>
+                    setExpandedDealStageNames(defaultExpandedDealStages)
+                  }
+                  style={styles.iconButton}
+                  type="button"
+                >
+                  Collapse empty
+                </button>
               </div>
             </div>
             <div style={styles.board}>
@@ -2057,7 +2435,7 @@ export const BrokerAppWorkspace = () => {
                   count: index === 0 ? 1 : 0,
                   name: stageName,
                   number: `${index + 1}.`,
-                  open: index === 0 || index === 1 || index === 15,
+                  open: expandedDealStageNames.includes(stageName),
                 };
 
                 return stage.open ? (
@@ -2066,23 +2444,43 @@ export const BrokerAppWorkspace = () => {
                       <span>
                         {stage.number} {stage.name}
                       </span>
-                      <span>C</span>
+                      <button
+                        onClick={() => toggleDealStage(stage.name)}
+                        style={styles.subtleButton}
+                        type="button"
+                      >
+                        Collapse
+                      </button>
                     </div>
                     <div style={styles.small}>
                       {stage.count} Records / {stage.amount}
                     </div>
-                    {index === 0 && leadCards.slice(2).map(renderCard)}
-                    {index === 1 && leadCards.slice(0, 1).map(renderCard)}
-                    {index === 15 && leadCards.slice(1, 2).map(renderCard)}
+                    {index === 0 &&
+                      leadCards
+                        .slice(2)
+                        .map((card) => renderCard(card, renderMoveStageSelect()))}
+                    {index === 1 &&
+                      leadCards
+                        .slice(0, 1)
+                        .map((card) => renderCard(card, renderMoveStageSelect()))}
+                    {index === 15 &&
+                      leadCards
+                        .slice(1, 2)
+                        .map((card) => renderCard(card, renderMoveStageSelect()))}
                   </div>
                 ) : (
-                  <div key={stage.name} style={styles.collapsedColumn}>
+                  <button
+                    key={stage.name}
+                    onClick={() => toggleDealStage(stage.name)}
+                    style={styles.collapsedColumn}
+                    type="button"
+                  >
                     <strong>{stage.number}</strong>
                     <div style={styles.verticalText}>{stage.name}</div>
                     <div style={styles.verticalText}>
                       {stage.count} Records / {stage.amount}
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -2309,7 +2707,14 @@ export const BrokerAppWorkspace = () => {
 
   return (
     <div style={styles.shell}>
-      <div style={styles.opportunityShell}>
+      <div
+        style={{
+          ...styles.opportunityShell,
+          gridTemplateColumns: `232px minmax(760px, 1fr) ${
+            isToolboxCollapsed ? '56px' : '360px'
+          }`,
+        }}
+      >
         <aside style={styles.loanSidebar}>
           <div style={styles.sidebarHeader}>
             <span>Loan Onboarding</span>
@@ -2362,8 +2767,27 @@ export const BrokerAppWorkspace = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <select defaultValue="1" style={styles.stageSelect}>
-                <option value="1">1. Outstanding Supporting Documents</option>
+              <select
+                onChange={(event) =>
+                  void moveOpportunityToStage(event.currentTarget.value)
+                }
+                style={styles.stageSelect}
+                value={loanStageValue}
+              >
+                <optgroup label="Lead board">
+                  {leadWorkflowStageOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Deal board">
+                  {dealWorkflowStageOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
               </select>
               <button style={styles.iconButton}>Sync</button>
               <button style={styles.newButton}>Save</button>
@@ -2494,38 +2918,74 @@ export const BrokerAppWorkspace = () => {
           </div>
         </main>
 
-        <aside style={styles.toolShell}>
+        <aside
+          style={{
+            ...styles.toolShell,
+            ...(isToolboxCollapsed ? styles.toolShellCollapsed : {}),
+          }}
+        >
           <div style={styles.darkToolRail}>
+            <button
+              onClick={() => setIsToolboxCollapsed((current) => !current)}
+              style={{
+                ...styles.toolButton,
+                fontSize: '16px',
+                minHeight: '38px',
+              }}
+              title={
+                isToolboxCollapsed
+                  ? 'Expand right toolbox'
+                  : 'Collapse right toolbox'
+              }
+              type="button"
+            >
+              {isToolboxCollapsed ? '<' : '>'}
+            </button>
             {rightRailTools.map((tool) => (
               <button
                 key={tool}
-                onClick={() => setActiveTool(tool)}
+                onClick={() => {
+                  setActiveTool(tool);
+                  setIsToolboxCollapsed(false);
+                }}
                 style={{
                   ...styles.toolButton,
                   ...(activeTool === tool ? styles.toolButtonActive : {}),
                 }}
+                title={tool}
               >
                 <span>{tool.split(' ')[0]}</span>
-                <span>{tool}</span>
+                {!isToolboxCollapsed && <span>{tool}</span>}
               </button>
             ))}
           </div>
 
-          <div style={styles.toolDrawer}>
-            <div style={styles.toolDrawerHeader}>
-              <strong>{activeTool}</strong>
-              <button style={styles.iconButton}>+</button>
-            </div>
-            {renderToolDrawer()}
-            <div style={styles.gate}>
-              <strong>Submission gate</strong>
-              <div style={{ ...styles.small, marginTop: '6px' }}>
-                Blocks lodgement until fact-find, CDD/KYC, serviceability,
-                product comparison, compliance acknowledgements, and credit
-                proposal are ready. Last workflow run: {lastWorkflowName}.
+          {!isToolboxCollapsed && (
+            <div style={styles.toolDrawer}>
+              <div style={styles.toolDrawerHeader}>
+                <strong>{activeTool}</strong>
+                <span style={{ display: 'flex', gap: '8px' }}>
+                  <button style={styles.iconButton}>+</button>
+                  <button
+                    onClick={() => setIsToolboxCollapsed(true)}
+                    style={styles.iconButton}
+                    type="button"
+                  >
+                    Collapse
+                  </button>
+                </span>
+              </div>
+              {renderToolDrawer()}
+              <div style={styles.gate}>
+                <strong>Submission gate</strong>
+                <div style={{ ...styles.small, marginTop: '6px' }}>
+                  Blocks lodgement until fact-find, CDD/KYC, serviceability,
+                  product comparison, compliance acknowledgements, and credit
+                  proposal are ready. Last workflow run: {lastWorkflowName}.
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </aside>
       </div>
     </div>

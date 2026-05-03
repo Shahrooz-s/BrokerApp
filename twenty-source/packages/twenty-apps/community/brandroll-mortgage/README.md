@@ -13,7 +13,8 @@ The live pilot now prioritises broker-facing workflow:
 - `Boards` navigation with native Kanban views for `Lead board` and `Deal board`; opening an Opportunity launches the BrokerApp loan workspace.
 - Lead stages matching the residential lead workflow: New Lead, Attempted Contact 1-3, Initial Call Held > Get Docs, Docs Requested, Research > Servicing, Prepare Loan Proposal, Loan Proposal Presented, Client Accepted > Handover, On Hold, Lost Opps.
 - Deal stages matching the residential loan processing workflow: Outstanding Supporting Documents through Settlement and Lost / Declined.
-- A `BrokerApp LoanDash` front component mounted on the native Opportunity record page as the first standard Opportunity record tab for the broker loan workspace. DealDash/LoanDash is a dashboard page inside the opened opportunity, and the left loan navigation opens pages for Team, Lender, Related Parties, Fact Find, Strategy, and Lodgement work.
+- Board handover is a stage change on the same Opportunity: when a lead is accepted, moving it to Deal sets `brokerWorkflowStage` to the Deal board’s first stage so assistant brokers and processors continue the same loan record.
+- A `BrokerApp LoanDash` front component mounted on the native Opportunity record page for the broker loan workspace. The workspace fills the opened loan record surface, collapses the global Twenty navigation to the icon rail, and uses the second loan sidebar plus right rail for the BrokerEngine-style workflow instead of leaving brokers in the default field grid.
 - `Broker Settings` kept narrow for pilot configuration, starting with Lenders.
 - Internal configuration objects are kept unlisted where possible so brokers do not work from raw setup tables.
 
@@ -24,7 +25,7 @@ The live pilot now prioritises broker-facing workflow:
 - LIXI-aware supporting records for applicants, loan requirements, property securities, credit proposals, serviceability assessments, product search, lender products, lender calculators, lender policy references, document requests, conditions, valuations, LMI, integration events, KYC/CDD, evidence packs, templates, checklists, and client portal tasks.
 - Native Kanban/list views for the broker boards.
 - Lender setup records for panel status, lodgement channel, product matrix source, calculator links, policy links, document categories, and integration aliases.
-- A clickable Opportunity-record LoanDash UI with BrokerEngine-style left navigation, fact-find controls, right-rail workflow drawers, checklist/task tooling, stage references, product search scaffolding, funding position controls, credit proposal controls, and submission tracker placeholders.
+- A clickable Opportunity-record LoanDash UI with BrokerEngine-style left navigation, collapsible right-rail workflow drawers, collapsible empty board stages, lead-to-deal handover controls, fact-find controls, checklist/task tooling, stage references, product search scaffolding, funding position controls, credit proposal controls, and submission tracker placeholders.
 
 ## Workflow Model
 
