@@ -62,14 +62,16 @@ export const NavigationDrawerHeader = ({
   const isNavigationDrawerExpanded = useAtomStateValue(
     isNavigationDrawerExpandedState,
   );
+  const shouldDisplayExpandedNavigationDrawer =
+    isMobile || isNavigationDrawerExpanded;
 
   return (
-    <StyledContainer isExpanded={isNavigationDrawerExpanded}>
+    <StyledContainer isExpanded={shouldDisplayExpandedNavigationDrawer}>
       <StyledWorkspaceDropdownContainer>
         <MultiWorkspaceDropdownButton />
       </StyledWorkspaceDropdownContainer>
       {!isMobile && (
-        <StyledRightActions isExpanded={isNavigationDrawerExpanded}>
+        <StyledRightActions isExpanded={shouldDisplayExpandedNavigationDrawer}>
           <LightIconButton
             Icon={IconSearch}
             accent="secondary"

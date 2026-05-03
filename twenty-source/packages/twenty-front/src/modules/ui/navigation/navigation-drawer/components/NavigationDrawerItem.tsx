@@ -288,9 +288,12 @@ export const NavigationDrawerItem = ({
 
   const handleMobileNavigation = () => {
     if (isMobile && !preventCollapseOnMobile) {
-      setIsNavigationDrawerExpanded(false);
+      setIsNavigationDrawerExpanded(true);
     }
   };
+
+  const shouldDisplayExpandedNavigationDrawer =
+    isMobile || isNavigationDrawerExpanded;
 
   const isExternalLink =
     isDefined(to) && (to.startsWith('http://') || to.startsWith('https://'));
@@ -333,7 +336,7 @@ export const NavigationDrawerItem = ({
         isSoon={isSoon}
         variant={variant}
         indentationLevel={indentationLevel}
-        isNavigationDrawerExpanded={isNavigationDrawerExpanded}
+        isNavigationDrawerExpanded={shouldDisplayExpandedNavigationDrawer}
         isDragging={isDragging}
         hasRightOptions={isDefined(rightOptions)}
         isSelectedInEditMode={isSelectedInEditMode}
@@ -368,7 +371,7 @@ export const NavigationDrawerItem = ({
                   color={
                     showBreadcrumb &&
                     !isSettingsPage &&
-                    !isNavigationDrawerExpanded
+                    !shouldDisplayExpandedNavigationDrawer
                       ? theme.font.color.light
                       : 'currentColor'
                   }
@@ -445,7 +448,7 @@ export const NavigationDrawerItem = ({
         </StyledItemElementsContainer>
       </StyledItem>
 
-      {!isNavigationDrawerExpanded && !isMobile && (
+      {!shouldDisplayExpandedNavigationDrawer && !isMobile && (
         <AppTooltip
           anchorSelect={`#${navigationItemId}`}
           content={label}

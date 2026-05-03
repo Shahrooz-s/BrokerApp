@@ -9,7 +9,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'Observed BrokerEngine board navigation and requested pipeline list.',
+    sourceReference:
+      'Observed BrokerEngine board navigation and requested pipeline list.',
     nextPilotAction:
       'Run post-install seed in the live workspace and confirm each board template is present.',
     notes:
@@ -25,7 +26,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'Sanitized board-stage capture from BrokerEngine lead board.',
+    sourceReference:
+      'Sanitized board-stage capture from BrokerEngine lead board.',
     nextPilotAction:
       'Map Opportunity stage values and stage due tasks to these templates inside the pilot workspace.',
     notes:
@@ -41,7 +43,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'Sanitized board-stage capture from BrokerEngine deal board.',
+    sourceReference:
+      'Sanitized board-stage capture from BrokerEngine deal board.',
     nextPilotAction:
       'Attach checklist gates and stage-entry tasks after the app is installed in the workspace.',
     notes:
@@ -52,32 +55,32 @@ export const brokerEngineFeatureParitySeeds = [
     featureArea: 'BOARDS',
     parityStatus: 'MODELLED',
     brokerAppImplementation:
-      'Board templates define list and Kanban requirements. Native Twenty views should provide list views; custom DealDash/front component work is needed for compact BrokerEngine-style Kanban columns.',
+      'Board templates define list and Kanban requirements. LoanDash now includes a compact BrokerEngine-style residential loan pipeline with automatic empty-stage collapse and click-to-expand columns.',
     privateImportRequired: false,
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
     sourceReference: 'Observed BrokerEngine board list and Kanban views.',
     nextPilotAction:
-      'Configure native list views first, then build or enable a compact Kanban UI if the deployed Twenty version supports the required front components.',
+      'Connect the LoanDash pipeline component to live Opportunity data once workspace API mapping is finalised.',
     notes:
-      'The current app stores the view requirements as configuration, not a pixel-level clone.',
+      'The current route models the UI and stage behaviour; persistence remains tied to the upcoming workspace API mapping.',
   },
   {
     featureName: 'Collapsed empty Kanban stages',
     featureArea: 'BOARDS',
-    parityStatus: 'CUSTOM_UI_REQUIRED',
+    parityStatus: 'MODELLED',
     brokerAppImplementation:
-      'Requirement is captured in board/stage documentation and parity map. A custom board component or Twenty core UI change is required to auto-collapse empty columns while expanding populated columns.',
+      'LoanDash starts with empty deal stages collapsed, allows each stage to expand by clicking the vertical column, and provides expand-all / hide-empty / expand-1-to-4 board controls.',
     privateImportRequired: false,
     requiresProviderApi: false,
     requiresWorkspaceLogin: false,
     productionReady: false,
-    sourceReference: 'User-supplied screenshots and instructions for collapsed/expanded stages.',
+    sourceReference:
+      'User-supplied screenshots and instructions for collapsed/expanded stages.',
     nextPilotAction:
-      'Prototype compact board component after confirming front-component support in the deployed workspace.',
-    notes:
-      'This is a UI behavior, not a data-model feature.',
+      'Wire stage collapse state and card movement to saved user preferences if brokers want the board layout persisted.',
+    notes: 'The UI behavior is implemented in the LoanDash route.',
   },
   {
     featureName: 'Bulk edit guarded board fields',
@@ -92,8 +95,7 @@ export const brokerEngineFeatureParitySeeds = [
     sourceReference: 'User-supplied BrokerEngine bulk edit screenshots.',
     nextPilotAction:
       'Confirm native Twenty bulk edit supports required fields; add workflow-safe guardrails for stage, broker, assigned team, processor, archive, and workflow toggles.',
-    notes:
-      'Bulk edits that trigger workflow must be explicit and auditable.',
+    notes: 'Bulk edits that trigger workflow must be explicit and auditable.',
   },
   {
     featureName: 'Column settings and default filters',
@@ -112,24 +114,24 @@ export const brokerEngineFeatureParitySeeds = [
       'Applicant repeat fields stay normalized through Applicant Profiles rather than duplicated as hard-coded Opportunity columns.',
   },
   {
-    featureName: 'DealDash layout',
-    featureArea: 'DEALDASH',
-    parityStatus: 'CUSTOM_UI_REQUIRED',
+    featureName: 'LoanDash layout',
+    featureArea: 'LOANDASH',
+    parityStatus: 'MODELLED',
     brokerAppImplementation:
-      'Deal Workspace Tools seed the Overview, Fact Find, Strategy, Lodgement, and right rail structure. A front component is still needed for a BrokerEngine-like DealDash visual layout.',
+      'The LoanDash route renders the BrokerEngine-like second sidebar, opened loan header, dashboard cards, quick view/edit panel, right rail tools, and residential application pages for Overview, Fact Find, Strategy, and Lodgement.',
     privateImportRequired: false,
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
     sourceReference: 'Observed self-test deal dashboard and user instructions.',
     nextPilotAction:
-      'Use seeded tool records to drive the first custom DealDash or workspace dashboard prototype.',
+      'Replace static sample values with live Opportunity, Applicant Profile, lender and fact-find records.',
     notes:
-      'Current Twenty records are ready; pixel-level DealDash UI remains future implementation work.',
+      'The current implementation is a functional wireframe; API/provider-backed submission remains future work.',
   },
   {
     featureName: 'Deal sidebar sections',
-    featureArea: 'DEALDASH',
+    featureArea: 'LOANDASH',
     parityStatus: 'SEEDED',
     brokerAppImplementation:
       'Deal Workspace Tools seed Overview, Fact Find, Strategy, Lodgement, Notes, Checklists, Tasks, Emails, Texts, Key Dates, Reports, 1-Click Workflows, Client Portal, and KYC/CDD tools.',
@@ -137,7 +139,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'Sanitized BrokerEngine sidebar structure captured during review.',
+    sourceReference:
+      'Sanitized BrokerEngine sidebar structure captured during review.',
     nextPilotAction:
       'Run post-install seed and review the Deal workspace tools table under Broker Settings.',
     notes:
@@ -145,7 +148,7 @@ export const brokerEngineFeatureParitySeeds = [
   },
   {
     featureName: 'Related parties and applicant roles',
-    featureArea: 'DEALDASH',
+    featureArea: 'LOANDASH',
     parityStatus: 'MODELLED',
     brokerAppImplementation:
       'Contacts and Companies remain reusable sidebar records, with Applicant Profiles linking people into Opportunities as primary applicant, co-applicants, guarantors, solicitor, builder, referrer, accountant, financial planner, and other parties.',
@@ -153,7 +156,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'BrokerEngine deal/contact pattern and user preference to call people Contacts.',
+    sourceReference:
+      'BrokerEngine deal/contact pattern and user preference to call people Contacts.',
     nextPilotAction:
       'Configure related-record views on Opportunity and test adding a spouse/co-applicant to a deal.',
     notes:
@@ -169,7 +173,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'BrokerEngine fact-find template review and LIXI-first field direction.',
+    sourceReference:
+      'BrokerEngine fact-find template review and LIXI-first field direction.',
     nextPilotAction:
       'Privately import approved field labels/options or build the BrokerApp-native form from the sanitized fact-find spec.',
     notes:
@@ -185,7 +190,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User instruction for conditional add-more-applicant logic.',
+    sourceReference:
+      'User instruction for conditional add-more-applicant logic.',
     nextPilotAction:
       'Add portal/form conditional logic to show applicant sections based on applicant count.',
     notes:
@@ -201,7 +207,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: false,
     productionReady: false,
-    sourceReference: 'User requirement for chatbot-like fact finding and simple client portal.',
+    sourceReference:
+      'User requirement for chatbot-like fact finding and simple client portal.',
     nextPilotAction:
       'Build the BrokerApp-native portal form flow or connect OpnForm embed with answer autosave.',
     notes:
@@ -217,7 +224,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User instruction to reuse desired loan features in product selection.',
+    sourceReference:
+      'User instruction to reuse desired loan features in product selection.',
     nextPilotAction:
       'Import the AFG product matrix and test feature matching against a sample Opportunity.',
     notes:
@@ -297,7 +305,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User-supplied AFG product matrix and BrokerEngine product-tool review.',
+    sourceReference:
+      'User-supplied AFG product matrix and BrokerEngine product-tool review.',
     nextPilotAction:
       'Implement the Excel import runner and filter UI for the AFG product matrix sheets.',
     notes:
@@ -313,7 +322,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'BrokerEngine product columns and AFG Product Information Matrix.',
+    sourceReference:
+      'BrokerEngine product columns and AFG Product Information Matrix.',
     nextPilotAction:
       'Load products from the provided AFG spreadsheet into private workspace records, not GitHub fixtures.',
     notes:
@@ -329,7 +339,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'Supplied ANZ, WBC, and broker calculator workbooks reviewed for architecture only.',
+    sourceReference:
+      'Supplied ANZ, WBC, and broker calculator workbooks reviewed for architecture only.',
     nextPilotAction:
       'Build lender-specific adapter contracts and private calculator metadata without committing workbook formulas or macros.',
     notes:
@@ -345,7 +356,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User requirement for lender policy and serviceability backend.',
+    sourceReference:
+      'User requirement for lender policy and serviceability backend.',
     nextPilotAction:
       'Create lender policy ingestion workflow with source, effective date, confidence, owner, and human approval.',
     notes:
@@ -361,7 +373,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User workflow from product/serviceability to credit proposal.',
+    sourceReference:
+      'User workflow from product/serviceability to credit proposal.',
     nextPilotAction:
       'Privately import the approved credit proposal layout and merge-variable map.',
     notes:
@@ -377,7 +390,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User-preferred future path: ApplyOnline first, AFG Flex alternate.',
+    sourceReference:
+      'User-preferred future path: ApplyOnline first, AFG Flex alternate.',
     nextPilotAction:
       'Obtain ApplyOnline/AFG Flex API docs, sandbox credentials, auth method, webhook support, and payload certification requirements.',
     notes:
@@ -393,7 +407,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'LIXI status/event concepts and BrokerEngine-style workflow.',
+    sourceReference:
+      'LIXI status/event concepts and BrokerEngine-style workflow.',
     nextPilotAction:
       'Confirm available status fields and event/webhook patterns from ApplyOnline, AFG Flex, AFG, or BrokerEngine APIs.',
     notes:
@@ -489,11 +504,11 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'BrokerEngine SMS template settings appeared empty during review.',
+    sourceReference:
+      'BrokerEngine SMS template settings appeared empty during review.',
     nextPilotAction:
       'Keep SMS optional; use email magic links and passkeys for v1, then add Microsoft or other SMS provider if required.',
-    notes:
-      'Avoid SMS OTP as sole proof of identity.',
+    notes: 'Avoid SMS OTP as sole proof of identity.',
   },
   {
     featureName: 'Merge variable compatibility',
@@ -505,7 +520,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'BrokerEngine template merge category review and Twenty-safe placeholders.',
+    sourceReference:
+      'BrokerEngine template merge category review and Twenty-safe placeholders.',
     nextPilotAction:
       'Test generated sample emails/reports against BrokerApp records and replace BrokerEngine placeholders with BrokerApp variables.',
     notes:
@@ -521,7 +537,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'BrokerEngine checklist setting and user requirement for processor controls.',
+    sourceReference:
+      'BrokerEngine checklist setting and user requirement for processor controls.',
     nextPilotAction:
       'Privately import approved checklist wording and link checklist templates to board stages.',
     notes:
@@ -537,7 +554,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User requirement for client portal documents and FinanceVault-like flow.',
+    sourceReference:
+      'User requirement for client portal documents and FinanceVault-like flow.',
     nextPilotAction:
       'Choose storage/provider path and define document categories under lender settings.',
     notes:
@@ -588,8 +606,7 @@ export const brokerEngineFeatureParitySeeds = [
     sourceReference: 'User requirement for simple client portal and dashboard.',
     nextPilotAction:
       'Build the borrower-facing portal UI with passkeys and email magic links, then connect tasks to Opportunity records.',
-    notes:
-      'Portal users must not be normal staff CRM users.',
+    notes: 'Portal users must not be normal staff CRM users.',
   },
   {
     featureName: 'Passkeys and email magic links',
@@ -601,7 +618,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: false,
     productionReady: false,
-    sourceReference: 'User direction to avoid extra Twilio licensing and keep system safe.',
+    sourceReference:
+      'User direction to avoid extra Twilio licensing and keep system safe.',
     nextPilotAction:
       'Select auth implementation path for external portal users and confirm staff SSO/passkey compatibility with the deployed Twenty version.',
     notes:
@@ -649,11 +667,11 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: false,
     productionReady: false,
-    sourceReference: 'User requirement for open banking and bank statement uploads.',
+    sourceReference:
+      'User requirement for open banking and bank statement uploads.',
     nextPilotAction:
       'Select provider and map consent scope, account holder match, income signal, liability signal, and reference ID fields.',
-    notes:
-      'Never ask for or store bank login credentials.',
+    notes: 'Never ask for or store bank login credentials.',
   },
   {
     featureName: 'ID verification provider adapter',
@@ -681,11 +699,11 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User uses AFG/BrokerEngine and may request actual mapping from AFG/BrokerEngine.',
+    sourceReference:
+      'User uses AFG/BrokerEngine and may request actual mapping from AFG/BrokerEngine.',
     nextPilotAction:
       'Request API docs, object model, auth, webhook support, rate limits, sandbox, and mapping from AFG/BrokerEngine.',
-    notes:
-      'Do not rely on Zapier as the core long-term integration path.',
+    notes: 'Do not rely on Zapier as the core long-term integration path.',
   },
   {
     featureName: 'White-label SaaS controls',
@@ -697,7 +715,8 @@ export const brokerEngineFeatureParitySeeds = [
     requiresProviderApi: true,
     requiresWorkspaceLogin: true,
     productionReady: false,
-    sourceReference: 'User requirement to white-label BrokerApp as a SaaS product.',
+    sourceReference:
+      'User requirement to white-label BrokerApp as a SaaS product.',
     nextPilotAction:
       'Confirm Twenty licence/SaaS boundaries, tenant isolation model, billing model, and production security review.',
     notes:

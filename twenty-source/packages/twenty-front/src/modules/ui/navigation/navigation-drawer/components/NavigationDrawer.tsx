@@ -44,10 +44,6 @@ const StyledAnimatedContainer = styled.div<{
     isExpanded
       ? `var(${NAVIGATION_DRAWER_WIDTH_VAR})`
       : `${NAVIGATION_DRAWER_COLLAPSED_WIDTH}px`};
-
-  @media (max-width: ${MOBILE_VIEWPORT}px) {
-    width: ${({ isExpanded }) => (isExpanded ? '100%' : '0')};
-  }
 `;
 
 const StyledContainer = styled.div<{
@@ -69,9 +65,8 @@ const StyledContainer = styled.div<{
   width: ${({ isExpanded }) =>
     isExpanded ? `var(${NAVIGATION_DRAWER_WIDTH_VAR})` : '100%'};
   @media (max-width: ${MOBILE_VIEWPORT}px) {
-    width: 100%;
-    padding-left: ${themeCssVariables.spacing[5]};
-    padding-right: ${themeCssVariables.spacing[5]};
+    padding-left: ${themeCssVariables.spacing[2]};
+    padding-right: 0;
   }
 `;
 
@@ -114,19 +109,22 @@ export const NavigationDrawer = ({
     setTableWidthResizeIsActive(false);
   };
 
+  const shouldDisplayExpandedNavigationDrawer =
+    isMobile || isNavigationDrawerExpanded;
+
   return (
     <>
       <NavigationDrawerWidthEffect />
       <StyledAnimatedContainer
         className={className}
         data-click-outside-id={NAVIGATION_DRAWER_CLICK_OUTSIDE_ID}
-        isExpanded={isNavigationDrawerExpanded}
+        isExpanded={shouldDisplayExpandedNavigationDrawer}
         isResizing={isResizing}
       >
         <StyledContainer
           isSettings={isSettingsDrawer}
           isMobile={isMobile}
-          isExpanded={isNavigationDrawerExpanded}
+          isExpanded={shouldDisplayExpandedNavigationDrawer}
         >
           {isSettingsDrawer && title ? (
             <NavigationDrawerBackButton title={title} />
@@ -136,18 +134,20 @@ export const NavigationDrawer = ({
           {children}
         </StyledContainer>
 
-        {isNavigationDrawerExpanded && !isMobile && !isSettingsDrawer && (
-          <ResizablePanelEdge
-            side="right"
-            constraints={NAVIGATION_DRAWER_CONSTRAINTS}
-            currentWidth={navigationDrawerWidth}
-            onWidthChange={handleWidthChange}
-            onCollapse={handleCollapse}
-            showHandle={false}
-            cssVariableName={NAVIGATION_DRAWER_WIDTH_VAR}
-            onResizeStart={handleResizeStart}
-          />
-        )}
+        {shouldDisplayExpandedNavigationDrawer &&
+          !isMobile &&
+          !isSettingsDrawer && (
+            <ResizablePanelEdge
+              side="right"
+              constraints={NAVIGATION_DRAWER_CONSTRAINTS}
+              currentWidth={navigationDrawerWidth}
+              onWidthChange={handleWidthChange}
+              onCollapse={handleCollapse}
+              showHandle={false}
+              cssVariableName={NAVIGATION_DRAWER_WIDTH_VAR}
+              onResizeStart={handleResizeStart}
+            />
+          )}
       </StyledAnimatedContainer>
     </>
   );

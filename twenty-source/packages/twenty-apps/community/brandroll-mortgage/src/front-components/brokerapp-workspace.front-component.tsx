@@ -1,6 +1,6 @@
 import { defineFrontComponent } from 'twenty-sdk/define';
 
-export const BROKERAPP_DEALDASH_FRONT_COMPONENT_ID =
+export const BROKERAPP_LOANDASH_FRONT_COMPONENT_ID =
   '6b6d0000-4100-4000-8000-000000000001';
 
 const leadStages = [
@@ -504,7 +504,7 @@ export const BrokerAppWorkspace = () => {
           <button style={styles.newButton}>+ New</button>
           <span style={styles.countText}>7 Leads</span>
           <span style={styles.countText}>$1.10M</span>
-          <span style={styles.small}>BrokerApp DealDash</span>
+          <span style={styles.small}>BrokerApp LoanDash</span>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <input style={styles.search} value="Find Deal" readOnly />
@@ -571,7 +571,7 @@ export const BrokerAppWorkspace = () => {
             <div style={styles.workspaceBody}>
               <div>
                 <h2 style={{ margin: '0 0 8px', fontSize: '18px' }}>
-                  Deal Workspace
+                  Loan Workspace
                 </h2>
                 <div style={styles.sectionList}>
                   {factFindSections.map(renderSection)}
@@ -622,7 +622,7 @@ export const BrokerAppWorkspace = () => {
 
           <section style={{ ...styles.boardWrap, marginTop: '12px' }}>
             <div style={styles.boardHeader}>
-              <strong>Deal Board Stages</strong>
+              <strong>Loan Board Stages</strong>
               <span style={styles.small}>
                 Used for list, kanban, stage due warnings, bulk edit, and
                 workflow triggers.
@@ -641,7 +641,9 @@ export const BrokerAppWorkspace = () => {
                   <strong>
                     {index + 1}. {stage}
                   </strong>
-                  <div style={styles.small}>Stage due, task gate, checklist</div>
+                  <div style={styles.small}>
+                    Stage due, task gate, checklist
+                  </div>
                 </div>
               ))}
             </div>
@@ -652,7 +654,7 @@ export const BrokerAppWorkspace = () => {
           <div style={styles.railHeader}>
             <h2 style={{ margin: 0, fontSize: '18px' }}>Right Rail</h2>
             <div style={styles.small}>
-              Deal actions, templates, key dates, reports, and workflow gates.
+              Loan actions, templates, key dates, reports, and workflow gates.
             </div>
           </div>
 
@@ -666,9 +668,9 @@ export const BrokerAppWorkspace = () => {
           <div style={styles.gate}>
             <strong>Submission gate</strong>
             <div style={{ ...styles.small, marginTop: '6px' }}>
-              Blocks lodgement until fact-find, CDD/KYC, serviceability,
-              product comparison, compliance acknowledgements, and credit
-              proposal are ready.
+              Blocks lodgement until fact-find, CDD/KYC, serviceability, product
+              comparison, compliance acknowledgements, and credit proposal are
+              ready.
             </div>
           </div>
 
@@ -698,8 +700,8 @@ export const BrokerAppWorkspace = () => {
 };
 
 export default defineFrontComponent({
-  universalIdentifier: BROKERAPP_DEALDASH_FRONT_COMPONENT_ID,
-  name: 'BrokerApp DealDash',
+  universalIdentifier: BROKERAPP_LOANDASH_FRONT_COMPONENT_ID,
+  name: 'BrokerApp LoanDash',
   description:
     'Broker-facing workspace for boards, fact-find, strategy, lodgement, checklists, KYC, and client portal tasks.',
   component: BrokerAppWorkspace,

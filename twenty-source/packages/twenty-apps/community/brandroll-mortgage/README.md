@@ -13,7 +13,7 @@ The live pilot now prioritises broker-facing workflow:
 - `Boards` navigation with native Kanban views for `Lead board` and `Deal board`.
 - Lead stages matching the residential lead workflow: New Lead, Attempted Contact 1-3, Initial Call Held > Get Docs, Docs Requested, Research > Servicing, Prepare Loan Proposal, Loan Proposal Presented, Client Accepted > Handover, On Hold, Lost Opps.
 - Deal stages matching the residential loan processing workflow: Outstanding Supporting Documents through Settlement and Lost / Declined.
-- A `BrokerApp DealDash` front component command for the broker workspace layout: Overview, Fact Find, Strategy, Lodgement, Client Portal Flow, and right rail tools.
+- A `BrokerApp LoanDash` front component command for the broker workspace layout: Overview, Fact Find, Strategy, Lodgement, Client Portal Flow, and right rail tools.
 - `Broker Settings` kept narrow for pilot configuration, starting with Lenders.
 - Internal configuration objects kept out of the primary sidebar so brokers do not work from raw setup tables.
 
