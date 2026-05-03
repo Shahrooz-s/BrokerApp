@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   DEAL_WORKSPACE_TOOL_AREA_FIELD_ID,
@@ -19,6 +19,7 @@ export default defineView({
   icon: 'IconLayoutSidebarRight',
   key: ViewKey.INDEX,
   position: 40,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-30a0-4000-8000-000000000002',

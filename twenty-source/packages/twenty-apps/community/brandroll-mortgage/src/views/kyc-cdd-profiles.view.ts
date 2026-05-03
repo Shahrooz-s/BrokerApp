@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   KYC_CDD_PROFILE_NAME_FIELD_ID,
@@ -16,6 +16,7 @@ export default defineView({
   icon: 'IconShieldCheck',
   key: ViewKey.INDEX,
   position: 15,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-5800-4000-8000-000000000002',

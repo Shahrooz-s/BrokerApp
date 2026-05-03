@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   BROKER_BOARD_TEMPLATE_NAME_FIELD_ID,
@@ -17,6 +17,7 @@ export default defineView({
   icon: 'IconLayoutKanban',
   key: ViewKey.INDEX,
   position: 20,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-3080-4000-8000-000000000002',

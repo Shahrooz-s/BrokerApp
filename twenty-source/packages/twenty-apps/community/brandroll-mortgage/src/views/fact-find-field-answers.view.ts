@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   FACT_FIND_FIELD_ANSWER_KEY_FIELD_ID,
@@ -19,6 +19,7 @@ export default defineView({
   icon: 'IconForms',
   key: ViewKey.INDEX,
   position: 22,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-3020-4000-8000-000000000002',

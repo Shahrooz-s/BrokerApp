@@ -7,6 +7,7 @@ import {
 } from 'src/config/brokerengine-board-stage-config';
 import {
   brokerEngineOneClickWorkflowNames,
+  brokerEngineOneClickWorkflowTaskRules,
   brokerEngineReportTemplates,
   brokerEngineDealWorkspaceTools,
 } from 'src/config/brokerengine-workspace-tools';
@@ -33,7 +34,9 @@ type ConnectionResult = {
 
 const removeNilValues = (record: SeedRecord): SeedRecord =>
   Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== null),
+    Object.entries(record).filter(
+      ([, value]) => value !== undefined && value !== null,
+    ),
   );
 
 const getExistingValues = async (
@@ -98,13 +101,11 @@ const seedRecords = async (
     objectNamePlural,
     uniqueFieldName,
   );
-  const recordsToCreate = records
-    .map(removeNilValues)
-    .filter((record) => {
-      const value = record[uniqueFieldName];
+  const recordsToCreate = records.map(removeNilValues).filter((record) => {
+    const value = record[uniqueFieldName];
 
-      return typeof value === 'string' && !existingValues.has(value);
-    });
+    return typeof value === 'string' && !existingValues.has(value);
+  });
 
   if (recordsToCreate.length === 0) {
     return 0;
@@ -135,24 +136,25 @@ const toBrokerTemplateRecords = (): SeedRecord[] => {
     mergeVariables: JSON.stringify(template.mergeVariables),
   }));
 
-  const reportRecords = brokerEngineReportTemplates.map((templateName, index) => ({
-    templateName,
-    templateType: 'REPORT',
-    workflowCategory: 'LODGEMENT',
-    templateStatus: 'BODY_PENDING_PRIVATE_IMPORT',
-    subject: templateName,
-    bodyFormat: 'PLAIN_TEXT',
-    body:
-      'Private report body not committed. Store approved report layout and merge mapping in the workspace.',
-    fromRole: 'SYSTEM',
-    toRecipientType: 'INTERNAL_TEAM',
-    sharedScope: 'BROKER_GROUP',
-    sourceSystem: 'BROKERENGINE',
-    sourceTemplateId: `brokerengine-report-${index}`,
-    relatedBoard: 'DEAL',
-    mergeVariables: '[]',
-    importStatus: 'BODY_PENDING_PRIVATE_IMPORT',
-  }));
+  const reportRecords = brokerEngineReportTemplates.map(
+    (templateName, index) => ({
+      templateName,
+      templateType: 'REPORT',
+      workflowCategory: 'LODGEMENT',
+      templateStatus: 'BODY_PENDING_PRIVATE_IMPORT',
+      subject: templateName,
+      bodyFormat: 'PLAIN_TEXT',
+      body: 'Private report body not committed. Store approved report layout and merge mapping in the workspace.',
+      fromRole: 'SYSTEM',
+      toRecipientType: 'INTERNAL_TEAM',
+      sharedScope: 'BROKER_GROUP',
+      sourceSystem: 'BROKERENGINE',
+      sourceTemplateId: `brokerengine-report-${index}`,
+      relatedBoard: 'DEAL',
+      mergeVariables: '[]',
+      importStatus: 'BODY_PENDING_PRIVATE_IMPORT',
+    }),
+  );
 
   const workflowRecords = brokerEngineOneClickWorkflowNames.map(
     (templateName, index) => ({
@@ -168,9 +170,12 @@ const toBrokerTemplateRecords = (): SeedRecord[] => {
               : 'LODGEMENT',
       templateStatus: 'DRAFT',
       subject: templateName,
-      bodyFormat: 'PLAIN_TEXT',
-      body:
-        'Workflow scenario captured from BrokerEngine. Configure stage actions, tasks, emails, checklists, and broker approval gates before activation.',
+      bodyFormat: 'RICH_TEXT_JSON',
+      body: JSON.stringify(
+        brokerEngineOneClickWorkflowTaskRules.find(
+          (rule) => rule.templateName === templateName,
+        ),
+      ),
       fromRole: 'SYSTEM',
       toRecipientType: 'INTERNAL_TEAM',
       sharedScope: 'BROKER_GROUP',

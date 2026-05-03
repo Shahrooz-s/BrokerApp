@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   LENDER_CALCULATOR_NAME_FIELD_ID,
@@ -18,6 +18,7 @@ export default defineView({
   icon: 'IconCalculator',
   key: ViewKey.INDEX,
   position: 31,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-3040-4000-8000-000000000002',

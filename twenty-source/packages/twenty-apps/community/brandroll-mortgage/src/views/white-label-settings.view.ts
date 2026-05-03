@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   WHITE_LABEL_SETTING_NAME_FIELD_ID,
@@ -15,6 +15,7 @@ export default defineView({
   icon: 'IconPalette',
   key: ViewKey.INDEX,
   position: 22,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-5920-4000-8000-000000000002',

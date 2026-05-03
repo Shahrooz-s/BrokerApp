@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   BROKER_CHECKLIST_ITEM_TEMPLATE_NAME_FIELD_ID,
@@ -18,6 +18,7 @@ export default defineView({
   icon: 'IconListDetails',
   key: ViewKey.INDEX,
   position: 14,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-5710-4000-8000-000000000002',

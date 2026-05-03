@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom';
 
+import { CoreObjectNameSingular } from 'twenty-shared/types';
+
 import { SidePanelToggleButton } from '@/side-panel/components/SidePanelToggleButton';
 import { RecordShowCommandMenu } from '@/command-menu-item/components/RecordShowCommandMenu';
 import { CommandMenuComponentInstanceContext } from '@/command-menu/states/contexts/CommandMenuComponentInstanceContext';
@@ -15,6 +17,7 @@ import { useRecordShowPage } from '@/object-record/record-show/hooks/useRecordSh
 import { computeRecordShowComponentInstanceId } from '@/object-record/record-show/utils/computeRecordShowComponentInstanceId';
 import { PageContainer } from '@/ui/layout/page/components/PageContainer';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { LoanDashPage } from '~/pages/loan-dash/LoanDashPage';
 import { RecordShowPageHeader } from '~/pages/object-record/RecordShowPageHeader';
 import { RecordShowPageTitle } from '~/pages/object-record/RecordShowPageTitle';
 
@@ -35,6 +38,8 @@ export const RecordShowPage = () => {
 
   const recordShowComponentInstanceId =
     computeRecordShowComponentInstanceId(objectRecordId);
+  const isOpportunityRecord =
+    objectNameSingular === CoreObjectNameSingular.Opportunity;
 
   return (
     <RecordComponentInstanceContextsWrapper
@@ -64,13 +69,17 @@ export const RecordShowPage = () => {
                   recordId: objectRecordId,
                 }}
               >
-                <PageLayoutRecordPageRenderer
-                  targetRecordIdentifier={{
-                    id: objectRecordId,
-                    targetObjectNameSingular: objectNameSingular,
-                  }}
-                  isInSidePanel={false}
-                />
+                {isOpportunityRecord ? (
+                  <LoanDashPage />
+                ) : (
+                  <PageLayoutRecordPageRenderer
+                    targetRecordIdentifier={{
+                      id: objectRecordId,
+                      targetObjectNameSingular: objectNameSingular,
+                    }}
+                    isInSidePanel={false}
+                  />
+                )}
                 <RecordShowPageSSESubscribeEffect
                   objectNameSingular={objectNameSingular}
                   recordId={objectRecordId}

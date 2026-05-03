@@ -471,3 +471,80 @@ export const brokerEngineOneClickWorkflowNames = [
   'Equity Release / Cash Out',
   'Self-Employed',
 ] as const;
+
+const baseOneClickWorkflowTasks = [
+  'Confirm scenario applies to this residential loan',
+  'Request missing evidence from the applicants',
+  'Update lender checklist and document map',
+  'Record broker file note before lender submission',
+] as const;
+
+const oneClickWorkflowTaskOverrides: Partial<
+  Record<(typeof brokerEngineOneClickWorkflowNames)[number], readonly string[]>
+> = {
+  Construction: [
+    'Request fixed-price building contract and plans',
+    'Capture progress payment schedule',
+    'Check lender construction policy and valuation path',
+    'Add construction pack to lodgement checklist',
+  ],
+  FIRB: [
+    'Confirm applicant residency and FIRB requirement',
+    'Request FIRB approval evidence',
+    'Record foreign income and currency notes',
+    'Block lodgement until FIRB evidence is attached',
+  ],
+  'Guarantor Home Loan': [
+    'Add guarantor related party record',
+    'Request guarantor income, ID and security evidence',
+    'Record independent legal advice requirement',
+    'Check guarantor policy and servicing treatment',
+  ],
+  'First Home Owners Grant': [
+    'Confirm first home buyer eligibility',
+    'Request FHOG and stamp duty concession evidence',
+    'Map grant funds into funding position',
+    'Add state-specific grant checklist to Smart Docs',
+  ],
+  'Non Face to Face Process Required': [
+    'Set AML non-face-to-face risk flag',
+    'Request certified ID or approved electronic IDV',
+    'Record enhanced customer due diligence decision',
+    'Hold credit check until consent and IDV are clean',
+  ],
+  Refinance: [
+    'Request latest loan statement and payout estimate',
+    'Confirm discharge authority requirements',
+    'Compare current loan against recommended product',
+    'Record refinance benefit and BID rationale',
+  ],
+  'Self-Employed': [
+    'Request latest tax returns and financial statements',
+    'Capture ABN, GST registration and trading period',
+    'Check add-backs and accountant letter requirements',
+    'Update servicing assumptions for self-employed income',
+  ],
+};
+
+export const brokerEngineOneClickWorkflowTaskRules =
+  brokerEngineOneClickWorkflowNames.map((templateName) => ({
+    templateName,
+    generatedTasks:
+      oneClickWorkflowTaskOverrides[templateName] ?? baseOneClickWorkflowTasks,
+    complianceGate:
+      templateName === 'Non Face to Face Process Required'
+        ? 'AML/CTF enhanced customer due diligence'
+        : templateName.includes('Guarantor')
+          ? 'Guarantor independent advice and security risk'
+          : templateName === 'FIRB'
+            ? 'FIRB evidence before submission'
+            : templateName === 'Self-Employed'
+              ? 'Income verification and lender policy exception review'
+              : 'Broker review before lender submission',
+    generatedObjects: [
+      'Twenty task',
+      'Deal checklist item',
+      'Document request',
+      'Broker file note',
+    ],
+  }));

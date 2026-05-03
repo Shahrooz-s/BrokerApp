@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   BROKERENGINE_FEATURE_PARITY_AREA_FIELD_ID,
@@ -21,6 +21,7 @@ export default defineView({
   icon: 'IconClipboardCheck',
   key: ViewKey.INDEX,
   position: 3,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-5930-4000-8000-000000000002',

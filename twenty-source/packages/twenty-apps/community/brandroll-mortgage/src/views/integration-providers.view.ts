@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   INTEGRATION_PROVIDER_NAME_FIELD_ID,
@@ -16,6 +16,7 @@ export default defineView({
   icon: 'IconPlugConnected',
   key: ViewKey.INDEX,
   position: 20,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-5900-4000-8000-000000000002',

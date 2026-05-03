@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   MORTGAGE_APPLICATION_ON_OPPORTUNITY_FIELD_ID,
@@ -24,6 +24,7 @@ export default defineView({
   icon: 'IconHomeDollar',
   key: ViewKey.INDEX,
   position: 0,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-2000-4000-8000-000000000002',

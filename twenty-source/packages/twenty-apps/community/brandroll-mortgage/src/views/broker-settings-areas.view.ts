@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   BROKER_SETTINGS_AREA_GROUP_FIELD_ID,
@@ -18,6 +18,7 @@ export default defineView({
   icon: 'IconSettings',
   key: ViewKey.INDEX,
   position: 5,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-3160-4000-8000-000000000002',

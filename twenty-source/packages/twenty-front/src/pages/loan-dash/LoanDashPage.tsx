@@ -124,6 +124,27 @@ type KeyDateRow = {
   source: string;
 };
 
+type OneClickWorkflowTemplate = {
+  category: string;
+  complianceGate: string;
+  description: string;
+  evidence: string;
+  name: string;
+  tasks: string[];
+};
+
+type GeneratedWorkflowTask = {
+  assignee: string;
+  description: string;
+  due: string;
+  gate: string;
+  id: string;
+  priority: 'Low' | 'Medium' | 'High';
+  sourceWorkflow: string;
+  status: 'Pending' | 'Completed' | 'Snoozed';
+  title: string;
+};
+
 const workflowItems: WorkflowItem[] = [
   {
     due: 'Today',
@@ -506,6 +527,107 @@ const oneClickWorkflows = [
   'Separation',
   'Equity Release / Cash Out',
   'Self-Employed',
+];
+
+const defaultWorkflowTasks = [
+  'Confirm scenario applies to this residential loan',
+  'Request missing evidence from the applicants',
+  'Update lender checklist and document map',
+  'Record broker file note before lender submission',
+];
+
+const workflowTaskOverrides: Record<string, string[]> = {
+  Construction: [
+    'Request fixed-price building contract and plans',
+    'Capture progress payment schedule',
+    'Check lender construction policy and valuation path',
+    'Add construction pack to lodgement checklist',
+  ],
+  FIRB: [
+    'Confirm applicant residency and FIRB requirement',
+    'Request FIRB approval evidence',
+    'Record foreign income and currency notes',
+    'Block lodgement until FIRB evidence is attached',
+  ],
+  'Guarantor Home Loan': [
+    'Add guarantor related party record',
+    'Request guarantor income, ID and security evidence',
+    'Record independent legal advice requirement',
+    'Check guarantor policy and servicing treatment',
+  ],
+  'First Home Owners Grant': [
+    'Confirm first home buyer eligibility',
+    'Request FHOG and stamp duty concession evidence',
+    'Map grant funds into funding position',
+    'Add state-specific grant checklist to Smart Docs',
+  ],
+  'Non Face to Face Process Required': [
+    'Set AML non-face-to-face risk flag',
+    'Request certified ID or approved electronic IDV',
+    'Record enhanced customer due diligence decision',
+    'Hold credit check until consent and IDV are clean',
+  ],
+  Refinance: [
+    'Request latest loan statement and payout estimate',
+    'Confirm discharge authority requirements',
+    'Compare current loan against recommended product',
+    'Record refinance benefit and BID rationale',
+  ],
+  'Self-Employed': [
+    'Request latest tax returns and financial statements',
+    'Capture ABN, GST registration and trading period',
+    'Check add-backs and accountant letter requirements',
+    'Update servicing assumptions for self-employed income',
+  ],
+};
+
+const oneClickWorkflowTemplates: OneClickWorkflowTemplate[] =
+  oneClickWorkflows.map((name) => ({
+    category:
+      name === 'Commercial Loan'
+        ? 'Commercial'
+        : name === 'Business Loan'
+          ? 'Business'
+          : name === 'Equipment Loan'
+            ? 'Asset Finance'
+            : 'Residential',
+    complianceGate:
+      name === 'Non Face to Face Process Required'
+        ? 'AML/CTF enhanced customer due diligence'
+        : name.includes('Guarantor')
+          ? 'Guarantor independent advice and security risk'
+          : name === 'FIRB'
+            ? 'FIRB evidence before submission'
+            : name === 'Self-Employed'
+              ? 'Income verification and lender policy exception review'
+              : 'Broker review before lender submission',
+    description:
+      'Creates assistant tasks, checklist gates, document requests and file notes for the selected scenario.',
+    evidence:
+      name === 'Construction'
+        ? 'Building contract, plans, progress schedule'
+        : name === 'FIRB'
+          ? 'Residency evidence and FIRB approval'
+          : name === 'Self-Employed'
+            ? 'Tax returns, financials, ABN and accountant notes'
+            : 'Scenario evidence, applicant confirmation and lender checklist',
+    name,
+    tasks: workflowTaskOverrides[name] ?? defaultWorkflowTasks,
+  }));
+
+const initialGeneratedWorkflowTasks: GeneratedWorkflowTask[] = [
+  {
+    assignee: 'Loan Processor',
+    description:
+      'BrokerEngine-style stage workflow task created before lender submission.',
+    due: '02/05/2026',
+    gate: 'Document stack',
+    id: 'initial-request-outstanding-documents',
+    priority: 'High',
+    sourceWorkflow: 'Outstanding Supporting Documents',
+    status: 'Pending',
+    title: 'Request Outstanding Documents',
+  },
 ];
 
 const reportTemplates = [
@@ -1536,6 +1658,39 @@ const blockerTasks: Array<[string, string]> = [
   ['living-expenses', 'Living expenses need client confirmation'],
   ['credit-consent', 'Credit check consent not captured'],
   ['bid', 'Best Interests Duty rationale not approved'],
+];
+
+const brokerSettingsControls: Array<[string, string, string]> = [
+  [
+    'Boards and Stages',
+    'Controls lead/deal boards, stage due offsets, empty-stage collapse, stage movement gates and bulk-edit behaviour.',
+    'brokerSettings.boardsAndStages',
+  ],
+  [
+    'Workflow Templates',
+    'Controls right-rail 1-Click Workflows, generated task batches, checklist triggers and assistant assignments.',
+    'brokerSettings.workflowTemplates',
+  ],
+  [
+    'Fact Find New',
+    'Controls conditional applicant questions, add-applicant logic, address-history coverage, autosave, client-view locks and field aliases.',
+    'brokerSettings.factFindNew',
+  ],
+  [
+    'Smart Docs and Reports',
+    'Controls PDF/Word report templates, merge variables, approval status and disclosure pack generation.',
+    'brokerSettings.smartDocsReports',
+  ],
+  [
+    'Compliance Gates',
+    'Controls NCCP, BID, responsible lending, credit guide, privacy consent, AML/CTF, KYC/CDD and credit-check blocks.',
+    'brokerSettings.complianceGates',
+  ],
+  [
+    'Integration Providers',
+    'Controls BrokerEngine, AFG Flex, ApplyOnline, Equifax, IDV, open banking and document storage providers.',
+    'brokerSettings.integrationProviders',
+  ],
 ];
 
 const statusColor: Record<WorkflowStatus, string> = {
@@ -3145,6 +3300,22 @@ const StyledWorkflowListRow = styled.div`
   padding: 0 ${themeCssVariables.spacing[3]};
 `;
 
+const StyledWorkflowActionRow = styled.button`
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid ${themeCssVariables.border.color.light};
+  color: ${themeCssVariables.font.color.secondary};
+  cursor: pointer;
+  display: grid;
+  font-family: ${themeCssVariables.font.family};
+  gap: ${themeCssVariables.spacing[2]};
+  grid-template-columns: 18px 1fr auto;
+  min-height: 62px;
+  padding: 0 ${themeCssVariables.spacing[3]};
+  text-align: left;
+`;
+
 const StyledRailPanel = styled.div`
   display: flex;
   flex-direction: column;
@@ -3241,6 +3412,20 @@ export const LoanDashPage = () => {
     useState<RightRailItemLabel>('Notes');
   const [selectedLoanRecordId, setSelectedLoanRecordId] =
     useState<string>('2/2026');
+  const [generatedWorkflowTasks, setGeneratedWorkflowTasks] = useState<
+    GeneratedWorkflowTask[]
+  >(initialGeneratedWorkflowTasks);
+  const [taskDrawerFilter, setTaskDrawerFilter] = useState<
+    'Pending' | 'Completed'
+  >('Pending');
+  const [lastRunWorkflowName, setLastRunWorkflowName] = useState(
+    'Outstanding Supporting Documents',
+  );
+  const [conversationApplicants, setConversationApplicants] = useState([
+    'Primary Applicant',
+    'Co-applicant 1',
+  ]);
+  const [activeConversationStep, setActiveConversationStep] = useState(0);
 
   useEffect(() => {
     const syncActiveItemFromHash = () => {
@@ -3746,6 +3931,196 @@ export const LoanDashPage = () => {
     ]);
   };
 
+  const runOneClickWorkflow = (template: OneClickWorkflowTemplate) => {
+    const taskBatch = template.tasks.map((task, index) => ({
+      assignee:
+        index === 0 || index === template.tasks.length - 1
+          ? selectedLoanRecord.broker
+          : 'Loan Processor',
+      description: `${template.description} Evidence: ${template.evidence}.`,
+      due: index === 0 ? 'Today' : `${index + 1} days`,
+      gate: template.complianceGate,
+      id: `${template.name}-${index}-${Date.now()}`,
+      priority: index === 0 ? ('High' as const) : ('Medium' as const),
+      sourceWorkflow: template.name,
+      status: 'Pending' as const,
+      title: task,
+    }));
+
+    setGeneratedWorkflowTasks((current) => [...taskBatch, ...current]);
+    setLastRunWorkflowName(template.name);
+    setTaskDrawerFilter('Pending');
+    setActiveRightRailItem('Tasks');
+  };
+
+  const updateGeneratedTaskStatus = (
+    taskId: string,
+    status: GeneratedWorkflowTask['status'],
+  ) => {
+    setGeneratedWorkflowTasks((current) =>
+      current.map((task) =>
+        task.id === taskId
+          ? {
+              ...task,
+              status,
+            }
+          : task,
+      ),
+    );
+  };
+
+  const addApplicant = () => {
+    setConversationApplicants((current) =>
+      current.length >= 4
+        ? current
+        : [...current, `Applicant ${current.length + 1}`],
+    );
+  };
+
+  const visibleGeneratedTasks = generatedWorkflowTasks.filter((task) =>
+    taskDrawerFilter === 'Completed'
+      ? task.status === 'Completed'
+      : task.status !== 'Completed',
+  );
+
+  const applicantConversationQuestions = [
+    {
+      answer: `${conversationApplicants.length}`,
+      key: 'factFind.applicantCount',
+      prompt: 'How many applicants are included in this residential loan?',
+      show: true,
+    },
+    {
+      answer: 'First name, surname, DOB, mobile and email are required.',
+      key: 'applicants[].identity',
+      prompt: 'Capture legal identity fields for every applicant.',
+      show: true,
+    },
+    {
+      answer:
+        'Current address plus previous repeatable rows until 36 months are covered.',
+      key: 'applicants[].addresses.previous[]',
+      prompt:
+        'Does each applicant have at least 3 years of residential address history?',
+      show: true,
+    },
+    {
+      answer:
+        'Relationship, shared address and shared liability flags are shown for co-applicants.',
+      key: 'applicants[1].relationshipToPrimaryApplicant',
+      prompt: 'Ask co-applicant relationship and household-sharing questions.',
+      show: conversationApplicants.length > 1,
+    },
+    {
+      answer:
+        'Additional applicants inherit the same identity, contact, consent, employment and address blocks.',
+      key: 'applicants[2..3]',
+      prompt: 'Show repeatable applicant tabs for applicant 3 and applicant 4.',
+      show: conversationApplicants.length > 2,
+    },
+  ].filter((question) => question.show);
+
+  const activeConversationQuestion =
+    applicantConversationQuestions[
+      Math.min(
+        activeConversationStep,
+        applicantConversationQuestions.length - 1,
+      )
+    ] ?? applicantConversationQuestions[0];
+
+  const renderApplicantConversationSurface = () => {
+    if (activeItem.id !== 'applicants') {
+      return null;
+    }
+
+    return (
+      <StyledSection>
+        <StyledSectionHeader>
+          <div>
+            <StyledSectionTitle>
+              Conditional Applicant Fact Find
+            </StyledSectionTitle>
+            <StyledSectionMeta>
+              BrokerEngine-style guided intake with applicant tabs, add
+              applicant logic and 3-year address-history coverage before
+              Equifax/credit-check readiness.
+            </StyledSectionMeta>
+          </div>
+          <StyledActionRow>
+            <StyledButton
+              accent="secondary"
+              disabled={conversationApplicants.length >= 4}
+              onClick={addApplicant}
+              type="button"
+            >
+              Add applicant
+            </StyledButton>
+            <StyledPill>{conversationApplicants.length} applicants</StyledPill>
+          </StyledActionRow>
+        </StyledSectionHeader>
+
+        <StyledBrokerFactFindSurface>
+          <StyledHouseholdTabs>
+            {conversationApplicants.map((applicant, index) => (
+              <StyledHouseholdTab active={index === 0} key={applicant}>
+                {applicant}
+              </StyledHouseholdTab>
+            ))}
+          </StyledHouseholdTabs>
+
+          <StyledRailPanel>
+            <StyledRailComposer>
+              <StyledPanelTitle>
+                {activeConversationQuestion?.prompt}
+              </StyledPanelTitle>
+              <StyledSectionMeta>
+                <StyledMetaCode>
+                  {activeConversationQuestion?.key}
+                </StyledMetaCode>
+              </StyledSectionMeta>
+              <StyledTextArea
+                readOnly
+                value={activeConversationQuestion?.answer ?? ''}
+              />
+              <StyledActionRow>
+                <StyledButton
+                  accent="secondary"
+                  disabled={activeConversationStep === 0}
+                  onClick={() =>
+                    setActiveConversationStep((current) =>
+                      Math.max(0, current - 1),
+                    )
+                  }
+                  type="button"
+                >
+                  Previous
+                </StyledButton>
+                <StyledButton
+                  accent="primary"
+                  disabled={
+                    activeConversationStep >=
+                    applicantConversationQuestions.length - 1
+                  }
+                  onClick={() =>
+                    setActiveConversationStep((current) =>
+                      Math.min(
+                        applicantConversationQuestions.length - 1,
+                        current + 1,
+                      ),
+                    )
+                  }
+                  type="button"
+                >
+                  Next
+                </StyledButton>
+              </StyledActionRow>
+            </StyledRailComposer>
+          </StyledRailPanel>
+        </StyledBrokerFactFindSurface>
+      </StyledSection>
+    );
+  };
+
   const renderRightRailDrawerContent = () => {
     if (activeRightRailItem === 'Notes') {
       return (
@@ -3784,27 +4159,64 @@ export const LoanDashPage = () => {
       return (
         <StyledRailPanel>
           <StyledTabs>
-            <StyledTab active>Pending</StyledTab>
-            <StyledTab>Completed</StyledTab>
+            <StyledTab
+              active={taskDrawerFilter === 'Pending'}
+              onClick={() => setTaskDrawerFilter('Pending')}
+              type="button"
+            >
+              Pending
+            </StyledTab>
+            <StyledTab
+              active={taskDrawerFilter === 'Completed'}
+              onClick={() => setTaskDrawerFilter('Completed')}
+              type="button"
+            >
+              Completed
+            </StyledTab>
           </StyledTabs>
-          <StyledRailComposer>
-            <StyledSectionMeta>02 May 2026 · High</StyledSectionMeta>
-            <StyledPanelTitle>Request Outstanding Documents</StyledPanelTitle>
-            <StyledFormGrid>
-              <StyledField>
-                <StyledFieldLabel>Due Date</StyledFieldLabel>
-                <StyledInput defaultValue="02/05/2026" />
-              </StyledField>
-              <StyledField>
-                <StyledFieldLabel>Assignee</StyledFieldLabel>
-                <StyledInput defaultValue={selectedLoanRecord.broker} />
-              </StyledField>
-            </StyledFormGrid>
-            <StyledActionRow>
-              <StyledButton accent="secondary">Mark as Completed</StyledButton>
-              <StyledButton accent="secondary">Snooze Task</StyledButton>
-            </StyledActionRow>
-          </StyledRailComposer>
+          {visibleGeneratedTasks.map((task) => (
+            <StyledRailComposer key={task.id}>
+              <StyledSectionMeta>
+                {task.due} · {task.priority} · {task.sourceWorkflow}
+              </StyledSectionMeta>
+              <StyledPanelTitle>{task.title}</StyledPanelTitle>
+              <StyledSectionMeta>{task.description}</StyledSectionMeta>
+              <StyledFormGrid>
+                <StyledField>
+                  <StyledFieldLabel>Gate</StyledFieldLabel>
+                  <StyledInput readOnly value={task.gate} />
+                </StyledField>
+                <StyledField>
+                  <StyledFieldLabel>Assignee</StyledFieldLabel>
+                  <StyledInput readOnly value={task.assignee} />
+                </StyledField>
+              </StyledFormGrid>
+              <StyledActionRow>
+                {task.status !== 'Completed' && (
+                  <StyledButton
+                    accent="secondary"
+                    onClick={() =>
+                      updateGeneratedTaskStatus(task.id, 'Completed')
+                    }
+                    type="button"
+                  >
+                    Mark as Completed
+                  </StyledButton>
+                )}
+                {task.status === 'Pending' && (
+                  <StyledButton
+                    accent="secondary"
+                    onClick={() =>
+                      updateGeneratedTaskStatus(task.id, 'Snoozed')
+                    }
+                    type="button"
+                  >
+                    Snooze Task
+                  </StyledButton>
+                )}
+              </StyledActionRow>
+            </StyledRailComposer>
+          ))}
         </StyledRailPanel>
       );
     }
@@ -3899,12 +4311,20 @@ export const LoanDashPage = () => {
 
     return (
       <StyledWorkflowList>
-        {oneClickWorkflows.map((workflow) => (
-          <StyledWorkflowListRow key={workflow}>
+        {oneClickWorkflowTemplates.map((workflow) => (
+          <StyledWorkflowActionRow
+            key={workflow.name}
+            onClick={() => runOneClickWorkflow(workflow)}
+            type="button"
+          >
             <StyledRadio />
-            <span>{workflow}</span>
-            <span>☆</span>
-          </StyledWorkflowListRow>
+            <span>
+              {workflow.name}
+              <br />
+              {workflow.complianceGate}
+            </span>
+            <span>{workflow.tasks.length} tasks</span>
+          </StyledWorkflowActionRow>
         ))}
       </StyledWorkflowList>
     );
@@ -4123,6 +4543,8 @@ export const LoanDashPage = () => {
 
           {renderLivingExpenseFactFindSurface()}
 
+          {renderApplicantConversationSurface()}
+
           {renderFactFindBuilderSurface()}
 
           <StyledSection>
@@ -4131,7 +4553,8 @@ export const LoanDashPage = () => {
                 <StyledSectionTitle>Application Brain</StyledSectionTitle>
                 <StyledSectionMeta>
                   NCCP, BID, responsible lending, AML/CTF and lender lodgement
-                  gates for residential consumer mortgages.
+                  gates for residential consumer mortgages. Last 1-click
+                  workflow run: {lastRunWorkflowName}.
                 </StyledSectionMeta>
               </div>
             </StyledSectionHeader>
@@ -4185,6 +4608,37 @@ export const LoanDashPage = () => {
                 </StyledChecklist>
               </StyledPanel>
             </StyledTwoColumn>
+          </StyledSection>
+
+          <StyledSection>
+            <StyledSectionHeader>
+              <div>
+                <StyledSectionTitle>
+                  Broker Settings Control Centre
+                </StyledSectionTitle>
+                <StyledSectionMeta>
+                  These controls drive BrokerApp behaviour for boards,
+                  workflows, templates, fact find, compliance and integrations.
+                  They are settings surfaces, not broker-facing deal tables.
+                </StyledSectionMeta>
+              </div>
+              <StyledPill>Workspace settings</StyledPill>
+            </StyledSectionHeader>
+            <StyledBlueprintGrid>
+              {brokerSettingsControls.map(([label, description, key]) => (
+                <StyledPanel key={key}>
+                  <StyledPanelTitle>{label}</StyledPanelTitle>
+                  <StyledSectionMeta>{description}</StyledSectionMeta>
+                  <StyledMetaCode>{key}</StyledMetaCode>
+                  <StyledActionRow>
+                    <StyledButton accent="secondary">Edit rules</StyledButton>
+                    <StyledButton accent="secondary">
+                      Preview impact
+                    </StyledButton>
+                  </StyledActionRow>
+                </StyledPanel>
+              ))}
+            </StyledBlueprintGrid>
           </StyledSection>
 
           <StyledSection>
@@ -4462,27 +4916,26 @@ export const LoanDashPage = () => {
               <StyledPanel>
                 <StyledPanelTitle>Upcoming Activities</StyledPanelTitle>
                 <StyledChecklist>
-                  <StyledChecklistRow>
-                    <input type="checkbox" />
-                    <span>
-                      Request Outstanding Documents · Assigned to{' '}
-                      {selectedLoanRecord.broker} · Due 02 May 2026
-                    </span>
-                  </StyledChecklistRow>
-                  <StyledChecklistRow>
-                    <input type="checkbox" />
-                    <span>
-                      Credit Guide & Privacy Consent · Not sent for both
-                      applicants
-                    </span>
-                  </StyledChecklistRow>
-                  <StyledChecklistRow>
-                    <input type="checkbox" />
-                    <span>
-                      Living Expenses clarification · Awaiting client
-                      confirmation
-                    </span>
-                  </StyledChecklistRow>
+                  {generatedWorkflowTasks.slice(0, 5).map((task) => (
+                    <StyledChecklistRow key={task.id}>
+                      <input
+                        checked={task.status === 'Completed'}
+                        onChange={() =>
+                          updateGeneratedTaskStatus(
+                            task.id,
+                            task.status === 'Completed'
+                              ? 'Pending'
+                              : 'Completed',
+                          )
+                        }
+                        type="checkbox"
+                      />
+                      <span>
+                        {task.title} · {task.sourceWorkflow} · Assigned to{' '}
+                        {task.assignee} · Due {task.due}
+                      </span>
+                    </StyledChecklistRow>
+                  ))}
                 </StyledChecklist>
               </StyledPanel>
 
@@ -4613,28 +5066,45 @@ export const LoanDashPage = () => {
 
       <StyledRightRail>
         <StyledRailBar>
-          {rightRailItems.map(({ Icon, count, label }) => (
-            <StyledRailButton
-              active={activeRightRailItem === label}
-              key={label}
-              onClick={() => setActiveRightRailItem(label)}
-              type="button"
-            >
-              <Icon size={18} />
-              {count > 0 && <StyledRailCount>{count}</StyledRailCount>}
-              {label}
-            </StyledRailButton>
-          ))}
+          {rightRailItems.map(({ Icon, count, label }) => {
+            const resolvedCount =
+              label === 'Tasks'
+                ? generatedWorkflowTasks.filter(
+                    (task) => task.status !== 'Completed',
+                  ).length
+                : label === '1-Click Workflows'
+                  ? oneClickWorkflowTemplates.length
+                  : count;
+
+            return (
+              <StyledRailButton
+                active={activeRightRailItem === label}
+                key={label}
+                onClick={() => setActiveRightRailItem(label)}
+                type="button"
+              >
+                <Icon size={18} />
+                {resolvedCount > 0 && (
+                  <StyledRailCount>{resolvedCount}</StyledRailCount>
+                )}
+                {label}
+              </StyledRailButton>
+            );
+          })}
         </StyledRailBar>
         <StyledWorkflowDrawer>
           <StyledWorkflowDrawerHeader>
             <strong>{activeRightRailItem}</strong>
             <StyledPill>
-              {
-                rightRailItems.find(
-                  (item) => item.label === activeRightRailItem,
-                )?.count
-              }
+              {activeRightRailItem === 'Tasks'
+                ? generatedWorkflowTasks.filter(
+                    (task) => task.status !== 'Completed',
+                  ).length
+                : activeRightRailItem === '1-Click Workflows'
+                  ? oneClickWorkflowTemplates.length
+                  : rightRailItems.find(
+                      (item) => item.label === activeRightRailItem,
+                    )?.count}
             </StyledPill>
           </StyledWorkflowDrawerHeader>
           {renderRightRailDrawerContent()}

@@ -64,7 +64,7 @@ export const brokerEngineFeatureParitySeeds = [
     nextPilotAction:
       'Connect the LoanDash pipeline component to live Opportunity data once workspace API mapping is finalised.',
     notes:
-      'The current route models the UI and stage behaviour; persistence remains tied to the upcoming workspace API mapping.',
+      'The current Opportunity record workspace models the UI and stage behaviour; persistence remains tied to the upcoming workspace API mapping.',
   },
   {
     featureName: 'Collapsed empty Kanban stages',
@@ -80,7 +80,7 @@ export const brokerEngineFeatureParitySeeds = [
       'User-supplied screenshots and instructions for collapsed/expanded stages.',
     nextPilotAction:
       'Wire stage collapse state and card movement to saved user preferences if brokers want the board layout persisted.',
-    notes: 'The UI behavior is implemented in the LoanDash route.',
+    notes: 'The UI behavior is implemented in the Opportunity record LoanDash workspace.',
   },
   {
     featureName: 'Bulk edit guarded board fields',
@@ -118,7 +118,7 @@ export const brokerEngineFeatureParitySeeds = [
     featureArea: 'LOANDASH',
     parityStatus: 'MODELLED',
     brokerAppImplementation:
-      'The LoanDash route renders the BrokerEngine-like second sidebar, opened loan header, dashboard cards, quick view/edit panel, right rail tools, and residential application pages for Overview, Fact Find, Strategy, and Lodgement.',
+      'The Opportunity record LoanDash workspace renders the BrokerEngine-like second sidebar, opened loan header, dashboard cards, quick view/edit panel, right rail tools, and residential application pages for Overview, Fact Find, Strategy, and Lodgement.',
     privateImportRequired: false,
     requiresProviderApi: false,
     requiresWorkspaceLogin: true,

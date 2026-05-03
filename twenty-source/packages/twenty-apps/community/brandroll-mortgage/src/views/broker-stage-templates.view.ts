@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   BROKER_STAGE_TEMPLATE_AMBER_DAYS_FIELD_ID,
@@ -21,6 +21,7 @@ export default defineView({
   icon: 'IconProgress',
   key: ViewKey.INDEX,
   position: 30,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-3090-4000-8000-000000000002',

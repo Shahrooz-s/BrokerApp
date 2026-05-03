@@ -6,10 +6,14 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.15
+## Included In v0.16.9
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
+- A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table.
+- Clickable loan workspace pages for DealDash, Team, Lender, Related Parties, Goals, Applicants, Dependants, Assets, Other Income, Liabilities, Living Expenses, Financial Security, Interview Guide, Security, Funding Position, Products, Smart Docs, BrokerWizard, Lodgement Funding, Credit Proposal, and Submission.
+- Right-rail drawers for Notes, Checklists, Tasks, Emails, Texts, Key Dates, Reports, and 1-Click Workflows.
+- BrokerEngine-style lead and deal stage references with collapsed empty-stage behaviour represented in the LoanDash UI.
 - BrokerEngine feature parity register for boards, DealDash, fact find, Strategy, serviceability, products, lodgement, templates, checklists, documents, settings, client portal, AML/KYC, integrations, and white-label controls.
 - Broker settings records for lenders, products, workflow templates, email/task/SMS/report/template metadata, boards/stages, fact-find templates, smart docs, security, integrations, client portal, AI, and compliance.
 - Broker template metadata records for emails, SMS, tasks, reports, workflows, and smart documents.
@@ -36,7 +40,7 @@ Use `.brokerapp-private/`, `brokerengine-private/`, `private-template-imports/`,
 
 ## Feature Parity Register
 
-BrokerApp now seeds a Broker Settings view called `Feature parity`. This is the internal pilot checklist for the BrokerEngine-style functionality discussed in this project. It tracks whether each feature is seeded/modelled, needs private content import, needs provider API credentials, needs workspace login/configuration, needs custom UI/front-component work, or belongs to a later phase.
+BrokerApp still seeds a sanitized internal feature parity register, but this is no longer intended to be a broker working screen. Internal setup views such as feature parity, integration providers, checklist templates, KYC events, and seed inventories are marked `UNLISTED` so the broker workflow is not driven from raw tables.
 
 The register intentionally stores sanitized feature coverage only. Full copied email/template bodies, checklist wording, screenshots, live account captures, lender calculator content, customer data, and licensed LIXI assets must remain private workspace imports or encrypted artifacts, not GitHub source.
 
@@ -48,10 +52,11 @@ The register intentionally stores sanitized feature coverage only. Full copied e
 4. Deploy the app package from `twenty-source/packages/twenty-apps/community/brandroll-mortgage`.
 5. Install the app.
 6. Run the post-install seed function.
-7. Refresh Twenty and confirm the Broker Settings folder contains the new views.
-8. Configure staff users and roles.
-9. Create a test Contact and Opportunity and verify the DealDash workflow records can be created and linked.
-10. Do not enter real borrower data until backups, access roles, retention, document storage, and provider credentials are approved.
+7. Refresh Twenty and confirm the primary workflow is `Boards > Lead board`, `Boards > Deal board`, opening an Opportunity record, and `Broker Settings > Lenders`. `LoanDash` should appear inside the opened Opportunity record workspace, not as a standalone Boards item.
+8. Confirm raw internal setup tables are not visible as primary broker workflow screens.
+9. Configure staff users and roles.
+10. Create or open a test Contact and Opportunity, then verify the Opportunity record opens with the LoanDash left sidebar pages and right-rail drawers.
+11. Do not enter real borrower data until backups, access roles, retention, document storage, and provider credentials are approved.
 
 ## Pilot Feature Coverage
 
@@ -66,12 +71,13 @@ BrokerApp now has source-level support for the workflow structure discussed in t
 - Checklists and stage gates support processors and assistants.
 - Client portal tasks keep borrower-facing work separate from broker-only notes and AML/compliance records.
 - KYC/CDD records separate identity confidence, AML/CTF risk, fraud risk, and CDD completion.
+- The loan workspace now presents field groups and form controls inside the loan dashboard instead of exposing backend records as the main workflow.
 
 ## Known Pilot Gaps
 
 These are not complete production software features yet:
 
-- The visual DealDash front component is still represented as data model, views, and workflow inventory rather than a custom React screen.
+- The LoanDash front component is now record-bound through the opened Opportunity record ID. It still uses local front-end state for most form controls; production persistence still needs wiring to related Twenty records and external providers.
 - Twenty workflow automations still need workspace configuration after install.
 - ApplyOnline, AFG Flex, AFG/BrokerEngine, IDV, open banking, bank statement, email, and product-data credentials are not present.
 - Lender-specific serviceability engines require licensed calculators, policy documents, provider APIs, or approved manual assumptions.

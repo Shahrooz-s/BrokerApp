@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   DEAL_CHECKLIST_ITEM_ASSIGNEE_ROLE_FIELD_ID,
@@ -19,6 +19,7 @@ export default defineView({
   icon: 'IconListDetails',
   key: ViewKey.INDEX,
   position: 16,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-5730-4000-8000-000000000002',

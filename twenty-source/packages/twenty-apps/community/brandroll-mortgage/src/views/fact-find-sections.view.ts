@@ -1,4 +1,4 @@
-import { ViewKey, defineView } from 'twenty-sdk/define';
+import { ViewKey, defineView, ViewVisibility } from 'twenty-sdk/define';
 
 import {
   FACT_FIND_SECTION_COMPLETION_FIELD_ID,
@@ -19,6 +19,7 @@ export default defineView({
   icon: 'IconLayoutList',
   key: ViewKey.INDEX,
   position: 21,
+  visibility: ViewVisibility.UNLISTED,
   fields: [
     {
       universalIdentifier: '6b6d0000-3010-4000-8000-000000000002',
