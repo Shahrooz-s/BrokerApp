@@ -13,7 +13,7 @@ The live pilot now prioritises broker-facing workflow:
 - `Boards` navigation with native Kanban views for `Lead board` and `Deal board`; opening an Opportunity launches the BrokerApp loan workspace.
 - Lead stages matching the residential lead workflow: New Lead, Attempted Contact 1-3, Initial Call Held > Get Docs, Docs Requested, Research > Servicing, Prepare Loan Proposal, Loan Proposal Presented, Client Accepted > Handover, On Hold, Lost Opps.
 - Deal stages matching the residential loan processing workflow: Outstanding Supporting Documents through Settlement and Lost / Declined.
-- A `BrokerApp LoanDash` front component mounted on the native Opportunity record page for the broker loan workspace. DealDash/LoanDash is a dashboard page inside the opened opportunity, and the left loan navigation opens pages for Team, Lender, Related Parties, Fact Find, Strategy, and Lodgement work.
+- A `BrokerApp LoanDash` front component mounted on the native Opportunity record page as the first standard Opportunity record tab for the broker loan workspace. DealDash/LoanDash is a dashboard page inside the opened opportunity, and the left loan navigation opens pages for Team, Lender, Related Parties, Fact Find, Strategy, and Lodgement work.
 - `Broker Settings` kept narrow for pilot configuration, starting with Lenders.
 - Internal configuration objects are kept unlisted where possible so brokers do not work from raw setup tables.
 

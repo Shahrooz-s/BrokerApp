@@ -7,6 +7,5 @@ export default defineApplication({
   displayName: 'BrokerApp',
   description:
     'White-labelled, LIXI-aware mortgage broking workspace with BrokerEngine-style deal boards, client portal foundations, product research, checklists, and AML/KYC controls.',
-  icon: 'IconHomeDollar',
   defaultRoleUniversalIdentifier: DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
 });

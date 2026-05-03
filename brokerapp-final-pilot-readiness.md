@@ -6,11 +6,11 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.9
+## Included In v0.16.10
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
-- A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table.
+- A BrokerApp LoanDash front component mounted on the native Opportunity record page and attached to the standard Opportunity record layout as the first tab. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table.
 - Clickable loan workspace pages for DealDash, Team, Lender, Related Parties, Goals, Applicants, Dependants, Assets, Other Income, Liabilities, Living Expenses, Financial Security, Interview Guide, Security, Funding Position, Products, Smart Docs, BrokerWizard, Lodgement Funding, Credit Proposal, and Submission.
 - Right-rail drawers for Notes, Checklists, Tasks, Emails, Texts, Key Dates, Reports, and 1-Click Workflows.
 - BrokerEngine-style lead and deal stage references with collapsed empty-stage behaviour represented in the LoanDash UI.
