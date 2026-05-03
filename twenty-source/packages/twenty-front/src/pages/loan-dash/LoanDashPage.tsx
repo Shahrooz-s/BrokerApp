@@ -63,6 +63,16 @@ type QuickViewTab =
   | 'Interview Guide'
   | 'Products';
 
+type RightRailItemLabel =
+  | 'Notes'
+  | 'Checklists'
+  | 'Tasks'
+  | 'Emails'
+  | 'Texts'
+  | 'Key Dates'
+  | 'Reports'
+  | '1-Click Workflows';
+
 type PageBlueprint = {
   fields: Array<[string, string]>;
   sections: Array<[string, string]>;
@@ -437,7 +447,11 @@ const initialBoardStages: BoardStage[] = [
   },
 ];
 
-const rightRailItems = [
+const rightRailItems: Array<{
+  Icon: typeof IconNotes;
+  count: number;
+  label: RightRailItemLabel;
+}> = [
   { Icon: IconNotes, count: 7, label: 'Notes' },
   { Icon: IconListCheck, count: 4, label: 'Checklists' },
   { Icon: IconCheck, count: 12, label: 'Tasks' },
@@ -1744,10 +1758,16 @@ const pageBlueprints: Record<string, PageBlueprint> = {
     fields: [
       ['Lender Name', 'Other'],
       ['Broker Code', 'Not recorded'],
+      ['Lender Reference', 'Not recorded'],
       ['Authority to Debit Available', 'No'],
       ['Lodgement channel', 'ApplyOnline once direct lodgement is configured'],
     ],
     sections: [
+      ['Lender Notes', 'Internal notes, exceptions and assessor call history.'],
+      [
+        'Lender Contact Details',
+        'Phone, email, postal address and lender support team records.',
+      ],
       [
         'Assessor Details',
         'Assessment team, queue notes and contact instructions.',
@@ -2030,18 +2050,11 @@ const StyledPage = styled.div`
   background: ${themeCssVariables.background.secondary};
   color: ${themeCssVariables.font.color.primary};
   display: grid;
-  grid-template-columns: 248px minmax(780px, 1fr) 312px;
+  grid-template-columns: 248px minmax(760px, 1fr) 340px;
   min-height: 100%;
-  overflow: hidden;
+  min-width: 1348px;
+  overflow: auto;
   width: 100%;
-
-  @media (max-width: 1180px) {
-    grid-template-columns: 216px minmax(740px, 1fr);
-  }
-
-  @media (max-width: 760px) {
-    grid-template-columns: 184px minmax(700px, 1fr);
-  }
 `;
 
 const StyledWorkflowSidebar = styled.aside`
@@ -2150,6 +2163,46 @@ const StyledTopAlertText = styled.div`
   align-items: center;
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
+`;
+
+const StyledLoanTopbar = styled.div`
+  align-items: center;
+  background: ${themeCssVariables.background.primary};
+  border-bottom: 1px solid ${themeCssVariables.border.color.light};
+  display: grid;
+  gap: ${themeCssVariables.spacing[4]};
+  grid-template-columns: minmax(360px, 1fr) auto;
+  min-height: 58px;
+  padding: 0 ${themeCssVariables.spacing[4]};
+`;
+
+const StyledTopbarIdentity = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${themeCssVariables.spacing[3]};
+  min-width: 0;
+`;
+
+const StyledIconButton = styled.button<{ active?: boolean }>`
+  align-items: center;
+  background: ${({ active }) =>
+    active
+      ? themeCssVariables.background.transparent.light
+      : themeCssVariables.background.primary};
+  border: 1px solid ${themeCssVariables.border.color.medium};
+  border-radius: ${themeCssVariables.border.radius.sm};
+  color: ${themeCssVariables.font.color.primary};
+  cursor: pointer;
+  display: inline-flex;
+  font-family: ${themeCssVariables.font.family};
+  height: ${themeCssVariables.spacing[8]};
+  justify-content: center;
+  min-width: ${themeCssVariables.spacing[8]};
+`;
+
+const StyledTopbarTitle = styled.div`
+  font-size: ${themeCssVariables.font.size.xl};
+  font-weight: ${themeCssVariables.font.weight.semiBold};
 `;
 
 const StyledHeader = styled.header`
@@ -3012,10 +3065,6 @@ const StyledRightRail = styled.aside`
   display: flex;
   min-height: 0;
   overflow: hidden;
-
-  @media (max-width: 1180px) {
-    display: none;
-  }
 `;
 
 const StyledRailBar = styled.div`
@@ -3027,10 +3076,12 @@ const StyledRailBar = styled.div`
   padding: ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[2]};
 `;
 
-const StyledRailButton = styled.button`
+const StyledRailButton = styled.button<{ active?: boolean }>`
   align-items: center;
-  background: transparent;
-  border: 0;
+  background: ${({ active }) =>
+    active ? 'rgba(255, 255, 255, 0.13)' : 'transparent'};
+  border: 1px solid
+    ${({ active }) => (active ? 'rgba(255, 255, 255, 0.24)' : 'transparent')};
   border-radius: ${themeCssVariables.border.radius.sm};
   color: ${themeCssVariables.color.gray1};
   cursor: pointer;
@@ -3040,6 +3091,24 @@ const StyledRailButton = styled.button`
   font-size: 10px;
   gap: ${themeCssVariables.spacing[1]};
   min-height: 48px;
+  position: relative;
+`;
+
+const StyledRailCount = styled.span`
+  align-items: center;
+  background: ${themeCssVariables.color.blue};
+  border: 1px solid ${themeCssVariables.color.gray1};
+  border-radius: 999px;
+  color: ${themeCssVariables.color.gray1};
+  display: inline-flex;
+  font-size: 10px;
+  height: 18px;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 4px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
 `;
 
 const StyledWorkflowDrawer = styled.div`
@@ -3074,6 +3143,50 @@ const StyledWorkflowListRow = styled.div`
   grid-template-columns: 18px 1fr 18px;
   min-height: 54px;
   padding: 0 ${themeCssVariables.spacing[3]};
+`;
+
+const StyledRailPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[3]};
+  padding: ${themeCssVariables.spacing[3]};
+`;
+
+const StyledRailEmptyState = styled.div`
+  align-items: center;
+  color: ${themeCssVariables.font.color.secondary};
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[3]};
+  justify-content: center;
+  min-height: 280px;
+  padding: ${themeCssVariables.spacing[6]} ${themeCssVariables.spacing[4]};
+  text-align: center;
+
+  strong {
+    color: ${themeCssVariables.font.color.primary};
+    font-size: ${themeCssVariables.font.size.lg};
+  }
+`;
+
+const StyledRailComposer = styled.div`
+  border: 1px solid ${themeCssVariables.border.color.light};
+  border-radius: ${themeCssVariables.border.radius.sm};
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[3]};
+  padding: ${themeCssVariables.spacing[3]};
+`;
+
+const StyledRailTextArea = styled.textarea`
+  border: 1px solid ${themeCssVariables.border.color.medium};
+  border-radius: ${themeCssVariables.border.radius.sm};
+  color: ${themeCssVariables.font.color.primary};
+  font-family: ${themeCssVariables.font.family};
+  min-height: 104px;
+  padding: ${themeCssVariables.spacing[2]};
+  resize: vertical;
+  width: 100%;
 `;
 
 const StyledRadio = styled.span`
@@ -3124,6 +3237,8 @@ export const LoanDashPage = () => {
     'Categories',
   ]);
   const [quickViewTab, setQuickViewTab] = useState<QuickViewTab>('Note');
+  const [activeRightRailItem, setActiveRightRailItem] =
+    useState<RightRailItemLabel>('Notes');
   const [selectedLoanRecordId, setSelectedLoanRecordId] =
     useState<string>('2/2026');
 
@@ -3631,6 +3746,170 @@ export const LoanDashPage = () => {
     ]);
   };
 
+  const renderRightRailDrawerContent = () => {
+    if (activeRightRailItem === 'Notes') {
+      return (
+        <StyledRailEmptyState>
+          <IconNotes size={48} />
+          <strong>It&apos;s empty here! Time to create your first note.</strong>
+          <StyledButton accent="primary">Create a Note</StyledButton>
+        </StyledRailEmptyState>
+      );
+    }
+
+    if (activeRightRailItem === 'Checklists') {
+      return (
+        <StyledRailPanel>
+          <StyledRailComposer>
+            <StyledPanelTitle>Readiness Checklist</StyledPanelTitle>
+            <StyledChecklist>
+              {[
+                'Credit Guide & Privacy Consent sent',
+                'AML/KYC evidence recorded for every applicant',
+                'Income, liability and living expense evidence attached',
+                'BID file note completed before recommendation',
+              ].map((item, index) => (
+                <StyledChecklistRow key={item}>
+                  <input defaultChecked={index === 0} type="checkbox" />
+                  <span>{item}</span>
+                </StyledChecklistRow>
+              ))}
+            </StyledChecklist>
+          </StyledRailComposer>
+        </StyledRailPanel>
+      );
+    }
+
+    if (activeRightRailItem === 'Tasks') {
+      return (
+        <StyledRailPanel>
+          <StyledTabs>
+            <StyledTab active>Pending</StyledTab>
+            <StyledTab>Completed</StyledTab>
+          </StyledTabs>
+          <StyledRailComposer>
+            <StyledSectionMeta>02 May 2026 · High</StyledSectionMeta>
+            <StyledPanelTitle>Request Outstanding Documents</StyledPanelTitle>
+            <StyledFormGrid>
+              <StyledField>
+                <StyledFieldLabel>Due Date</StyledFieldLabel>
+                <StyledInput defaultValue="02/05/2026" />
+              </StyledField>
+              <StyledField>
+                <StyledFieldLabel>Assignee</StyledFieldLabel>
+                <StyledInput defaultValue={selectedLoanRecord.broker} />
+              </StyledField>
+            </StyledFormGrid>
+            <StyledActionRow>
+              <StyledButton accent="secondary">Mark as Completed</StyledButton>
+              <StyledButton accent="secondary">Snooze Task</StyledButton>
+            </StyledActionRow>
+          </StyledRailComposer>
+        </StyledRailPanel>
+      );
+    }
+
+    if (activeRightRailItem === 'Emails') {
+      return (
+        <StyledRailPanel>
+          <StyledRailComposer>
+            <StyledPanelTitle>Send Email</StyledPanelTitle>
+            <StyledField>
+              <StyledFieldLabel>Template</StyledFieldLabel>
+              <StyledSelect defaultValue="Outstanding Supporting Documents">
+                <option>Outstanding Supporting Documents</option>
+                <option>Credit Guide & Privacy Consent</option>
+                <option>Conditional Approval Update</option>
+              </StyledSelect>
+            </StyledField>
+            <StyledField>
+              <StyledFieldLabel>To</StyledFieldLabel>
+              <StyledInput
+                defaultValue={selectedLoanRecord.applicants[0].email}
+              />
+            </StyledField>
+            <StyledField>
+              <StyledFieldLabel>Subject</StyledFieldLabel>
+              <StyledInput defaultValue="Outstanding documents for your loan application" />
+            </StyledField>
+            <StyledRailTextArea defaultValue="Hi Alex, please complete the remaining document requests in your client portal so we can progress your application." />
+            <StyledButton accent="primary">Send Email</StyledButton>
+          </StyledRailComposer>
+        </StyledRailPanel>
+      );
+    }
+
+    if (activeRightRailItem === 'Texts') {
+      return (
+        <StyledRailPanel>
+          <StyledRailComposer>
+            <StyledPanelTitle>Send Text</StyledPanelTitle>
+            <StyledField>
+              <StyledFieldLabel>To</StyledFieldLabel>
+              <StyledInput
+                defaultValue={selectedLoanRecord.applicants[0].phone}
+              />
+            </StyledField>
+            <StyledRailTextArea defaultValue="Hi Alex, your broker has requested outstanding documents for your home loan application. Please check your portal when convenient." />
+            <StyledSectionMeta>
+              SMS templates stay linked to the loan timeline and applicant
+              consent status.
+            </StyledSectionMeta>
+            <StyledButton accent="primary">Send Text</StyledButton>
+          </StyledRailComposer>
+        </StyledRailPanel>
+      );
+    }
+
+    if (activeRightRailItem === 'Key Dates') {
+      return (
+        <StyledWorkflowList>
+          {keyDateRows.map((row) => (
+            <StyledWorkflowListRow key={row.key}>
+              <StyledRadio />
+              <span>
+                {row.label}
+                <br />
+                {row.date} · {row.source}
+              </span>
+              <span>›</span>
+            </StyledWorkflowListRow>
+          ))}
+        </StyledWorkflowList>
+      );
+    }
+
+    if (activeRightRailItem === 'Reports') {
+      return (
+        <StyledWorkflowList>
+          {reportTemplates.map((report) => (
+            <StyledWorkflowListRow key={report}>
+              <StyledRadio />
+              <span>
+                {report}
+                <br />
+                PDF report
+              </span>
+              <span>›</span>
+            </StyledWorkflowListRow>
+          ))}
+        </StyledWorkflowList>
+      );
+    }
+
+    return (
+      <StyledWorkflowList>
+        {oneClickWorkflows.map((workflow) => (
+          <StyledWorkflowListRow key={workflow}>
+            <StyledRadio />
+            <span>{workflow}</span>
+            <span>☆</span>
+          </StyledWorkflowListRow>
+        ))}
+      </StyledWorkflowList>
+    );
+  };
+
   return (
     <StyledPage>
       <StyledWorkflowSidebar>
@@ -3668,6 +3947,42 @@ export const LoanDashPage = () => {
             <StyledButton accent="primary">Get Started</StyledButton>
           </StyledActionRow>
         </StyledTopAlert>
+
+        <StyledLoanTopbar>
+          <StyledTopbarIdentity>
+            <StyledIconButton
+              onClick={() => handleWorkflowClick('loandash')}
+              type="button"
+            >
+              ←
+            </StyledIconButton>
+            <div>
+              <StyledTopbarTitle>{activeItem.label}</StyledTopbarTitle>
+              <StyledSubheading>
+                {selectedLoanRecord.name} · ID {selectedLoanRecord.id} ·{' '}
+                {selectedLoanRecord.lender}
+              </StyledSubheading>
+            </div>
+          </StyledTopbarIdentity>
+          <StyledActionRow>
+            <StyledSelect
+              aria-label="Move loan to stage"
+              onChange={(event) =>
+                moveSelectedLoanToStage(Number(event.target.value))
+              }
+              value={selectedLoanStage.id}
+            >
+              {boardStages.map((stage) => (
+                <option key={stage.id} value={stage.id}>
+                  {stage.id}. {stage.name}
+                </option>
+              ))}
+            </StyledSelect>
+            <StyledButton accent="secondary">Sync</StyledButton>
+            <StyledButton accent="secondary">Copy Link</StyledButton>
+            <StyledButton accent="primary">Save</StyledButton>
+          </StyledActionRow>
+        </StyledLoanTopbar>
 
         <StyledHeader>
           <StyledTitleRow>
@@ -4298,53 +4613,31 @@ export const LoanDashPage = () => {
 
       <StyledRightRail>
         <StyledRailBar>
-          {rightRailItems.map(({ Icon, label }) => (
-            <StyledRailButton key={label}>
+          {rightRailItems.map(({ Icon, count, label }) => (
+            <StyledRailButton
+              active={activeRightRailItem === label}
+              key={label}
+              onClick={() => setActiveRightRailItem(label)}
+              type="button"
+            >
               <Icon size={18} />
+              {count > 0 && <StyledRailCount>{count}</StyledRailCount>}
               {label}
             </StyledRailButton>
           ))}
         </StyledRailBar>
         <StyledWorkflowDrawer>
           <StyledWorkflowDrawerHeader>
-            <strong>1-Click Workflows</strong>
-            <StyledPill>All</StyledPill>
+            <strong>{activeRightRailItem}</strong>
+            <StyledPill>
+              {
+                rightRailItems.find(
+                  (item) => item.label === activeRightRailItem,
+                )?.count
+              }
+            </StyledPill>
           </StyledWorkflowDrawerHeader>
-          <StyledWorkflowList>
-            {oneClickWorkflows.map((workflow) => (
-              <StyledWorkflowListRow key={workflow}>
-                <StyledRadio />
-                <span>{workflow}</span>
-                <span>☆</span>
-              </StyledWorkflowListRow>
-            ))}
-            <StyledWorkflowDrawerHeader>
-              <strong>Key Dates</strong>
-              <StyledPill>{keyDateRows.length}</StyledPill>
-            </StyledWorkflowDrawerHeader>
-            {keyDateRows.map((row) => (
-              <StyledWorkflowListRow key={row.key}>
-                <StyledRadio />
-                <span>
-                  {row.label}
-                  <br />
-                  {row.date} · {row.source}
-                </span>
-                <span>›</span>
-              </StyledWorkflowListRow>
-            ))}
-            <StyledWorkflowDrawerHeader>
-              <strong>Reports</strong>
-              <StyledPill>{reportTemplates.length}</StyledPill>
-            </StyledWorkflowDrawerHeader>
-            {reportTemplates.map((report) => (
-              <StyledWorkflowListRow key={report}>
-                <StyledRadio />
-                <span>{report}</span>
-                <span>›</span>
-              </StyledWorkflowListRow>
-            ))}
-          </StyledWorkflowList>
+          {renderRightRailDrawerContent()}
         </StyledWorkflowDrawer>
       </StyledRightRail>
     </StyledPage>
