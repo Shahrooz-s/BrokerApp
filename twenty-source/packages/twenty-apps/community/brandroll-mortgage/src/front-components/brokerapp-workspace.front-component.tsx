@@ -816,6 +816,8 @@ const workspacePages: Record<string, WorkspacePage> = {
           field('Unit Number'),
           field('Street Number'),
           field('Street Name'),
+          field('Street Type', 'select', ['Street', 'Road', 'Avenue', 'Drive', 'Court', 'Crescent', 'Place', 'Parade', 'Lane', 'Highway', 'Terrace', 'Way']),
+          field('Street Suffix'),
           field('Suburb'),
           field('State', 'select', ['ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA']),
           field('Postcode'),
@@ -1939,13 +1941,11 @@ const styles = {
     borderRadius: 'var(--t-border-radius-sm, 4px)',
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
     display: 'grid',
-    left: 0,
+    marginTop: '4px',
     maxHeight: '220px',
     overflowY: 'auto' as const,
     padding: '4px',
-    position: 'absolute' as const,
-    right: 0,
-    top: '36px',
+    position: 'relative' as const,
     zIndex: 15,
   },
   selectOption: {
@@ -2200,6 +2200,9 @@ export const BrokerAppWorkspace = () => {
     null,
   );
   const hasMountedRef = useRef(false);
+  const fieldControlRefs = useRef<
+    Record<string, HTMLInputElement | HTMLTextAreaElement>
+  >({});
   const [taskFilter, setTaskFilter] = useState<'Pending' | 'Completed'>(
     'Pending',
   );
@@ -2366,12 +2369,69 @@ export const BrokerAppWorkspace = () => {
   const loanTitle = opportunityRecordId
     ? `Opportunity ${opportunityRecordId.slice(0, 8)}`
     : 'Opened Opportunity';
+
+  const collectVisibleDomAnswers = () => {
+    const domAnswers: Record<string, FactFindAnswerValue> = {};
+    const collectControlValue = (
+      fieldKey: string,
+      control: HTMLInputElement | HTMLTextAreaElement,
+    ) => {
+      if (control.tagName === 'INPUT' && control.type === 'checkbox') {
+        domAnswers[fieldKey] = (control as HTMLInputElement).checked;
+        return;
+      }
+
+      domAnswers[fieldKey] = control.value;
+    };
+
+    Object.entries(fieldControlRefs.current).forEach(([fieldKey, control]) => {
+      collectControlValue(fieldKey, control);
+    });
+
+    const controls = document.querySelectorAll<
+      HTMLInputElement | HTMLTextAreaElement
+    >('[data-brokerapp-field-key], input[name], textarea[name]');
+
+    controls.forEach((control) => {
+      const fieldKey =
+        control.getAttribute('data-brokerapp-field-key') ??
+        control.getAttribute('name');
+
+      if (!fieldKey) {
+        return;
+      }
+
+      collectControlValue(fieldKey, control);
+    });
+
+    return domAnswers;
+  };
+
+  const syncVisibleDomAnswers = () => {
+    const domAnswers = collectVisibleDomAnswers();
+
+    if (Object.keys(domAnswers).length > 0) {
+      setFactFindAnswers((current) => ({
+        ...current,
+        ...domAnswers,
+      }));
+    }
+
+    return domAnswers;
+  };
+
+  const openWorkspacePage = (pageName: string) => {
+    syncVisibleDomAnswers();
+    setOpenSelectFieldKey(null);
+    setActivePageName(pageName);
+  };
+
   const toolbarTabs = [
     {
       icon: '⌂',
       label: 'Home',
       active: activePageName === 'LoanDash',
-      onClick: () => setActivePageName('LoanDash'),
+      onClick: () => openWorkspacePage('LoanDash'),
     },
     {
       icon: '◷',
@@ -2404,7 +2464,7 @@ export const BrokerAppWorkspace = () => {
       icon: '⌕',
       label: 'Files',
       active: activePageName === 'Smart Docs',
-      onClick: () => setActivePageName('Smart Docs'),
+      onClick: () => openWorkspacePage('Smart Docs'),
     },
     {
       icon: '@',
@@ -2440,13 +2500,19 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
-  const getFieldKey = (workspaceField: WorkspaceField) =>
+  const getFieldKey = (
+    workspaceField: WorkspaceField,
+    applicantRole = activeApplicantRole,
+  ) =>
     `${activePage.title}:${
-      activePage.group === 'Fact Find' ? `${activeApplicantRole}:` : ''
+      activePage.group === 'Fact Find' ? `${applicantRole}:` : ''
     }${workspaceField.label.replace(/^\*/, '').trim()}`;
 
-  const getFieldValue = (workspaceField: WorkspaceField) => {
-    const fieldKey = getFieldKey(workspaceField);
+  const getFieldValue = (
+    workspaceField: WorkspaceField,
+    applicantRole = activeApplicantRole,
+  ) => {
+    const fieldKey = getFieldKey(workspaceField, applicantRole);
     const savedValue = factFindAnswers[fieldKey];
 
     if (savedValue !== undefined) {
@@ -2467,12 +2533,13 @@ export const BrokerAppWorkspace = () => {
   const updateFieldValue = (
     workspaceField: WorkspaceField,
     value: FactFindAnswerValue,
+    applicantRole = activeApplicantRole,
   ) => {
     const fieldLabel = workspaceField.label.replace(/^\*/, '').trim();
 
     setFactFindAnswers((current) => ({
       ...current,
-      [getFieldKey(workspaceField)]: value,
+      [getFieldKey(workspaceField, applicantRole)]: value,
     }));
     setSaveStatus('Saving');
     setAutosaveVersion((version) => version + 1);
@@ -2489,24 +2556,39 @@ export const BrokerAppWorkspace = () => {
     }
   };
 
-  const getPersistedSummary = (completedAnswerCount: number) =>
+  const getPersistedSummary = (
+    completedAnswerCount: number,
+    answers: Record<string, FactFindAnswerValue>,
+  ) =>
     JSON.stringify(
       {
         activeApplicant: activeApplicantRole,
         activePage: activePage.title,
         answerCount: completedAnswerCount,
+        applicantFactFind: applicantRoles.map((role) => ({
+          answers: Object.fromEntries(
+            Object.entries(answers).filter(([key]) =>
+              key.includes(`:${role}:`),
+            ),
+          ),
+          role,
+        })),
         applicantCount,
         autoSavedAt: new Date().toISOString(),
         board: loanBoard,
         stage: activeStageOption.value,
-        values: factFindAnswers,
+        values: answers,
       },
       null,
       2,
     );
 
   const persistWorkspaceAnswers = async (mode: 'manual' | 'auto') => {
-    const completedAnswerCount = Object.values(factFindAnswers).filter(
+    const answers = {
+      ...factFindAnswers,
+      ...collectVisibleDomAnswers(),
+    };
+    const completedAnswerCount = Object.values(answers).filter(
       (value) => value !== '' && value !== false,
     ).length;
 
@@ -2524,12 +2606,15 @@ export const BrokerAppWorkspace = () => {
 
     try {
       const client = new CoreApiClient();
-      const persistedSummary = getPersistedSummary(completedAnswerCount);
+      const persistedSummary = getPersistedSummary(
+        completedAnswerCount,
+        answers,
+      );
       const requirementsObjectives = String(
-        factFindAnswers[
+        answers[
           `Goals:${activeApplicantRole}:Requirements and Objectives`
         ] ??
-          factFindAnswers['Goals:Requirements and Objectives'] ??
+          answers['Goals:Requirements and Objectives'] ??
           '',
       ).trim();
       const opportunityUpdateData: {
@@ -2608,11 +2693,14 @@ export const BrokerAppWorkspace = () => {
 
   const handleWorkspaceAction = async (action: string) => {
     if (action === 'Add Applicant' || action === 'Add applicant') {
+      const visibleAnswers = syncVisibleDomAnswers();
+
       setApplicantCount((count) => {
         const nextCount = Math.min(4, count + 1);
 
         setFactFindAnswers((current) => ({
           ...current,
+          ...visibleAnswers,
           'Applicants:Applicant Count': String(nextCount),
         }));
         setActiveApplicantIndex(nextCount - 1);
@@ -2646,13 +2734,17 @@ export const BrokerAppWorkspace = () => {
     });
   };
 
-  const renderWorkspaceField = (workspaceField: WorkspaceField) => {
+  const renderWorkspaceField = (
+    workspaceField: WorkspaceField,
+    applicantRole = activeApplicantRole,
+  ) => {
     const label = workspaceField.required
       ? workspaceField.label.replace(/^\*/, '').trim()
       : workspaceField.label;
     const commonInputStyle =
       workspaceField.type === 'textarea' ? styles.textArea : styles.input;
-    const fieldValue = getFieldValue(workspaceField);
+    const fieldKey = getFieldKey(workspaceField, applicantRole);
+    const fieldValue = getFieldValue(workspaceField, applicantRole);
 
     if (workspaceField.type === 'checkbox') {
       return (
@@ -2662,9 +2754,19 @@ export const BrokerAppWorkspace = () => {
             <span>{workspaceField.help ?? 'Available'}</span>
             <input
               checked={fieldValue === true}
+              data-brokerapp-field-key={fieldKey}
               onChange={(event) =>
-                updateFieldValue(workspaceField, event.currentTarget.checked)
+                updateFieldValue(
+                  workspaceField,
+                  event.currentTarget.checked,
+                  applicantRole,
+                )
               }
+              ref={(control) => {
+                if (control) {
+                  fieldControlRefs.current[fieldKey] = control;
+                }
+              }}
               type="checkbox"
             />
           </span>
@@ -2681,8 +2783,10 @@ export const BrokerAppWorkspace = () => {
               <label key={option} style={styles.rowButton}>
                 <input
                   checked={fieldValue === option}
-                  name={getFieldKey(workspaceField)}
-                  onChange={() => updateFieldValue(workspaceField, option)}
+                  name={fieldKey}
+                  onChange={() =>
+                    updateFieldValue(workspaceField, option, applicantRole)
+                  }
                   type="radio"
                 />{' '}
                 {option}
@@ -2694,7 +2798,6 @@ export const BrokerAppWorkspace = () => {
     }
 
     if (workspaceField.type === 'select') {
-      const fieldKey = getFieldKey(workspaceField);
       const isOpen = openSelectFieldKey === fieldKey;
       const selectedValue = String(fieldValue);
       const placeholder = `Select ${label.toLowerCase()}`;
@@ -2726,7 +2829,7 @@ export const BrokerAppWorkspace = () => {
                 <button
                   aria-selected={selectedValue === ''}
                   onClick={() => {
-                    updateFieldValue(workspaceField, '');
+                    updateFieldValue(workspaceField, '', applicantRole);
                     setOpenSelectFieldKey(null);
                   }}
                   role="option"
@@ -2740,7 +2843,7 @@ export const BrokerAppWorkspace = () => {
                     aria-selected={selectedValue === option}
                     key={option}
                     onClick={() => {
-                      updateFieldValue(workspaceField, option);
+                      updateFieldValue(workspaceField, option, applicantRole);
                       setOpenSelectFieldKey(null);
                     }}
                     role="option"
@@ -2774,20 +2877,43 @@ export const BrokerAppWorkspace = () => {
               Paragraph · B · I · U · bullets · numbers · table
             </div>
             <textarea
+              data-brokerapp-field-key={fieldKey}
+              defaultValue={String(fieldValue)}
+              key={fieldKey}
+              name={fieldKey}
+              onBlur={(event) =>
+                updateFieldValue(
+                  workspaceField,
+                  event.currentTarget.value,
+                  applicantRole,
+                )
+              }
               onInput={(event) =>
-                updateFieldValue(workspaceField, event.currentTarget.value)
+                updateFieldValue(
+                  workspaceField,
+                  event.currentTarget.value,
+                  applicantRole,
+                )
               }
               onChange={(event) =>
-                updateFieldValue(workspaceField, event.currentTarget.value)
+                updateFieldValue(
+                  workspaceField,
+                  event.currentTarget.value,
+                  applicantRole,
+                )
               }
               placeholder="Type something..."
+              ref={(control) => {
+                if (control) {
+                  fieldControlRefs.current[fieldKey] = control;
+                }
+              }}
               style={{
                 ...styles.textArea,
                 border: '0',
                 minHeight: '86px',
                 padding: 0,
               }}
-              value={String(fieldValue)}
             />
           </div>
         </label>
@@ -2800,7 +2926,7 @@ export const BrokerAppWorkspace = () => {
           ? `${applicantCount} applicant${applicantCount === 1 ? '' : 's'}`
           : label === '3 year address history complete'
             ? factFindAnswers[
-                `Applicants:${activeApplicantRole}:Current Address Tenure`
+                `Applicants:${applicantRole}:Current Address Tenure`
               ] === 'Less than 3 years'
               ? 'Previous address required'
               : 'Current address covers 3 years'
@@ -2830,41 +2956,90 @@ export const BrokerAppWorkspace = () => {
         <span style={styles.label}>{label}</span>
         {workspaceField.type === 'textarea' ? (
           <textarea
+            data-brokerapp-field-key={fieldKey}
+            defaultValue={String(fieldValue)}
+            key={fieldKey}
+            name={fieldKey}
+            onBlur={(event) =>
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
+            }
             onInput={(event) =>
-              updateFieldValue(workspaceField, event.currentTarget.value)
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
             }
             onChange={(event) =>
-              updateFieldValue(workspaceField, event.currentTarget.value)
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
             }
             placeholder="Type something..."
+            ref={(control) => {
+              if (control) {
+                fieldControlRefs.current[fieldKey] = control;
+              }
+            }}
             style={commonInputStyle}
-            value={String(fieldValue)}
           />
         ) : (
           <input
+            data-brokerapp-field-key={fieldKey}
+            defaultValue={String(fieldValue)}
+            key={fieldKey}
+            name={fieldKey}
+            onBlur={(event) =>
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
+            }
             onInput={(event) =>
-              updateFieldValue(workspaceField, event.currentTarget.value)
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
             }
             onChange={(event) =>
-              updateFieldValue(workspaceField, event.currentTarget.value)
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
             }
             placeholder={
               workspaceField.type === 'money'
                 ? '$0.00'
                 : workspaceField.type === 'date'
                   ? 'Select date'
-                  : 'Type something...'
+                : 'Type something...'
             }
+            ref={(control) => {
+              if (control) {
+                fieldControlRefs.current[fieldKey] = control;
+              }
+            }}
             style={commonInputStyle}
             type={workspaceField.type === 'date' ? 'date' : 'text'}
-            value={String(fieldValue)}
           />
         )}
       </label>
     );
   };
 
-  const shouldShowSection = (section: WorkspaceSection) => {
+  const shouldShowSection = (
+    section: WorkspaceSection,
+    applicantRole = activeApplicantRole,
+  ) => {
     if (activePage.title === 'Other Income' && section.title === 'Income Sources') {
       return (
         factFindAnswers[
@@ -2879,7 +3054,7 @@ export const BrokerAppWorkspace = () => {
     ) {
       return (
         factFindAnswers[
-          `Applicants:${activeApplicantRole}:Current Address Tenure`
+          `Applicants:${applicantRole}:Current Address Tenure`
         ] === 'Less than 3 years'
       );
     }
@@ -2887,7 +3062,9 @@ export const BrokerAppWorkspace = () => {
     return true;
   };
 
-  const pageSections = activePage.sections.filter(shouldShowSection);
+  const pageSections = activePage.sections.filter((section) =>
+    shouldShowSection(section),
+  );
   const hasZeroLivingExpense = livingExpenseFields
     .filter((expenseField) => expenseField.type === 'money')
     .some((expenseField) => {
@@ -2917,7 +3094,11 @@ export const BrokerAppWorkspace = () => {
           {applicantRoles.map((role, index) => (
             <button
               key={role}
-              onClick={() => setActiveApplicantIndex(index)}
+              onClick={() => {
+                syncVisibleDomAnswers();
+                setOpenSelectFieldKey(null);
+                setActiveApplicantIndex(index);
+              }}
               style={{
                 ...styles.applicantTab,
                 ...(activeApplicantIndex === index
@@ -2950,6 +3131,56 @@ export const BrokerAppWorkspace = () => {
             +
           </button>
         </div>
+      </section>
+    );
+  };
+
+  const renderPageSection = (
+    section: WorkspaceSection,
+    applicantRole = activeApplicantRole,
+  ) => {
+    const sectionKey = `${activePage.title}:${section.title}`;
+
+    return (
+      <section key={`${applicantRole}:${section.title}`} style={styles.boardWrap}>
+        <div style={styles.sectionHeader}>
+          <div>
+            <strong>{section.title}</strong>
+            <div style={styles.small}>{section.description}</div>
+          </div>
+          <button
+            onClick={() => togglePageSection(sectionKey)}
+            style={styles.subtleButton}
+            type="button"
+          >
+            {collapsedPageSections.includes(sectionKey)
+              ? 'Expand'
+              : 'Collapse'}
+          </button>
+        </div>
+        {!collapsedPageSections.includes(sectionKey) && (
+          <>
+            <div style={styles.formGrid}>
+              {section.fields.map((fieldDefinition) =>
+                renderWorkspaceField(fieldDefinition, applicantRole),
+              )}
+            </div>
+            {section.actions && (
+              <div style={styles.actionBar}>
+                {section.actions.map((action) => (
+                  <button
+                    key={action}
+                    onClick={() => void handleWorkspaceAction(action)}
+                    style={styles.subtleButton}
+                    type="button"
+                  >
+                    {action}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </section>
     );
   };
@@ -3270,52 +3501,21 @@ export const BrokerAppWorkspace = () => {
         </section>
       )}
 
-      {pageSections.map((section) => (
-        <section key={section.title} style={styles.boardWrap}>
-          <div style={styles.sectionHeader}>
-            <div>
-              <strong>{section.title}</strong>
-              <div style={styles.small}>{section.description}</div>
-            </div>
-            <button
-              onClick={() =>
-                togglePageSection(`${activePage.title}:${section.title}`)
-              }
-              style={styles.subtleButton}
-              type="button"
+      {activePage.group === 'Fact Find'
+        ? applicantRoles.map((role, index) => (
+            <div
+              key={role}
+              style={{
+                display: index === activeApplicantIndex ? 'grid' : 'none',
+                gap: '12px',
+              }}
             >
-              {collapsedPageSections.includes(
-                `${activePage.title}:${section.title}`,
-              )
-                ? 'Expand'
-                : 'Collapse'}
-            </button>
-          </div>
-          {!collapsedPageSections.includes(
-            `${activePage.title}:${section.title}`,
-          ) && (
-            <>
-              <div style={styles.formGrid}>
-                {section.fields.map(renderWorkspaceField)}
-              </div>
-              {section.actions && (
-                <div style={styles.actionBar}>
-                  {section.actions.map((action) => (
-                    <button
-                      key={action}
-                      onClick={() => void handleWorkspaceAction(action)}
-                      style={styles.subtleButton}
-                      type="button"
-                    >
-                      {action}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </section>
-      ))}
+              {activePage.sections
+                .filter((section) => shouldShowSection(section, role))
+                .map((section) => renderPageSection(section, role))}
+            </div>
+          ))
+        : pageSections.map((section) => renderPageSection(section))}
     </div>
   );
 
@@ -3583,7 +3783,7 @@ export const BrokerAppWorkspace = () => {
                   return (
                     <button
                       key={item}
-                      onClick={() => setActivePageName(item)}
+                      onClick={() => openWorkspacePage(item)}
                       style={{
                         ...styles.navItem,
                         ...(item === activePageName

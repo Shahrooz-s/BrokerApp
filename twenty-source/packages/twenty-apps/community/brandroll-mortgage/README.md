@@ -22,6 +22,11 @@ The live pilot now prioritises broker-facing workflow:
 - Fact Find pages now include applicant tabs and a plus button, so brokers can switch between Primary Applicant and co-applicants before entering mapped fields.
 - Address history now follows the 3-year lender/Equifax rule: previous-address fields open only when the active applicant has been at the current address for less than 3 years.
 - Dropdown fields are controlled BrokerApp/Twenty-style controls rather than native browser selects, so option clicks update mapped fact-find state and conditional panels inside the Opportunity workspace.
+- Text, date and textarea fields use stable per-applicant input keys with DOM-backed save capture, so each applicant can hold separate fact-find values without typed text being wiped during autosave.
+- Switching applicant tabs or workspace pages first syncs visible values into the per-applicant fact-find map, preserving each applicant's separate answers.
+- Field sync uses React refs as well as DOM attributes so visible input values can be captured reliably inside the Twenty front-component sandbox.
+- Applicant fact-find panes stay mounted while tabs switch visibility, so Primary Applicant and co-applicant fields retain separate values during tab changes.
+- Current and previous address history includes broker-style address parts such as Street Number, Street Name, Street Type, Street Suffix, Suburb, State, Postcode and Country.
 - The workspace autosaves field changes back to the Opportunity `loanDashSummary`, `factFindStatus`, and `nextBrokerAction` fields, with manual Save still available for explicit broker confirmation.
 - `Broker Settings` kept narrow for pilot configuration, starting with Lenders.
 - Internal configuration objects are kept unlisted where possible so brokers do not work from raw setup tables.
