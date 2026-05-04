@@ -6,7 +6,7 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.19
+## Included In v0.16.22
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
@@ -18,6 +18,11 @@ BrokerApp is designed as a white-labelled Twenty workspace for Australian mortga
 - Collapsible loan sidebar groups, collapsible field sections, right-rail icon buttons for Notes, Checklists, Tasks, Emails, Texts, Key Dates, Reports, and 1-Click Workflows, and applicant expansion up to four residential applicants.
 - Controlled fact-find inputs inside the Opportunity record workspace. Page Save now updates the Opportunity fact-find status and next broker action instead of leaving the fact-find controls as static placeholders.
 - Conditional fact-find logic for residential applicants, other income and living expenses: applicant count drives one to four applicant cards, other-income detail rows open only after a Yes answer, and blank/zero living expense categories show a broker validation warning until comments are captured.
+- BrokerEngine-style applicant tabs now appear above Fact Find pages, with a plus button for adding applicants up to four residential applicants and answer keys scoped to the active applicant.
+- Fact-find autosave now writes a JSON snapshot into `loanDashSummary`, updates `factFindStatus`, and keeps the Opportunity `nextBrokerAction` current. Manual Save still shows a confirmation toast.
+- Applicant address history now asks for current address tenure and conditionally opens previous-address fields when the current address is less than 3 years old.
+- BrokerApp select controls now use a controlled Twenty-styled dropdown, so selecting an option updates the fact-find state and opens conditional sections reliably inside the Opportunity front-component worker.
+- Field styling now inherits Twenty font and control styles, removes native grey button backgrounds from the loan sidebar, and avoids monospace textarea rendering.
 - Compact workflow-stage chips inside LoanDash so the current Lead/Deal stage remains visible without reintroducing a duplicate embedded pipeline board.
 - BrokerEngine-style lead and deal stage references with empty stages collapsed by default and clickable collapsed stages that expand inline.
 - BrokerEngine feature parity register for boards, DealDash, fact find, Strategy, serviceability, products, lodgement, templates, checklists, documents, settings, client portal, AML/KYC, integrations, and white-label controls.

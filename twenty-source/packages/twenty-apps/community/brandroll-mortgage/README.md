@@ -19,6 +19,10 @@ The live pilot now prioritises broker-facing workflow:
 - LoanDash does not render a duplicate loan board inside the record. Native Lead and Deal boards stay as the pipeline views, while the opened loan record only shows dashboard, fact-find, applicant, strategy, lodgement, and handover tools.
 - Fact-find fields in the loan workspace are controlled inputs with page-level Save. Saving updates the native Opportunity fact-find status and next broker action while deeper answer-row persistence is wired through the existing Fact Find Session/Section/Answer model in the next data-sync pass.
 - Residential conditional logic is available in the opened loan workspace: applicant count expands up to four applicant cards, other income rows only open after a Yes answer, and living expense pages flag blank/zero categories for broker comments before serviceability/lodgement readiness.
+- Fact Find pages now include applicant tabs and a plus button, so brokers can switch between Primary Applicant and co-applicants before entering mapped fields.
+- Address history now follows the 3-year lender/Equifax rule: previous-address fields open only when the active applicant has been at the current address for less than 3 years.
+- Dropdown fields are controlled BrokerApp/Twenty-style controls rather than native browser selects, so option clicks update mapped fact-find state and conditional panels inside the Opportunity workspace.
+- The workspace autosaves field changes back to the Opportunity `loanDashSummary`, `factFindStatus`, and `nextBrokerAction` fields, with manual Save still available for explicit broker confirmation.
 - `Broker Settings` kept narrow for pilot configuration, starting with Lenders.
 - Internal configuration objects are kept unlisted where possible so brokers do not work from raw setup tables.
 

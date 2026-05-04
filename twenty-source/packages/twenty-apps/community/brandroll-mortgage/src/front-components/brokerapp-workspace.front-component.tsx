@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { CoreApiClient } from 'twenty-client-sdk/core';
@@ -769,11 +769,11 @@ const workspacePages: Record<string, WorkspacePage> = {
     observedControls: ['Add applicant', 'Show actions', 'Personal Details', 'Address History', 'Equifax Reports'],
     sections: [
       {
-        title: 'Applicant Controls',
+        title: 'Applicant Setup',
         description:
           'Controls which applicant cards appear in fact find, client portal and lodgement payloads.',
         fields: [
-          field('Applicant Count', 'select', ['1', '2', '3', '4']),
+          field('Applicant Count', 'status', undefined, 'Use the plus button above the applicant tabs'),
           field('* Applicant Type', 'select', ['Individual', 'Company', 'Trust', 'Sole Trader']),
           field('* Applicant Role', 'select', ['Primary Applicant', 'Co-Applicant 1', 'Co-Applicant 2', 'Co-Applicant 3']),
           field('Contact Role', 'select', ['Applicant', 'Guarantor', 'Director', 'Trustee', 'Beneficial Owner']),
@@ -805,19 +805,43 @@ const workspacePages: Record<string, WorkspacePage> = {
         ],
       },
       {
-        title: 'Address History and KYC',
+        title: 'Current Address and KYC',
         description:
           'Address history supports lender CDD/KYC, credit checks and non-face-to-face process rules.',
         fields: [
           field('* Start Date', 'date'),
+          field('Current Address Tenure', 'select', ['3+ years', 'Less than 3 years']),
+          field('Residential Status', 'select', ['Own home', 'Renting', 'Boarding', 'Living with family', 'Other']),
           field('Address Lookup'),
+          field('Unit Number'),
+          field('Street Number'),
+          field('Street Name'),
+          field('Suburb'),
+          field('State', 'select', ['ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA']),
+          field('Postcode'),
+          field('Country', 'select', ['Australia', 'New Zealand', 'Other']),
           field('Enter Address Manually', 'textarea'),
-          field('Previous Address 1', 'textarea'),
-          field('Previous Address 2', 'textarea'),
           field('Equifax Reports', 'status'),
           field('IDV/KYC Status', 'status'),
           field('Open Banking Consent', 'status'),
         ],
+      },
+      {
+        title: 'Previous Address History',
+        description:
+          'Required when the applicant has been at the current residential address for less than 3 years.',
+        fields: [
+          field('Previous Address 1 Start Date', 'date'),
+          field('Previous Address 1 End Date', 'date'),
+          field('Previous Address 1 Lookup'),
+          field('Previous Address 1 Manual Address', 'textarea'),
+          field('Previous Address 2 Start Date', 'date'),
+          field('Previous Address 2 End Date', 'date'),
+          field('Previous Address 2 Lookup'),
+          field('Previous Address 2 Manual Address', 'textarea'),
+          field('3 year address history complete', 'status'),
+        ],
+        actions: ['Add Previous Address', 'Validate 3 Year Address History'],
       },
     ],
   },
@@ -1615,10 +1639,10 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: '232px minmax(760px, 1fr) 360px',
+    gridTemplateColumns: 'clamp(180px, 19vw, 232px) minmax(520px, 1fr) 360px',
     height: '100%',
     minHeight: '100%',
-    minWidth: '1180px',
+    minWidth: 0,
     overflow: 'auto',
   },
   loanSidebar: {
@@ -1647,7 +1671,7 @@ const styles = {
     color: 'var(--t-font-color-primary, #333333)',
     cursor: 'pointer',
     display: 'flex',
-    fontSize: 'var(--t-font-size-md, 1rem)',
+    fontSize: '14px',
     fontWeight: 700,
     justifyContent: 'space-between',
     padding: '9px 8px',
@@ -1655,10 +1679,11 @@ const styles = {
   },
   navItem: {
     alignItems: 'center',
+    background: 'transparent',
     borderRadius: 'var(--t-border-radius-md, 8px)',
     color: 'var(--t-font-color-secondary, #666666)',
     display: 'grid',
-    fontSize: 'var(--t-font-size-sm, 0.95rem)',
+    fontSize: '13px',
     fontWeight: 600,
     gap: '8px',
     gridTemplateColumns: '18px minmax(0, 1fr)',
@@ -1673,11 +1698,11 @@ const styles = {
     alignItems: 'center',
     borderRadius: '999px',
     display: 'inline-flex',
-    fontSize: '12px',
+    fontSize: '11px',
     fontWeight: 900,
-    height: '18px',
+    height: '16px',
     justifyContent: 'center',
-    width: '18px',
+    width: '16px',
   },
   navStatusComplete: {
     background: 'rgba(22, 130, 93, 0.12)',
@@ -1808,9 +1833,14 @@ const styles = {
     padding: '12px',
   },
   textArea: {
-    border: '1px solid #d8dce4',
-    borderRadius: '4px',
-    color: '#252a31',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    boxSizing: 'border-box' as const,
+    color: 'var(--t-font-color-primary, #333333)',
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    fontSize: '13px',
+    lineHeight: 1.45,
     minHeight: '108px',
     padding: '8px',
     resize: 'vertical' as const,
@@ -1872,10 +1902,67 @@ const styles = {
     background: 'var(--t-background-primary, #ffffff)',
     border: '1px solid var(--t-border-color-medium, #ebebeb)',
     borderRadius: 'var(--t-border-radius-sm, 4px)',
+    boxSizing: 'border-box' as const,
     color: 'var(--t-font-color-primary, #333333)',
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    fontSize: '13px',
     minHeight: '32px',
     padding: '0 8px',
     width: '100%',
+  },
+  selectShell: {
+    position: 'relative' as const,
+  },
+  selectButton: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    boxSizing: 'border-box' as const,
+    color: 'var(--t-font-color-primary, #333333)',
+    cursor: 'pointer',
+    display: 'flex',
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    fontSize: '13px',
+    justifyContent: 'space-between',
+    minHeight: '32px',
+    padding: '0 8px',
+    textAlign: 'left' as const,
+    width: '100%',
+  },
+  placeholderText: {
+    color: 'var(--t-font-color-tertiary, #999999)',
+  },
+  selectMenu: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+    display: 'grid',
+    left: 0,
+    maxHeight: '220px',
+    overflowY: 'auto' as const,
+    padding: '4px',
+    position: 'absolute' as const,
+    right: 0,
+    top: '36px',
+    zIndex: 15,
+  },
+  selectOption: {
+    background: 'transparent',
+    border: 0,
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-primary, #333333)',
+    cursor: 'pointer',
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    fontSize: '13px',
+    minHeight: '30px',
+    padding: '0 8px',
+    textAlign: 'left' as const,
+  },
+  selectOptionActive: {
+    background: 'var(--t-background-secondary, #f5f5f5)',
+    fontWeight: 700,
   },
   richEditor: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1940,6 +2027,81 @@ const styles = {
     display: 'grid',
     gap: '8px',
     padding: '12px',
+  },
+  applicantTabsPanel: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    overflow: 'hidden',
+  },
+  applicantTabsHeader: {
+    alignItems: 'center',
+    borderBottom: '1px solid var(--t-border-color-light, #f1f1f1)',
+    display: 'flex',
+    justifyContent: 'space-between',
+    minHeight: '38px',
+    padding: '0 12px',
+  },
+  applicantTabs: {
+    display: 'flex',
+    gap: '8px',
+    overflowX: 'auto' as const,
+    padding: '10px 12px',
+  },
+  applicantTab: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    display: 'flex',
+    flex: '0 0 auto',
+    gap: '8px',
+    minHeight: '46px',
+    minWidth: '178px',
+    padding: '0 10px',
+    textAlign: 'left' as const,
+  },
+  applicantTabActive: {
+    border: '1px solid var(--t-color-red, #e5484d)',
+    boxShadow: 'inset 0 -2px 0 var(--t-color-red, #e5484d)',
+    color: 'var(--t-font-color-primary, #333333)',
+  },
+  applicantBadge: {
+    alignItems: 'center',
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    borderRadius: '999px',
+    color: 'var(--t-font-color-primary, #333333)',
+    display: 'inline-flex',
+    fontSize: '12px',
+    fontWeight: 800,
+    height: '24px',
+    justifyContent: 'center',
+    width: '24px',
+  },
+  addApplicantButton: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary-inverted, #333333)',
+    border: '1px solid var(--t-border-color-inverted, #333333)',
+    borderRadius: '999px',
+    color: 'var(--t-font-color-inverted, #ffffff)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    flex: '0 0 auto',
+    fontSize: '22px',
+    fontWeight: 600,
+    height: '44px',
+    justifyContent: 'center',
+    width: '44px',
+  },
+  autosaveStatus: {
+    alignItems: 'center',
+    color: 'var(--t-color-green, #16825d)',
+    display: 'inline-flex',
+    fontSize: '12px',
+    fontWeight: 700,
+    gap: '6px',
   },
   quickMove: {
     borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
@@ -2011,6 +2173,7 @@ export const BrokerAppWorkspace = () => {
     [],
   );
   const [applicantCount, setApplicantCount] = useState(2);
+  const [activeApplicantIndex, setActiveApplicantIndex] = useState(0);
   const [loanBoard, setLoanBoard] = useState<BoardKey>('Deal');
   const [loanStageValue, setLoanStageValue] = useState(firstDealStage.value);
   const [boardMoveStatus, setBoardMoveStatus] = useState<
@@ -2029,6 +2192,14 @@ export const BrokerAppWorkspace = () => {
     'Idle' | 'Saving' | 'Saved' | 'Error'
   >('Idle');
   const [lastSavedPage, setLastSavedPage] = useState<string | null>(null);
+  const [autosaveVersion, setAutosaveVersion] = useState(0);
+  const [lastAutosavedAt, setLastAutosavedAt] = useState<string | null>(null);
+  const [isClientViewVisible, setIsClientViewVisible] = useState(false);
+  const [isFactFindLocked, setIsFactFindLocked] = useState(false);
+  const [openSelectFieldKey, setOpenSelectFieldKey] = useState<string | null>(
+    null,
+  );
+  const hasMountedRef = useRef(false);
   const [taskFilter, setTaskFilter] = useState<'Pending' | 'Completed'>(
     'Pending',
   );
@@ -2059,6 +2230,10 @@ export const BrokerAppWorkspace = () => {
   useEffect(() => {
     setIsWorkspaceOpen(true);
   }, [opportunityRecordId]);
+
+  useEffect(() => {
+    setOpenSelectFieldKey(null);
+  }, [activeApplicantIndex, activePageName]);
 
   const moveOpportunityToStage = async (
     stageValue: string,
@@ -2180,6 +2355,8 @@ export const BrokerAppWorkspace = () => {
     'Co-Applicant 2',
     'Co-Applicant 3',
   ].slice(0, applicantCount);
+  const activeApplicantRole =
+    applicantRoles[activeApplicantIndex] ?? 'Primary Applicant';
   const activePage = workspacePages[activePageName] ?? workspacePages.LoanDash;
   const activeStageOption =
     boardStageOptions.find((option) => option.value === loanStageValue) ??
@@ -2191,11 +2368,13 @@ export const BrokerAppWorkspace = () => {
     : 'Opened Opportunity';
   const toolbarTabs = [
     {
+      icon: '⌂',
       label: 'Home',
       active: activePageName === 'LoanDash',
       onClick: () => setActivePageName('LoanDash'),
     },
     {
+      icon: '◷',
       label: 'Timeline',
       active: activeTool === 'Notes',
       onClick: () => {
@@ -2204,6 +2383,7 @@ export const BrokerAppWorkspace = () => {
       },
     },
     {
+      icon: '✓',
       label: 'Tasks',
       active: activeTool === 'Tasks',
       onClick: () => {
@@ -2212,6 +2392,7 @@ export const BrokerAppWorkspace = () => {
       },
     },
     {
+      icon: '□',
       label: 'Notes',
       active: activeTool === 'Notes',
       onClick: () => {
@@ -2220,11 +2401,13 @@ export const BrokerAppWorkspace = () => {
       },
     },
     {
+      icon: '⌕',
       label: 'Files',
       active: activePageName === 'Smart Docs',
       onClick: () => setActivePageName('Smart Docs'),
     },
     {
+      icon: '@',
       label: 'Emails',
       active: activeTool === 'Emails',
       onClick: () => {
@@ -2233,6 +2416,7 @@ export const BrokerAppWorkspace = () => {
       },
     },
     {
+      icon: '▣',
       label: 'Calendar',
       active: activeTool === 'Key Dates',
       onClick: () => {
@@ -2257,7 +2441,9 @@ export const BrokerAppWorkspace = () => {
   };
 
   const getFieldKey = (workspaceField: WorkspaceField) =>
-    `${activePage.title}:${workspaceField.label.replace(/^\*/, '').trim()}`;
+    `${activePage.title}:${
+      activePage.group === 'Fact Find' ? `${activeApplicantRole}:` : ''
+    }${workspaceField.label.replace(/^\*/, '').trim()}`;
 
   const getFieldValue = (workspaceField: WorkspaceField) => {
     const fieldKey = getFieldKey(workspaceField);
@@ -2288,18 +2474,38 @@ export const BrokerAppWorkspace = () => {
       ...current,
       [getFieldKey(workspaceField)]: value,
     }));
-    setSaveStatus('Idle');
+    setSaveStatus('Saving');
+    setAutosaveVersion((version) => version + 1);
 
     if (fieldLabel === 'Applicant Count' && typeof value === 'string') {
       const nextCount = Number(value);
 
       if (Number.isInteger(nextCount)) {
-        setApplicantCount(Math.min(4, Math.max(1, nextCount)));
+        const safeCount = Math.min(4, Math.max(1, nextCount));
+
+        setApplicantCount(safeCount);
+        setActiveApplicantIndex((index) => Math.min(index, safeCount - 1));
       }
     }
   };
 
-  const saveWorkspacePage = async () => {
+  const getPersistedSummary = (completedAnswerCount: number) =>
+    JSON.stringify(
+      {
+        activeApplicant: activeApplicantRole,
+        activePage: activePage.title,
+        answerCount: completedAnswerCount,
+        applicantCount,
+        autoSavedAt: new Date().toISOString(),
+        board: loanBoard,
+        stage: activeStageOption.value,
+        values: factFindAnswers,
+      },
+      null,
+      2,
+    );
+
+  const persistWorkspaceAnswers = async (mode: 'manual' | 'auto') => {
     const completedAnswerCount = Object.values(factFindAnswers).filter(
       (value) => value !== '' && value !== false,
     ).length;
@@ -2318,42 +2524,90 @@ export const BrokerAppWorkspace = () => {
 
     try {
       const client = new CoreApiClient();
+      const persistedSummary = getPersistedSummary(completedAnswerCount);
+      const requirementsObjectives = String(
+        factFindAnswers[
+          `Goals:${activeApplicantRole}:Requirements and Objectives`
+        ] ??
+          factFindAnswers['Goals:Requirements and Objectives'] ??
+          '',
+      ).trim();
+      const opportunityUpdateData: {
+        clientRequirementsObjectives?: string;
+        factFindStatus: string;
+        loanDashSummary: string;
+        nextBrokerAction: string;
+      } = {
+        factFindStatus: 'BROKER_REVIEW',
+        loanDashSummary: persistedSummary,
+        nextBrokerAction: `Fact-find page saved: ${activePage.title}. ${completedAnswerCount} captured answer${completedAnswerCount === 1 ? '' : 's'} in the loan workspace.`,
+      };
+
+      if (requirementsObjectives.length > 0) {
+        opportunityUpdateData.clientRequirementsObjectives =
+          requirementsObjectives;
+      }
 
       await client.mutation({
         updateOpportunity: {
           __args: {
             id: opportunityRecordId,
-            data: {
-              factFindStatus: 'BROKER_REVIEW',
-              nextBrokerAction: `Fact-find page saved: ${activePage.title}. ${completedAnswerCount} captured answer${completedAnswerCount === 1 ? '' : 's'} in the loan workspace.`,
-            },
+            data: opportunityUpdateData,
           },
           id: true,
           factFindStatus: true,
+          loanDashSummary: true,
+          clientRequirementsObjectives: true,
           nextBrokerAction: true,
         },
       });
 
       setSaveStatus('Saved');
       setLastSavedPage(activePage.title);
-      await enqueueSnackbar({
-        message: `${activePage.title} saved to this Opportunity`,
-        variant: 'success',
-      });
+      setLastAutosavedAt(mode === 'auto' ? 'a few seconds ago' : null);
+
+      if (mode === 'manual') {
+        await enqueueSnackbar({
+          message: `${activePage.title} saved to this Opportunity`,
+          variant: 'success',
+        });
+      }
     } catch (error) {
       setSaveStatus('Error');
-      await enqueueSnackbar({
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Could not save the fact-find page',
-        variant: 'error',
-      });
+
+      if (mode === 'manual') {
+        await enqueueSnackbar({
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Could not save the fact-find page',
+          variant: 'error',
+        });
+      }
     }
   };
 
+  const saveWorkspacePage = () => persistWorkspaceAnswers('manual');
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
+    if (autosaveVersion === 0) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      void persistWorkspaceAnswers('auto');
+    }, 900);
+
+    return () => clearTimeout(timeout);
+  }, [autosaveVersion]);
+
   const handleWorkspaceAction = async (action: string) => {
-    if (action === 'Add Applicant') {
+    if (action === 'Add Applicant' || action === 'Add applicant') {
       setApplicantCount((count) => {
         const nextCount = Math.min(4, count + 1);
 
@@ -2361,10 +2615,23 @@ export const BrokerAppWorkspace = () => {
           ...current,
           'Applicants:Applicant Count': String(nextCount),
         }));
+        setActiveApplicantIndex(nextCount - 1);
+        setAutosaveVersion((version) => version + 1);
 
         return nextCount;
       });
-      setSaveStatus('Idle');
+      setSaveStatus('Saving');
+      return;
+    }
+
+    if (action === 'Add Previous Address') {
+      updateFieldValue(
+        {
+          label: 'Current Address Tenure',
+          type: 'select',
+        },
+        'Less than 3 years',
+      );
       return;
     }
 
@@ -2427,24 +2694,71 @@ export const BrokerAppWorkspace = () => {
     }
 
     if (workspaceField.type === 'select') {
+      const fieldKey = getFieldKey(workspaceField);
+      const isOpen = openSelectFieldKey === fieldKey;
+      const selectedValue = String(fieldValue);
+      const placeholder = `Select ${label.toLowerCase()}`;
+
       return (
-        <label key={workspaceField.label} style={styles.fieldShell}>
+        <div key={workspaceField.label} style={styles.fieldShell}>
           <span style={styles.label}>{label}</span>
-          <select
-            onChange={(event) =>
-              updateFieldValue(workspaceField, event.currentTarget.value)
-            }
-            style={styles.input}
-            value={String(fieldValue)}
-          >
-            <option value="">Select {label.toLowerCase()}</option>
-            {(workspaceField.options ?? []).map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div style={styles.selectShell}>
+            <button
+              aria-expanded={isOpen}
+              aria-haspopup="listbox"
+              aria-label={label}
+              onClick={() =>
+                setOpenSelectFieldKey((current) =>
+                  current === fieldKey ? null : fieldKey,
+                )
+              }
+              role="combobox"
+              style={styles.selectButton}
+              type="button"
+            >
+              <span style={selectedValue ? undefined : styles.placeholderText}>
+                {selectedValue || placeholder}
+              </span>
+              <span aria-hidden="true">▾</span>
+            </button>
+            {isOpen ? (
+              <div role="listbox" style={styles.selectMenu}>
+                <button
+                  aria-selected={selectedValue === ''}
+                  onClick={() => {
+                    updateFieldValue(workspaceField, '');
+                    setOpenSelectFieldKey(null);
+                  }}
+                  role="option"
+                  style={styles.selectOption}
+                  type="button"
+                >
+                  {placeholder}
+                </button>
+                {(workspaceField.options ?? []).map((option) => (
+                  <button
+                    aria-selected={selectedValue === option}
+                    key={option}
+                    onClick={() => {
+                      updateFieldValue(workspaceField, option);
+                      setOpenSelectFieldKey(null);
+                    }}
+                    role="option"
+                    style={{
+                      ...styles.selectOption,
+                      ...(selectedValue === option
+                        ? styles.selectOptionActive
+                        : {}),
+                    }}
+                    type="button"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
       );
     }
 
@@ -2460,6 +2774,9 @@ export const BrokerAppWorkspace = () => {
               Paragraph · B · I · U · bullets · numbers · table
             </div>
             <textarea
+              onInput={(event) =>
+                updateFieldValue(workspaceField, event.currentTarget.value)
+              }
               onChange={(event) =>
                 updateFieldValue(workspaceField, event.currentTarget.value)
               }
@@ -2478,11 +2795,22 @@ export const BrokerAppWorkspace = () => {
     }
 
     if (workspaceField.type === 'status' || workspaceField.type === 'table') {
+      const statusText =
+        label === 'Applicant Count'
+          ? `${applicantCount} applicant${applicantCount === 1 ? '' : 's'}`
+          : label === '3 year address history complete'
+            ? factFindAnswers[
+                `Applicants:${activeApplicantRole}:Current Address Tenure`
+              ] === 'Less than 3 years'
+              ? 'Previous address required'
+              : 'Current address covers 3 years'
+            : workspaceField.help ?? 'Not started';
+
       return (
         <div key={workspaceField.label} style={styles.fieldShell}>
           <span style={styles.label}>{label}</span>
           <div style={styles.rowButton}>
-            <span>{workspaceField.help ?? 'Not started'}</span>
+            <span>{statusText}</span>
             <strong style={styles.statusWarn}>Review</strong>
           </div>
         </div>
@@ -2502,6 +2830,9 @@ export const BrokerAppWorkspace = () => {
         <span style={styles.label}>{label}</span>
         {workspaceField.type === 'textarea' ? (
           <textarea
+            onInput={(event) =>
+              updateFieldValue(workspaceField, event.currentTarget.value)
+            }
             onChange={(event) =>
               updateFieldValue(workspaceField, event.currentTarget.value)
             }
@@ -2511,6 +2842,9 @@ export const BrokerAppWorkspace = () => {
           />
         ) : (
           <input
+            onInput={(event) =>
+              updateFieldValue(workspaceField, event.currentTarget.value)
+            }
             onChange={(event) =>
               updateFieldValue(workspaceField, event.currentTarget.value)
             }
@@ -2522,7 +2856,7 @@ export const BrokerAppWorkspace = () => {
                   : 'Type something...'
             }
             style={commonInputStyle}
-            type={workspaceField.type === 'date' ? 'text' : 'text'}
+            type={workspaceField.type === 'date' ? 'date' : 'text'}
             value={String(fieldValue)}
           />
         )}
@@ -2539,6 +2873,17 @@ export const BrokerAppWorkspace = () => {
       );
     }
 
+    if (
+      activePage.title === 'Applicants' &&
+      section.title === 'Previous Address History'
+    ) {
+      return (
+        factFindAnswers[
+          `Applicants:${activeApplicantRole}:Current Address Tenure`
+        ] === 'Less than 3 years'
+      );
+    }
+
     return true;
   };
 
@@ -2550,6 +2895,64 @@ export const BrokerAppWorkspace = () => {
 
       return value === undefined || value === '' || value === '$0.00' || value === '0';
     });
+
+  const renderApplicantTabs = () => {
+    if (activePage.group !== 'Fact Find') {
+      return null;
+    }
+
+    return (
+      <section style={styles.applicantTabsPanel}>
+        <div style={styles.applicantTabsHeader}>
+          <strong>Applicant sections</strong>
+          <span style={styles.autosaveStatus}>
+            {saveStatus === 'Saving'
+              ? 'Auto saving...'
+              : lastAutosavedAt
+                ? `Auto saved ${lastAutosavedAt}`
+                : 'Ready'}
+          </span>
+        </div>
+        <div style={styles.applicantTabs}>
+          {applicantRoles.map((role, index) => (
+            <button
+              key={role}
+              onClick={() => setActiveApplicantIndex(index)}
+              style={{
+                ...styles.applicantTab,
+                ...(activeApplicantIndex === index
+                  ? styles.applicantTabActive
+                  : {}),
+              }}
+              type="button"
+            >
+              <span style={styles.applicantBadge}>
+                {index === 0 ? 'P' : index + 1}
+              </span>
+              <span>
+                {role}
+                <small style={styles.small}>
+                  {index === 0 ? 'Primary' : `Applicant ${index + 1}`}
+                </small>
+              </span>
+            </button>
+          ))}
+          <button
+            aria-label="Add applicant"
+            disabled={applicantCount >= 4}
+            onClick={() => void handleWorkspaceAction('Add applicant')}
+            style={{
+              ...styles.addApplicantButton,
+              ...(applicantCount >= 4 ? styles.disabledButton : {}),
+            }}
+            type="button"
+          >
+            +
+          </button>
+        </div>
+      </section>
+    );
+  };
 
   const renderWorkspacePage = () => (
     <div style={styles.pageLayout}>
@@ -2585,13 +2988,32 @@ export const BrokerAppWorkspace = () => {
             >
               {saveStatus === 'Saving' ? 'Saving...' : 'Save'}
             </button>
-            <button style={styles.subtleButton} type="button">
-              Show page in client view
+            <button
+              onClick={() => {
+                setIsClientViewVisible((current) => !current);
+                setActiveTool('Tasks');
+                setIsToolboxCollapsed(false);
+              }}
+              style={styles.subtleButton}
+              type="button"
+            >
+              {isClientViewVisible ? 'Hide client view' : 'Show page in client view'}
             </button>
-            <button style={styles.subtleButton} type="button">
-              Lock / unlock
+            <button
+              onClick={() => setIsFactFindLocked((current) => !current)}
+              style={styles.subtleButton}
+              type="button"
+            >
+              {isFactFindLocked ? 'Unlock client edits' : 'Lock client edits'}
             </button>
-            <button style={styles.subtleButton} type="button">
+            <button
+              onClick={() => {
+                setActiveTool('Emails');
+                setIsToolboxCollapsed(false);
+              }}
+              style={styles.subtleButton}
+              type="button"
+            >
               Email or Download Fact Find
             </button>
           </div>
@@ -2605,6 +3027,22 @@ export const BrokerAppWorkspace = () => {
           ))}
         </div>
       </section>
+
+      {renderApplicantTabs()}
+
+      {(isClientViewVisible || isFactFindLocked) && (
+        <section style={styles.conditionalPanel}>
+          <strong>Fact-find page state</strong>
+          <p style={styles.small}>
+            {isClientViewVisible
+              ? 'Client-view preview is enabled for this workspace page. '
+              : ''}
+            {isFactFindLocked
+              ? 'Client edits are locked for this page until the broker unlocks it.'
+              : 'Client edits remain unlocked.'}
+          </p>
+        </section>
+      )}
 
       {activePage.title === 'LoanDash' && (
         <>
@@ -2734,29 +3172,41 @@ export const BrokerAppWorkspace = () => {
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 disabled={applicantCount <= 1}
-                onClick={() =>
-                  setApplicantCount((count) => Math.max(1, count - 1))
-                }
+                onClick={() => {
+                  setApplicantCount((count) => {
+                    const nextCount = Math.max(1, count - 1);
+
+                    setFactFindAnswers((current) => ({
+                      ...current,
+                      'Applicants:Applicant Count': String(nextCount),
+                    }));
+                    setActiveApplicantIndex((index) =>
+                      Math.min(index, nextCount - 1),
+                    );
+                    setAutosaveVersion((version) => version + 1);
+
+                    return nextCount;
+                  });
+                  setSaveStatus('Saving');
+                }}
                 style={{
                   ...styles.subtleButton,
                   ...(applicantCount <= 1 ? styles.disabledButton : {}),
                 }}
                 type="button"
               >
-                Remove applicant
+                - Remove
               </button>
               <button
                 disabled={applicantCount >= 4}
-                onClick={() =>
-                  setApplicantCount((count) => Math.min(4, count + 1))
-                }
+                onClick={() => void handleWorkspaceAction('Add applicant')}
                 style={{
                   ...styles.newButton,
                   ...(applicantCount >= 4 ? styles.disabledButton : {}),
                 }}
                 type="button"
               >
-                Add applicant
+                + Add applicant
               </button>
             </div>
           </div>
@@ -2791,6 +3241,20 @@ export const BrokerAppWorkspace = () => {
             <p style={styles.small}>
               The income source table is hidden because the answer is No. Select
               Yes to open repeatable income rows and evidence request actions.
+            </p>
+          </section>
+        )}
+
+      {activePage.title === 'Applicants' &&
+        factFindAnswers[
+          `Applicants:${activeApplicantRole}:Current Address Tenure`
+        ] !== 'Less than 3 years' && (
+          <section style={styles.conditionalPanel}>
+            <strong>Address history rule</strong>
+            <p style={styles.small}>
+              Select “Less than 3 years” in Current Address Tenure to open the
+              previous-address fields required for a 3-year Equifax/lender
+              address history.
             </p>
           </section>
         )}
@@ -3063,6 +3527,7 @@ export const BrokerAppWorkspace = () => {
                   }}
                   type="button"
                 >
+                  <span aria-hidden="true">{tab.icon}</span>
                   {tab.label}
                 </button>
               ))}
@@ -3089,7 +3554,7 @@ export const BrokerAppWorkspace = () => {
       <div
         style={{
           ...styles.opportunityShell,
-          gridTemplateColumns: `232px minmax(760px, 1fr) ${
+          gridTemplateColumns: `clamp(180px, 19vw, 232px) minmax(520px, 1fr) ${
             isToolboxCollapsed ? '56px' : '360px'
           }`,
         }}
