@@ -47,9 +47,10 @@ export default defineObject({
         { value: 'SMART_DOCS', label: 'Smart docs', position: 7, color: 'purple' },
         { value: 'COMPLIANCE', label: 'Compliance', position: 8, color: 'red' },
         { value: 'INTEGRATIONS', label: 'Integrations', position: 9, color: 'green' },
-        { value: 'SECURITY', label: 'Security', position: 10, color: 'red' },
-        { value: 'CLIENT_PORTAL', label: 'Client portal', position: 11, color: 'blue' },
-        { value: 'AI', label: 'AI', position: 12, color: 'purple' },
+        { value: 'LOANDOX', label: 'LoanDox', position: 10, color: 'purple' },
+        { value: 'SECURITY', label: 'Security', position: 11, color: 'red' },
+        { value: 'CLIENT_PORTAL', label: 'Client portal', position: 12, color: 'blue' },
+        { value: 'AI', label: 'AI', position: 13, color: 'purple' },
       ],
     },
     {

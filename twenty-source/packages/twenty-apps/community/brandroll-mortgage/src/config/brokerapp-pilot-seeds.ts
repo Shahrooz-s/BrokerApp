@@ -91,6 +91,46 @@ export const brokerAppChecklistTemplateSeeds = [
 
 export const brokerAppIntegrationProviderSeeds = [
   {
+    providerName: 'ABN Lookup business search',
+    providerStatus: 'NEEDS_KEYS',
+    providerCategory: 'BUSINESS_LOOKUP',
+    authMethod: 'official-abn-lookup-guid',
+    secretEnvNames: 'ABR_LOOKUP_GUID,ABR_LOOKUP_BASE_URL',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'Official ABN Lookup JSON service for ABN, ACN and business-name prefill. Keep GUID in environment/private workspace settings and allow manual entry when disabled.',
+  },
+  {
+    providerName: 'CashDeck bank statements',
+    providerStatus: 'NEEDS_KEYS',
+    providerCategory: 'BANK_STATEMENT',
+    authMethod: 'provider-specific',
+    secretEnvNames: 'CASHDECK_API_BASE_URL,CASHDECK_API_KEY',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'LoanDox bank statement collection option for applicants. Disabled until provider contract, credentials and consent wording are approved.',
+  },
+  {
+    providerName: 'Equifax credit checks',
+    providerStatus: 'NEEDS_KEYS',
+    providerCategory: 'CREDIT_CHECK',
+    authMethod: 'provider-specific',
+    secretEnvNames: 'EQUIFAX_API_BASE_URL,EQUIFAX_API_KEY',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'LoanDox-managed credit check consent and request path. Do not run checks without applicant consent, credentials and broker approval.',
+  },
+  {
+    providerName: 'LoanDox AI document review',
+    providerStatus: 'PLANNED',
+    providerCategory: 'DOCUMENT_AI',
+    authMethod: 'admin-enabled-agent-tools',
+    secretEnvNames: 'OPENAI_API_KEY,DOCUMENT_AI_*',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'Future AI/RAG document review skills, discrepancy extraction and checklist recommendations. Broker approval required before any action affects lodgement readiness.',
+  },
+  {
     providerName: 'BrokerApp email magic links',
     providerStatus: 'PLANNED',
     providerCategory: 'PORTAL_AUTH',

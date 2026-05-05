@@ -11,6 +11,7 @@ type BrokerAppSettingsAreaSeed = {
     | 'SMART_DOCS'
     | 'COMPLIANCE'
     | 'INTEGRATIONS'
+    | 'LOANDOX'
     | 'SECURITY'
     | 'CLIENT_PORTAL'
     | 'AI';
@@ -85,6 +86,32 @@ export const brokerAppSettingsAreaSeeds: BrokerAppSettingsAreaSeed[] = [
     brokerAppImprovement:
       'Define lender-specific and scenario-specific document categories, required evidence, stage gates, expiry rules, and portal upload labels.',
     ownerRole: 'LOAN_PROCESSOR',
+  },
+  {
+    settingName: 'LoanDox document request engine',
+    settingArea: 'LOANDOX',
+    implementationStatus: 'DRAFT',
+    position: 65,
+    brokerEngineReference:
+      'FinanceVault document requests, right-rail tools, client uploads, and checklist gates',
+    brokerAppImprovement:
+      'Manage document request templates, applicant-specific request stacks, upload methods, broker review status, provider gates, AI instructions, do-not-do rules, and ClientDash task creation from the opened loan.',
+    ownerRole: 'ADMIN',
+    notes:
+      'CashDeck, Basiq, Equifax, IDV and AI document review remain disabled until Master Admin enables provider credentials and pilot approvals.',
+  },
+  {
+    settingName: 'ABN Lookup business search',
+    settingArea: 'INTEGRATIONS',
+    implementationStatus: 'DRAFT',
+    position: 66,
+    brokerEngineReference:
+      'Self-employed, sole trader, company and trust applicant business fields',
+    brokerAppImprovement:
+      'Use the official ABN Lookup JSON service with an authentication GUID to prefill ABN, ACN, business name, entity name, entity type, GST status, state and postcode while keeping manual entry available.',
+    ownerRole: 'ADMIN',
+    notes:
+      'Requires ABN Lookup GUID in private settings or environment. ASIC paid/company extracts are a later integration if ABN Lookup is insufficient.',
   },
   {
     settingName: 'Boards and stages',

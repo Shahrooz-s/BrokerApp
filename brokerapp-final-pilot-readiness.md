@@ -6,12 +6,12 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.28
+## Included In v0.16.38
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
-- A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table. The record workspace opens as a BrokerEngine-style overlay above the default Twenty record, includes its own toolbar and Close button, and collapses the global Twenty sidebar to the icon rail while the second loan sidebar and right rail handle the broker workflow.
-- The Opportunity record workspace now reopens automatically whenever an Opportunity loads. The Close button hides only the in-record overlay because Twenty front components run in a worker sandbox and cannot call browser navigation APIs directly.
+- A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table. The record workspace is inline record content, not a popup: no overlay scrim, modal border/shadow, Close button, or reopen button.
+- The Opportunity record workspace remains visible whenever an Opportunity loads. The global Twenty sidebar collapses to the icon rail, and the loan sidebar plus right tool rail can be expanded/collapsed without hiding the loan workflow.
 - Board handover controls inside LoanDash: moving an Opportunity from Lead to Deal updates the same `brokerWorkflowStage` record field to the first Deal stage so backend staff continue the same loan record without duplication.
 - LoanDash now removes the fake embedded board/pipeline and keeps board movement as a stage/handover control only. Native Lead and Deal boards remain the pipeline entry points.
 - Clickable loan workspace pages for DealDash, Team, Lender, Related Parties, Goals, Applicants, Dependants, Assets, Other Income, Liabilities, Living Expenses, Financial Security, Interview Guide, Security, Funding Position, Products, Smart Docs, BrokerWizard, Lodgement Funding, Credit Proposal, and Submission.
@@ -21,13 +21,25 @@ BrokerApp is designed as a white-labelled Twenty workspace for Australian mortga
 - BrokerEngine-style applicant tabs now appear above Fact Find pages, with a plus button for adding applicants up to four residential applicants and answer keys scoped to the active applicant.
 - Fact-find autosave now writes a JSON snapshot into `loanDashSummary`, updates `factFindStatus`, and keeps the Opportunity `nextBrokerAction` current. Manual Save still shows a confirmation toast.
 - Applicant address history now asks for current address tenure and conditionally opens previous-address fields when the current address is less than 3 years old.
-- BrokerApp select controls now use a controlled Twenty-styled dropdown, so selecting an option updates the fact-find state and opens conditional sections reliably inside the Opportunity front-component worker.
+- BrokerApp select controls now use native controlled selects, so selecting an option updates the fact-find state and opens conditional sections reliably inside the Opportunity front-component worker.
 - Text, date, and textarea fields now use stable per-applicant input keys and DOM-backed save capture, so typing is not reset by React re-renders and each applicant's fact-find answers remain separated in the saved Opportunity summary.
 - Applicant/page navigation now syncs visible DOM field values before changing context, so Primary Applicant and co-applicant entries do not overwrite each other when switching tabs.
 - Field sync now uses React element refs in addition to DOM attributes, which is required inside the Twenty front-component sandbox for reliable applicant tab switching.
 - Fact-find applicant tabs now keep each applicant pane mounted and visually switch between panes, matching BrokerEngine-style applicant tabs and preventing browser-entered field values from being destroyed on tab changes.
 - Address history fields now include Street Number, Street Name, Street Type, Street Suffix, Suburb, State, Postcode, and Country to better match broker fact-find address capture.
 - Field styling now inherits Twenty font and control styles, removes native grey button backgrounds from the loan sidebar, and avoids monospace textarea rendering.
+- Workspace layout spacing now uses larger Twenty-style padding, readable warning banners, stable form gaps, subtle borders, validation-driven sidebar status icons, field provenance markers, and responsive desktop/mobile grid behavior.
+- Compact and mobile Opportunity views collapse the loan sidebar by default and expose a native workspace-section selector, keeping the active LoanDash/fact-find page readable instead of squeezing it behind the section list.
+- Compact mode is based on both browser width and actual Loan Workspace container width, so the section selector also appears when Twenty’s native record layout narrows the front component even on a desktop-sized browser.
+- The container-width check uses the rendered workspace element rather than a React ref, avoiding the Twenty front-component sandbox ref issue seen during live verification.
+- Loan workspace page switching now changes the active page even if a best-effort DOM field-sync read fails inside the Twenty front-component sandbox.
+- The loan sidebar now starts collapsed on an opened Opportunity, and the main content always includes a visible workspace-section selector for switching between LoanDash, Applicants, Goals, Strategy and Lodgement pages.
+- Native selects now listen to both `input` and `change` events, covering normal browser selection and the in-app browser automation path used during verification.
+- Main workspace page chips now sit beside the section selector, giving a visible click target for LoanDash, Applicants, Living Expenses, Strategy and Lodgement pages even when the left loan sidebar is collapsed.
+- Page chips are real hash links backed by a hash-change listener, so page switching still works if the embedded front-component click bridge is unreliable.
+- Collapsed loan navigation now leaves the grid entirely instead of reserving a 64px column, keeping the main workspace controls visible in Twenty’s narrow record canvas.
+- LoanDox now appears in the right rail as the broker document request workspace with document templates/stacks, active document request cards, review actions, ClientDash step previews, and provider-disabled safety gates.
+- ABN Lookup is scaffolded for self-employed, sole trader, company and trust applicant fields. The official ABN Lookup provider remains disabled until an authentication GUID is configured in private settings.
 - Compact workflow-stage chips inside LoanDash so the current Lead/Deal stage remains visible without reintroducing a duplicate embedded pipeline board.
 - BrokerEngine-style lead and deal stage references with empty stages collapsed by default and clickable collapsed stages that expand inline.
 - BrokerEngine feature parity register for boards, DealDash, fact find, Strategy, serviceability, products, lodgement, templates, checklists, documents, settings, client portal, AML/KYC, integrations, and white-label controls.

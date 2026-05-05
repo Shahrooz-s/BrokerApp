@@ -55,6 +55,9 @@ export default defineObject({
         { value: 'PRODUCT_DATA', label: 'Product data', position: 5, color: 'yellow' },
         { value: 'EMAIL', label: 'Email', position: 6, color: 'blue' },
         { value: 'STORAGE', label: 'Storage', position: 7, color: 'gray' },
+        { value: 'BUSINESS_LOOKUP', label: 'Business lookup', position: 8, color: 'green' },
+        { value: 'CREDIT_CHECK', label: 'Credit check', position: 9, color: 'orange' },
+        { value: 'DOCUMENT_AI', label: 'Document AI', position: 10, color: 'purple' },
       ],
     },
     {

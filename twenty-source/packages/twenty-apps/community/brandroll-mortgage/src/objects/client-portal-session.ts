@@ -160,5 +160,45 @@ export default defineObject({
       description:
         'Display-safe client-facing status text. Do not store AML suspicion, internal risk scores, or broker-only notes here.',
     },
+    {
+      universalIdentifier: '6b6d0000-4600-4000-8000-000000000016',
+      type: FieldType.TEXT,
+      name: 'clientDashStepSummary',
+      label: 'ClientDash step summary',
+      icon: 'IconLayoutDashboard',
+      description:
+        'Safe borrower-facing step grid: credit guide, fact find, KYC, documents, bank statements, and review/confirm.',
+    },
+    {
+      universalIdentifier: '6b6d0000-4600-4000-8000-000000000017',
+      type: FieldType.TEXT,
+      name: 'applicantConfirmations',
+      label: 'Applicant confirmations',
+      icon: 'IconUsersGroup',
+      description:
+        'Applicant-by-applicant confirmation state for shared fact-find and submitted information.',
+    },
+    {
+      universalIdentifier: '6b6d0000-4600-4000-8000-000000000018',
+      type: FieldType.SELECT,
+      name: 'dataLockStatus',
+      label: 'Data lock status',
+      icon: 'IconLock',
+      options: [
+        { value: 'OPEN', label: 'Open', position: 0, color: 'blue' },
+        { value: 'CLIENT_SUBMITTED', label: 'Client submitted', position: 1, color: 'green' },
+        { value: 'BROKER_REVIEW', label: 'Broker review', position: 2, color: 'orange' },
+        { value: 'LOCKED', label: 'Locked', position: 3, color: 'red' },
+      ],
+    },
+    {
+      universalIdentifier: '6b6d0000-4600-4000-8000-000000000019',
+      type: FieldType.TEXT,
+      name: 'fieldProvenanceSummary',
+      label: 'Field provenance summary',
+      icon: 'IconHistory',
+      description:
+        'Safe summary of applicant, broker, provider, document, or AI-assisted source markers for visible fields.',
+    },
   ],
 });

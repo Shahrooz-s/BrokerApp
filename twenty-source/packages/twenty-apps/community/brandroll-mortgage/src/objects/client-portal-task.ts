@@ -101,5 +101,41 @@ export default defineObject({
       label: 'Completed at',
       icon: 'IconCircleCheck',
     },
+    {
+      universalIdentifier: '6b6d0000-4610-4000-8000-000000000011',
+      type: FieldType.NUMBER,
+      name: 'portalStepNumber',
+      label: 'Portal step number',
+      icon: 'IconListNumbers',
+    },
+    {
+      universalIdentifier: '6b6d0000-4610-4000-8000-000000000012',
+      type: FieldType.SELECT,
+      name: 'lockStatus',
+      label: 'Lock status',
+      icon: 'IconLock',
+      options: [
+        { value: 'EDITABLE', label: 'Editable', position: 0, color: 'blue' },
+        { value: 'SUBMITTED_LOCKED', label: 'Submitted locked', position: 1, color: 'green' },
+        { value: 'BROKER_UNLOCKED', label: 'Broker unlocked', position: 2, color: 'orange' },
+        { value: 'COMPLIANCE_LOCKED', label: 'Compliance locked', position: 3, color: 'red' },
+      ],
+    },
+    {
+      universalIdentifier: '6b6d0000-4610-4000-8000-000000000013',
+      type: FieldType.TEXT,
+      name: 'linkedDocumentRequest',
+      label: 'Linked document request',
+      icon: 'IconFileDescription',
+      description:
+        'LoanDox document request reference shown to the borrower in ClientDash.',
+    },
+    {
+      universalIdentifier: '6b6d0000-4610-4000-8000-000000000014',
+      type: FieldType.DATE_TIME,
+      name: 'submittedAt',
+      label: 'Submitted at',
+      icon: 'IconSend',
+    },
   ],
 });

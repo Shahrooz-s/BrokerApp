@@ -77,6 +77,52 @@ export default defineObject({
       icon: 'IconUser',
     },
     {
+      universalIdentifier: '6b6d0000-1600-4000-8000-000000000010',
+      type: FieldType.TEXT,
+      name: 'applicantScope',
+      label: 'Applicant scope',
+      icon: 'IconUsers',
+      description:
+        'Primary applicant, co-applicant, all applicants, household, company, trust, or guarantor scope for LoanDox and ClientDash.',
+    },
+    {
+      universalIdentifier: '6b6d0000-1600-4000-8000-000000000011',
+      type: FieldType.SELECT,
+      name: 'uploadMethod',
+      label: 'Upload method',
+      icon: 'IconUpload',
+      options: [
+        { value: 'CLIENTDASH_UPLOAD', label: 'ClientDash upload', position: 0, color: 'blue' },
+        { value: 'MANUAL_UPLOAD', label: 'Manual upload', position: 1, color: 'gray' },
+        { value: 'CASHDECK', label: 'CashDeck', position: 2, color: 'purple' },
+        { value: 'BASIQ_OPEN_BANKING', label: 'Basiq open banking', position: 3, color: 'green' },
+        { value: 'BROKER_UPLOAD', label: 'Broker upload', position: 4, color: 'orange' },
+      ],
+    },
+    {
+      universalIdentifier: '6b6d0000-1600-4000-8000-000000000012',
+      type: FieldType.TEXT,
+      name: 'requestStack',
+      label: 'Request stack',
+      icon: 'IconStack2',
+      description:
+        'LoanDox stack/template that created this document request.',
+    },
+    {
+      universalIdentifier: '6b6d0000-1600-4000-8000-000000000013',
+      type: FieldType.SELECT,
+      name: 'reviewOutcome',
+      label: 'Review outcome',
+      icon: 'IconClipboardCheck',
+      options: [
+        { value: 'NOT_REVIEWED', label: 'Not reviewed', position: 0, color: 'gray' },
+        { value: 'ACCEPTED', label: 'Accepted', position: 1, color: 'green' },
+        { value: 'DECLINED', label: 'Declined', position: 2, color: 'red' },
+        { value: 'QUESTION_SENT', label: 'Question sent', position: 3, color: 'orange' },
+        { value: 'AI_REVIEW_REQUIRED', label: 'AI review required', position: 4, color: 'purple' },
+      ],
+    },
+    {
       universalIdentifier: '6b6d0000-1600-4000-8000-000000000008',
       type: FieldType.TEXT,
       name: 'reviewNotes',

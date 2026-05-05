@@ -215,6 +215,15 @@ export const brokerEngineDealWorkspaceTools = [
   {
     workspaceArea: 'RIGHT_RAIL',
     position: 60,
+    toolName: 'LoanDox',
+    toolType: 'DRAWER',
+    recordOwner:
+      'Document requests, ClientDash tasks, bank statement collection, credit check requests, and document review gates',
+    shownInsideDeal: true,
+  },
+  {
+    workspaceArea: 'RIGHT_RAIL',
+    position: 70,
     toolName: 'Key Dates',
     toolType: 'DRAWER',
     recordOwner: 'Opportunity dates and mortgage application dates',
@@ -222,7 +231,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 70,
+    position: 80,
     toolName: 'Reports',
     toolType: 'DRAWER',
     recordOwner: 'Broker templates and document generation',
@@ -230,7 +239,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 80,
+    position: 90,
     toolName: '1-Click Workflows',
     toolType: 'DRAWER',
     recordOwner: 'Workflow templates',
@@ -238,7 +247,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 90,
+    position: 100,
     toolName: 'Client Portal',
     toolType: 'DRAWER',
     recordOwner: 'Client portal sessions and portal tasks',
@@ -246,7 +255,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 100,
+    position: 110,
     toolName: 'KYC/CDD',
     toolType: 'DRAWER',
     recordOwner:

@@ -128,6 +128,7 @@ const rightRailTools = [
   'Tasks',
   'Emails',
   'Texts',
+  'LoanDox',
   'Key Dates',
   'Reports',
   '1-Click Workflows',
@@ -139,16 +140,11 @@ const rightRailToolIcons: Record<string, string> = {
   Tasks: 'T',
   Emails: '@',
   Texts: 'SMS',
+  LoanDox: 'LD',
   'Key Dates': 'KD',
   Reports: 'R',
   '1-Click Workflows': 'WF',
 };
-
-const completedWorkspacePages = new Set([
-  'LoanDash',
-  'Team',
-  'Goals',
-]);
 
 const loanDashboardMetricCards = [
   ['Loan Amount', '$0.00'],
@@ -351,6 +347,15 @@ const loanNavigationGroups = [
   },
 ];
 
+const workspacePageOptions = loanNavigationGroups.flatMap((group) =>
+  group.items.map((item) => ({
+    group: group.group,
+    name: item,
+  })),
+);
+
+const brokerAppPageHashPrefix = '#brokerapp-page-';
+
 const keyDates = [
   ['Stage Due', '07/05/2026'],
   ['Credit Guide Due', 'Not sent'],
@@ -377,6 +382,74 @@ const checklistItems = [
   ['KYC/CDD complete', 'Blocked'],
   ['Serviceability assessed', 'Not started'],
   ['Credit proposal approved', 'Not started'],
+];
+
+const loanDoxTemplates = [
+  {
+    category: 'Compliance',
+    description:
+      'Credit guide, privacy consent, broker interview acknowledgements and client confirmations.',
+    name: 'Credit Guide & Privacy Consent',
+    target: 'All applicants',
+  },
+  {
+    category: 'Identity',
+    description:
+      'Photo ID, Medicare/passport/licence checks and consent for ID verification provider workflows.',
+    name: 'KYC identity pack',
+    target: 'Each applicant',
+  },
+  {
+    category: 'Income',
+    description:
+      'Latest payslips, employment contract and salary credits for PAYG applicants.',
+    name: 'PAYG income pack',
+    target: 'PAYG applicant',
+  },
+  {
+    category: 'Self-employed',
+    description:
+      'Two years tax returns, financial statements, ABN/GST evidence and accountant contact details.',
+    name: 'Self-employed income pack',
+    target: 'Self-employed applicant',
+  },
+  {
+    category: 'Bank statements',
+    description:
+      'Personal, home loan and business statements via manual upload, CashDeck or future Basiq open banking.',
+    name: 'Bank statement request',
+    target: 'Selected applicant',
+  },
+];
+
+const loanDoxRequests = [
+  {
+    applicant: 'Primary Applicant',
+    method: 'ClientDash upload',
+    status: 'Requested',
+    title: 'Credit Guide & Privacy Consent acknowledgement',
+  },
+  {
+    applicant: 'Primary Applicant',
+    method: 'Manual upload / CashDeck later',
+    status: 'Draft',
+    title: 'Latest 2 payslips',
+  },
+  {
+    applicant: 'Co-Applicant 1',
+    method: 'Manual upload / Basiq later',
+    status: 'Draft',
+    title: 'Personal bank statements - 90 days',
+  },
+];
+
+const clientDashSteps = [
+  ['Step 1', 'Credit Guide and Privacy Consent', 'Required before fact-find unlock'],
+  ['Step 2', 'Fact Find', 'Applicant and shared household information'],
+  ['Step 3', 'KYC / IDV', 'Provider-gated identity checks and consent'],
+  ['Step 4', 'Documents', 'LoanDox requests and uploads'],
+  ['Step 5', 'Bank Statements', 'Manual upload now; CashDeck/Basiq gated later'],
+  ['Step 6', 'Review and Confirm', 'All applicants confirm submitted information'],
 ];
 
 type WorkspaceFieldType =
@@ -802,6 +875,43 @@ const workspacePages: Record<string, WorkspacePage> = {
           field('Secondary Email'),
           field('Country code'),
           field('National number'),
+        ],
+      },
+      {
+        title: 'Business and ABR Lookup',
+        description:
+          'Official ABN Lookup-prefill for self-employed, sole trader, company and trust applicants. Live lookup stays disabled until the ABN Lookup GUID is configured in Broker Settings.',
+        fields: [
+          field('ABN'),
+          field('ACN'),
+          field('Business Name'),
+          field('Entity Name'),
+          field('Entity Type', 'select', [
+            'Individual/Sole Trader',
+            'Company',
+            'Trust',
+            'Partnership',
+            'Other',
+          ]),
+          field('ABN Status', 'status', undefined, 'Provider not configured'),
+          field('GST Registered From', 'date'),
+          field('Business State', 'select', [
+            'ACT',
+            'NSW',
+            'NT',
+            'QLD',
+            'SA',
+            'TAS',
+            'VIC',
+            'WA',
+          ]),
+          field('Business Postcode'),
+          field('ABR Lookup Evidence', 'status', undefined, 'Manual entry allowed'),
+        ],
+        actions: [
+          'Verify ABN/ACN',
+          'Search Business Name',
+          'Mark manual business verification',
         ],
       },
       {
@@ -1265,22 +1375,33 @@ const styles = {
     padding: '0',
     position: 'relative' as const,
   },
+  workspaceInline: {
+    background: 'var(--t-background-secondary, #fafafa)',
+    color: 'var(--t-font-color-primary, #333333)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    height: '100%',
+    minHeight: 'calc(100vh - 120px)',
+    overflow: 'hidden',
+    width: '100%',
+  },
   overlayScrim: {
-    background: 'rgba(20, 24, 31, 0.18)',
-    bottom: 0,
+    background: 'transparent',
+    bottom: 'auto',
     boxSizing: 'border-box' as const,
-    left: '40px',
-    padding: '10px 12px 12px',
-    position: 'fixed' as const,
-    right: 0,
-    top: '56px',
-    zIndex: 2147480000,
+    left: 0,
+    padding: 0,
+    position: 'relative' as const,
+    right: 'auto',
+    top: 'auto',
+    zIndex: 1,
   },
   workspaceModal: {
     background: 'var(--t-background-primary, #ffffff)',
-    border: '1px solid var(--t-border-color-medium, #ebebeb)',
-    borderRadius: 'var(--t-border-radius-md, 8px)',
-    boxShadow: '0 18px 48px rgba(15, 23, 42, 0.22)',
+    border: 0,
+    borderRadius: 0,
+    boxShadow: 'none',
     display: 'flex',
     flexDirection: 'column' as const,
     height: '100%',
@@ -1293,8 +1414,8 @@ const styles = {
     display: 'grid',
     gap: '12px',
     gridTemplateColumns: 'minmax(0, 1fr) auto',
-    minHeight: '48px',
-    padding: '0 10px 0 14px',
+    minHeight: '52px',
+    padding: '0 16px',
   },
   toolbarLeft: {
     alignItems: 'center',
@@ -1306,7 +1427,7 @@ const styles = {
     color: 'var(--t-font-color-primary, #333333)',
     fontSize: 'var(--t-font-size-sm, 0.95rem)',
     fontWeight: 700,
-    whiteSpace: 'nowrap',
+    whiteSpace: 'normal',
   },
   toolbarTabs: {
     alignItems: 'center',
@@ -1483,6 +1604,7 @@ const styles = {
   small: {
     color: 'var(--t-font-color-secondary, #666666)',
     fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    lineHeight: 1.45,
   },
   card: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1548,14 +1670,15 @@ const styles = {
   panelGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-    gap: '10px',
-    marginTop: '12px',
+    gap: '16px',
+    marginTop: '20px',
   },
   panel: {
     background: 'var(--t-background-primary, #ffffff)',
     border: '1px solid var(--t-border-color-medium, #ebebeb)',
     borderRadius: 'var(--t-border-radius-md, 8px)',
-    padding: '12px',
+    lineHeight: 1.45,
+    padding: '16px',
   },
   tabRow: {
     display: 'flex',
@@ -1641,11 +1764,11 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: 'clamp(180px, 19vw, 232px) minmax(520px, 1fr) 360px',
+    gridTemplateColumns: 'minmax(280px, 320px) minmax(0, 1fr) 56px',
     height: '100%',
     minHeight: '100%',
     minWidth: 0,
-    overflow: 'auto',
+    overflow: 'hidden',
   },
   loanSidebar: {
     background: 'var(--t-background-secondary, #fafafa)',
@@ -1653,18 +1776,45 @@ const styles = {
     overflow: 'auto',
     maxHeight: '100%',
   },
+  loanSidebarCollapsed: {
+    overflow: 'hidden',
+  },
   sidebarHeader: {
     alignItems: 'center',
     display: 'flex',
-    fontSize: '17px',
-    fontWeight: 800,
+    fontSize: 'var(--t-font-size-sm, 0.95rem)',
+    fontWeight: 700,
+    gap: '8px',
     justifyContent: 'space-between',
-    minHeight: '54px',
-    padding: '0 14px',
+    minHeight: '56px',
+    padding: '0 16px',
+    whiteSpace: 'nowrap',
+  },
+  sidebarTitle: {
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  sidebarCollapseButton: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    flex: '0 0 auto',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
+    fontWeight: 700,
+    height: '30px',
+    justifyContent: 'center',
+    minWidth: '30px',
+    padding: '0 8px',
   },
   navGroup: {
     borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
-    padding: '8px',
+    padding: '12px',
   },
   navHeader: {
     alignItems: 'center',
@@ -1687,10 +1837,11 @@ const styles = {
     display: 'grid',
     fontSize: '13px',
     fontWeight: 600,
-    gap: '8px',
-    gridTemplateColumns: '18px minmax(0, 1fr)',
-    minHeight: '34px',
-    padding: '0 10px',
+    gap: '10px',
+    gridTemplateColumns: '22px minmax(0, 1fr)',
+    lineHeight: 1.3,
+    minHeight: '40px',
+    padding: '0 12px',
   },
   navItemActive: {
     background: 'var(--t-background-tertiary, #f1f1f1)',
@@ -1702,9 +1853,9 @@ const styles = {
     display: 'inline-flex',
     fontSize: '11px',
     fontWeight: 900,
-    height: '16px',
+    height: '20px',
     justifyContent: 'center',
-    width: '16px',
+    width: '20px',
   },
   navStatusComplete: {
     background: 'rgba(22, 130, 93, 0.12)',
@@ -1714,6 +1865,10 @@ const styles = {
     background: 'rgba(196, 49, 45, 0.10)',
     color: 'var(--t-color-red, #c4312d)',
   },
+  navStatusNeutral: {
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    color: 'var(--t-font-color-tertiary, #999999)',
+  },
   loanMain: {
     minWidth: 0,
     overflow: 'auto',
@@ -1722,32 +1877,39 @@ const styles = {
   warningBar: {
     alignItems: 'center',
     background: 'var(--t-background-primary, #ffffff)',
-    borderBottom: '1px solid var(--t-border-color-medium, #ebebeb)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     color: 'var(--t-font-color-primary, #333333)',
-    display: 'flex',
+    display: 'grid',
     fontSize: '13px',
-    justifyContent: 'space-between',
-    minHeight: '34px',
-    padding: '0 12px',
+    gap: '12px',
+    gridTemplateColumns: 'minmax(0, 1fr) auto',
+    lineHeight: 1.45,
+    margin: '16px 20px 0',
+    minHeight: '48px',
+    padding: '12px 16px',
   },
   loanTopbar: {
     alignItems: 'center',
     background: 'var(--t-background-primary, #ffffff)',
-    borderBottom: '1px solid var(--t-border-color-medium, #ebebeb)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     display: 'grid',
-    gap: '12px',
+    gap: '16px',
     gridTemplateColumns: 'minmax(0, 1fr) auto',
-    minHeight: '58px',
-    padding: '0 12px',
+    margin: '16px 20px 0',
+    minHeight: '68px',
+    padding: '14px 16px',
   },
   titleBlock: {
     minWidth: 0,
   },
   title: {
-    fontSize: 'var(--t-font-size-lg, 1.23rem)',
+    fontSize: 'var(--t-font-size-xl, 1.45rem)',
     fontWeight: 600,
-    lineHeight: 1.2,
+    lineHeight: 1.25,
     margin: 0,
+    overflowWrap: 'anywhere' as const,
   },
   stageSelect: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1761,25 +1923,25 @@ const styles = {
   workspaceContent: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '12px',
-    padding: '12px',
+    gap: '20px',
+    padding: '20px',
   },
   metrics: {
     display: 'grid',
-    gap: '10px',
+    gap: '16px',
     gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
   },
   metricCard: {
     background: 'var(--t-background-primary, #ffffff)',
     border: '1px solid var(--t-border-color-medium, #ebebeb)',
     borderRadius: 'var(--t-border-radius-md, 8px)',
-    padding: '12px',
+    padding: '16px',
   },
   toolShell: {
     background: 'var(--t-background-primary, #ffffff)',
     borderLeft: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'grid',
-    gridTemplateColumns: '66px minmax(0, 1fr)',
+    gridTemplateColumns: '56px minmax(0, 1fr)',
     minHeight: 0,
     maxHeight: '100%',
   },
@@ -1826,13 +1988,13 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     minHeight: '54px',
-    padding: '0 12px',
+    padding: '0 16px',
   },
   toolDrawerBody: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '12px',
-    padding: '12px',
+    gap: '16px',
+    padding: '16px',
   },
   textArea: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1843,8 +2005,8 @@ const styles = {
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
     fontSize: '13px',
     lineHeight: 1.45,
-    minHeight: '108px',
-    padding: '8px',
+    minHeight: '112px',
+    padding: '10px 12px',
     resize: 'vertical' as const,
     width: '100%',
   },
@@ -1855,25 +2017,26 @@ const styles = {
     borderRadius: 'var(--t-border-radius-sm, 4px)',
     display: 'flex',
     justifyContent: 'space-between',
-    minHeight: '38px',
-    padding: '0 10px',
+    lineHeight: 1.35,
+    minHeight: '40px',
+    padding: '8px 12px',
   },
   pageHero: {
     background: 'var(--t-background-primary, #ffffff)',
     border: '1px solid var(--t-border-color-medium, #ebebeb)',
     borderRadius: 'var(--t-border-radius-md, 8px)',
     display: 'grid',
-    gap: '12px',
+    gap: '16px',
     gridTemplateColumns: 'minmax(0, 1fr) 260px',
-    padding: '12px',
+    padding: '18px',
   },
   observedList: {
     background: 'var(--t-background-secondary, #fafafa)',
     border: '1px solid var(--t-border-color-medium, #ebebeb)',
     borderRadius: 'var(--t-border-radius-md, 8px)',
     display: 'grid',
-    gap: '6px',
-    padding: '10px',
+    gap: '8px',
+    padding: '12px',
   },
   sectionHeader: {
     alignItems: 'center',
@@ -1881,18 +2044,19 @@ const styles = {
     borderBottom: '1px solid var(--t-border-color-light, #f1f1f1)',
     display: 'flex',
     justifyContent: 'space-between',
-    minHeight: '40px',
-    padding: '0 12px',
+    gap: '12px',
+    minHeight: '52px',
+    padding: '12px 16px',
   },
   formGrid: {
     display: 'grid',
-    gap: '10px',
+    gap: '16px',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    padding: '12px',
+    padding: '16px',
   },
   fieldShell: {
     display: 'grid',
-    gap: '5px',
+    gap: '6px',
     minWidth: 0,
   },
   label: {
@@ -1908,8 +2072,9 @@ const styles = {
     color: 'var(--t-font-color-primary, #333333)',
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
     fontSize: '13px',
-    minHeight: '32px',
-    padding: '0 8px',
+    lineHeight: 1.45,
+    minHeight: '36px',
+    padding: '0 10px',
     width: '100%',
   },
   selectShell: {
@@ -1927,8 +2092,9 @@ const styles = {
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
     fontSize: '13px',
     justifyContent: 'space-between',
-    minHeight: '32px',
-    padding: '0 8px',
+    lineHeight: 1.45,
+    minHeight: '36px',
+    padding: '0 10px',
     textAlign: 'left' as const,
     width: '100%',
   },
@@ -1969,14 +2135,14 @@ const styles = {
     border: '1px solid var(--t-border-color-medium, #ebebeb)',
     borderRadius: 'var(--t-border-radius-sm, 4px)',
     minHeight: '108px',
-    padding: '8px',
+    padding: '10px 12px',
   },
   actionBar: {
     borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
     display: 'flex',
     flexWrap: 'wrap' as const,
-    gap: '8px',
-    padding: '10px 12px',
+    gap: '10px',
+    padding: '12px 16px',
   },
   subtleButton: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1985,8 +2151,8 @@ const styles = {
     color: 'var(--t-font-color-secondary, #666666)',
     fontSize: 'var(--t-font-size-xs, 0.85rem)',
     fontWeight: 600,
-    minHeight: '30px',
-    padding: '0 10px',
+    minHeight: '32px',
+    padding: '0 12px',
   },
   disabledButton: {
     cursor: 'not-allowed',
@@ -2158,7 +2324,92 @@ const styles = {
     border: '1px solid rgba(196, 49, 45, 0.24)',
     borderRadius: 'var(--t-border-radius-md, 8px)',
     color: 'var(--t-font-color-primary, #333333)',
+    lineHeight: 1.45,
+    padding: '16px',
+  },
+  fieldProvenance: {
+    background:
+      'linear-gradient(90deg, var(--t-color-blue, #3b82f6) 0 50%, var(--t-color-green, #16825d) 50% 100%)',
+    borderRadius: '999px',
+    height: '2px',
+    opacity: 0.52,
+    width: '100%',
+  },
+  compactWorkspaceNav: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'grid',
+    gap: '10px',
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    margin: '12px 12px 0',
     padding: '12px',
+  },
+  compactHidden: {
+    display: 'none',
+  },
+  pageChipBar: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '6px',
+    maxHeight: '96px',
+    overflow: 'auto',
+  },
+  pageChipButton: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    fontSize: '12px',
+    fontWeight: 600,
+    justifyContent: 'center',
+    minHeight: '28px',
+    padding: '0 8px',
+    textDecoration: 'none',
+    whiteSpace: 'nowrap' as const,
+  },
+  pageChipButtonActive: {
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    color: 'var(--t-font-color-primary, #333333)',
+  },
+  loanDoxGrid: {
+    display: 'grid',
+    gap: '16px',
+    gridTemplateColumns: 'minmax(150px, 1fr) minmax(260px, 3fr) minmax(150px, 1fr)',
+  },
+  loanDoxColumn: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '10px',
+    minWidth: 0,
+    padding: '14px',
+  },
+  requestCard: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'grid',
+    gap: '10px',
+    padding: '14px',
+  },
+  clientStepGrid: {
+    display: 'grid',
+    gap: '12px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+  },
+  clientStepCard: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    minHeight: '110px',
+    padding: '14px',
   },
 } as const;
 
@@ -2166,8 +2417,12 @@ export const BrokerAppWorkspace = () => {
   const opportunityRecordId = useRecordId();
   const [activePageName, setActivePageName] = useState('LoanDash');
   const [activeTool, setActiveTool] = useState(rightRailTools[0]);
-  const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(true);
+  const [isLoanSidebarCollapsed, setIsLoanSidebarCollapsed] = useState(true);
   const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(true);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window === 'undefined' ? 1280 : window.innerWidth,
+  );
+  const [workspaceWidth, setWorkspaceWidth] = useState(1280);
   const [collapsedNavGroups, setCollapsedNavGroups] = useState<string[]>([]);
   const [collapsedPageSections, setCollapsedPageSections] = useState<string[]>(
     [],
@@ -2196,12 +2451,9 @@ export const BrokerAppWorkspace = () => {
   const [lastAutosavedAt, setLastAutosavedAt] = useState<string | null>(null);
   const [isClientViewVisible, setIsClientViewVisible] = useState(false);
   const [isFactFindLocked, setIsFactFindLocked] = useState(false);
-  const [openSelectFieldKey, setOpenSelectFieldKey] = useState<string | null>(
-    null,
-  );
   const hasMountedRef = useRef(false);
   const fieldControlRefs = useRef<
-    Record<string, HTMLInputElement | HTMLTextAreaElement>
+    Record<string, HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   >({});
   const [taskFilter, setTaskFilter] = useState<'Pending' | 'Completed'>(
     'Pending',
@@ -2231,12 +2483,71 @@ export const BrokerAppWorkspace = () => {
   }, []);
 
   useEffect(() => {
-    setIsWorkspaceOpen(true);
-  }, [opportunityRecordId]);
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth);
+
+    updateViewportWidth();
+    window.addEventListener('resize', updateViewportWidth);
+
+    return () => window.removeEventListener('resize', updateViewportWidth);
+  }, []);
 
   useEffect(() => {
-    setOpenSelectFieldKey(null);
-  }, [activeApplicantIndex, activePageName]);
+    const syncPageFromHash = () => {
+      const hash = window.location.hash;
+
+      if (!hash.startsWith(brokerAppPageHashPrefix)) {
+        return;
+      }
+
+      const pageName = decodeURIComponent(
+        hash.slice(brokerAppPageHashPrefix.length),
+      );
+
+      if (workspacePages[pageName]) {
+        setActivePageName(pageName);
+      }
+    };
+
+    syncPageFromHash();
+    window.addEventListener('hashchange', syncPageFromHash);
+
+    return () => window.removeEventListener('hashchange', syncPageFromHash);
+  }, []);
+
+  useEffect(() => {
+    const root = document.querySelector<HTMLElement>(
+      '[data-brokerapp-loan-workspace="true"]',
+    );
+
+    if (!root) {
+      return;
+    }
+
+    const updateWorkspaceWidth = () => {
+      if (typeof root.getBoundingClientRect === 'function') {
+        setWorkspaceWidth(root.getBoundingClientRect().width);
+        return;
+      }
+
+      if (typeof root.clientWidth === 'number' && root.clientWidth > 0) {
+        setWorkspaceWidth(root.clientWidth);
+      }
+    };
+
+    updateWorkspaceWidth();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateWorkspaceWidth);
+
+      return () => window.removeEventListener('resize', updateWorkspaceWidth);
+    }
+
+    const observer = new ResizeObserver(updateWorkspaceWidth);
+
+    observer.observe(root);
+
+    return () => observer.disconnect();
+  }, []);
 
   const moveOpportunityToStage = async (
     stageValue: string,
@@ -2347,6 +2658,27 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
+  const runAbrLookup = async (lookupType: 'ABN_ACN' | 'BUSINESS_NAME') => {
+    const providerMessage =
+      lookupType === 'ABN_ACN'
+        ? 'ABN/ACN lookup is ready but disabled until the official ABN Lookup GUID is configured in Broker Settings > Integrations.'
+        : 'Business name search is ready but disabled until the official ABN Lookup GUID is configured in Broker Settings > Integrations.';
+
+    setFactFindAnswers((current) => ({
+      ...current,
+      [`Applicants:${activeApplicantRole}:ABR Lookup Evidence`]:
+        'Provider not configured - manual entry allowed',
+      [`Applicants:${activeApplicantRole}:ABN Status`]:
+        'Provider not configured',
+    }));
+    setAutosaveVersion((version) => version + 1);
+
+    await enqueueSnackbar({
+      message: providerMessage,
+      variant: 'info',
+    });
+  };
+
   const visibleTasks = generatedTasks.filter((task) =>
     taskFilter === 'Completed'
       ? task.status === 'Completed'
@@ -2369,12 +2701,71 @@ export const BrokerAppWorkspace = () => {
   const loanTitle = opportunityRecordId
     ? `Opportunity ${opportunityRecordId.slice(0, 8)}`
     : 'Opened Opportunity';
+  const isCompactWorkspace = viewportWidth < 920 || workspaceWidth < 780;
+  const cleanFieldLabel = (label: string) => label.replace(/^\*/, '').trim();
+  const isAnswerFilled = (value: FactFindAnswerValue | undefined) =>
+    value !== undefined && value !== '' && value !== false;
+
+  useEffect(() => {
+    if (!isCompactWorkspace) {
+      return;
+    }
+
+    setIsLoanSidebarCollapsed(true);
+    setIsToolboxCollapsed(true);
+  }, [isCompactWorkspace]);
+
+  const getWorkspacePageStatus = (
+    pageName: string,
+  ): 'complete' | 'incomplete' | 'neutral' => {
+    const page = workspacePages[pageName];
+
+    if (!page) {
+      return 'neutral';
+    }
+
+    if (pageName === 'LoanDash') {
+      return 'complete';
+    }
+
+    const requiredFields = page.sections.flatMap((section) =>
+      section.fields.filter((workspaceField) => workspaceField.required),
+    );
+
+    if (requiredFields.length === 0) {
+      return Object.entries(factFindAnswers).some(
+        ([key, value]) => key.startsWith(`${page.title}:`) && isAnswerFilled(value),
+      )
+        ? 'complete'
+        : 'neutral';
+    }
+
+    const rolesToCheck =
+      page.group === 'Fact Find' && pageName === 'Applicants'
+        ? applicantRoles
+        : page.group === 'Fact Find'
+          ? [activeApplicantRole]
+          : [''];
+
+    const isComplete = requiredFields.every((workspaceField) =>
+      rolesToCheck.every((role) => {
+        const fieldKey =
+          page.group === 'Fact Find'
+            ? `${page.title}:${role}:${cleanFieldLabel(workspaceField.label)}`
+            : `${page.title}:${cleanFieldLabel(workspaceField.label)}`;
+
+        return isAnswerFilled(factFindAnswers[fieldKey]);
+      }),
+    );
+
+    return isComplete ? 'complete' : 'incomplete';
+  };
 
   const collectVisibleDomAnswers = () => {
     const domAnswers: Record<string, FactFindAnswerValue> = {};
     const collectControlValue = (
       fieldKey: string,
-      control: HTMLInputElement | HTMLTextAreaElement,
+      control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     ) => {
       if (control.tagName === 'INPUT' && control.type === 'checkbox') {
         domAnswers[fieldKey] = (control as HTMLInputElement).checked;
@@ -2389,8 +2780,8 @@ export const BrokerAppWorkspace = () => {
     });
 
     const controls = document.querySelectorAll<
-      HTMLInputElement | HTMLTextAreaElement
-    >('[data-brokerapp-field-key], input[name], textarea[name]');
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >('[data-brokerapp-field-key], input[name], textarea[name], select[name]');
 
     controls.forEach((control) => {
       const fieldKey =
@@ -2421,8 +2812,13 @@ export const BrokerAppWorkspace = () => {
   };
 
   const openWorkspacePage = (pageName: string) => {
-    syncVisibleDomAnswers();
-    setOpenSelectFieldKey(null);
+    try {
+      syncVisibleDomAnswers();
+    } catch {
+      // Front-component sandbox DOM reads can fail on native Twenty controls.
+      // Navigation should still be reliable; explicit Save can persist once the
+      // target page is open.
+    }
     setActivePageName(pageName);
   };
 
@@ -2506,7 +2902,7 @@ export const BrokerAppWorkspace = () => {
   ) =>
     `${activePage.title}:${
       activePage.group === 'Fact Find' ? `${applicantRole}:` : ''
-    }${workspaceField.label.replace(/^\*/, '').trim()}`;
+    }${cleanFieldLabel(workspaceField.label)}`;
 
   const getFieldValue = (
     workspaceField: WorkspaceField,
@@ -2535,7 +2931,7 @@ export const BrokerAppWorkspace = () => {
     value: FactFindAnswerValue,
     applicantRole = activeApplicantRole,
   ) => {
-    const fieldLabel = workspaceField.label.replace(/^\*/, '').trim();
+    const fieldLabel = cleanFieldLabel(workspaceField.label);
 
     setFactFindAnswers((current) => ({
       ...current,
@@ -2723,6 +3119,16 @@ export const BrokerAppWorkspace = () => {
       return;
     }
 
+    if (action === 'Verify ABN/ACN') {
+      await runAbrLookup('ABN_ACN');
+      return;
+    }
+
+    if (action === 'Search Business Name') {
+      await runAbrLookup('BUSINESS_NAME');
+      return;
+    }
+
     if (action.includes('Validate') || action.includes('checklist')) {
       setActiveTool('Checklists');
       setIsToolboxCollapsed(false);
@@ -2732,6 +3138,29 @@ export const BrokerAppWorkspace = () => {
       message: `${action} is ready as a gated BrokerApp action. Provider sends, lender submissions and external checks remain disabled until credentials are approved.`,
       variant: 'info',
     });
+  };
+
+  const renderFieldProvenance = (fieldKey: string) => {
+    const hasValue = isAnswerFilled(factFindAnswers[fieldKey]);
+
+    return (
+      <span
+        aria-label={
+          hasValue
+            ? 'Field has captured borrower or broker input'
+            : 'Field has no captured source yet'
+        }
+        style={{
+          ...styles.fieldProvenance,
+          opacity: hasValue ? 0.72 : 0.16,
+        }}
+        title={
+          hasValue
+            ? 'Latest source: BrokerApp workspace. Full source history will sync to the timeline in the persistence pass.'
+            : 'No source captured yet'
+        }
+      />
+    );
   };
 
   const renderWorkspaceField = (
@@ -2770,6 +3199,7 @@ export const BrokerAppWorkspace = () => {
               type="checkbox"
             />
           </span>
+          {renderFieldProvenance(fieldKey)}
         </label>
       );
     }
@@ -2793,75 +3223,52 @@ export const BrokerAppWorkspace = () => {
               </label>
             ))}
           </div>
+          {renderFieldProvenance(fieldKey)}
         </div>
       );
     }
 
     if (workspaceField.type === 'select') {
-      const isOpen = openSelectFieldKey === fieldKey;
       const selectedValue = String(fieldValue);
       const placeholder = `Select ${label.toLowerCase()}`;
 
       return (
-        <div key={workspaceField.label} style={styles.fieldShell}>
+        <label key={workspaceField.label} style={styles.fieldShell}>
           <span style={styles.label}>{label}</span>
-          <div style={styles.selectShell}>
-            <button
-              aria-expanded={isOpen}
-              aria-haspopup="listbox"
-              aria-label={label}
-              onClick={() =>
-                setOpenSelectFieldKey((current) =>
-                  current === fieldKey ? null : fieldKey,
-                )
+          <select
+            data-brokerapp-field-key={fieldKey}
+            name={fieldKey}
+            onChange={(event) =>
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
+            }
+            onInput={(event) =>
+              updateFieldValue(
+                workspaceField,
+                event.currentTarget.value,
+                applicantRole,
+              )
+            }
+            ref={(control) => {
+              if (control) {
+                fieldControlRefs.current[fieldKey] = control;
               }
-              role="combobox"
-              style={styles.selectButton}
-              type="button"
-            >
-              <span style={selectedValue ? undefined : styles.placeholderText}>
-                {selectedValue || placeholder}
-              </span>
-              <span aria-hidden="true">▾</span>
-            </button>
-            {isOpen ? (
-              <div role="listbox" style={styles.selectMenu}>
-                <button
-                  aria-selected={selectedValue === ''}
-                  onClick={() => {
-                    updateFieldValue(workspaceField, '', applicantRole);
-                    setOpenSelectFieldKey(null);
-                  }}
-                  role="option"
-                  style={styles.selectOption}
-                  type="button"
-                >
-                  {placeholder}
-                </button>
-                {(workspaceField.options ?? []).map((option) => (
-                  <button
-                    aria-selected={selectedValue === option}
-                    key={option}
-                    onClick={() => {
-                      updateFieldValue(workspaceField, option, applicantRole);
-                      setOpenSelectFieldKey(null);
-                    }}
-                    role="option"
-                    style={{
-                      ...styles.selectOption,
-                      ...(selectedValue === option
-                        ? styles.selectOptionActive
-                        : {}),
-                    }}
-                    type="button"
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </div>
+            }}
+            style={styles.input}
+            value={selectedValue}
+          >
+            <option value="">{placeholder}</option>
+            {(workspaceField.options ?? []).map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          {renderFieldProvenance(fieldKey)}
+        </label>
       );
     }
 
@@ -2916,6 +3323,7 @@ export const BrokerAppWorkspace = () => {
               }}
             />
           </div>
+          {renderFieldProvenance(fieldKey)}
         </label>
       );
     }
@@ -2939,6 +3347,7 @@ export const BrokerAppWorkspace = () => {
             <span>{statusText}</span>
             <strong style={styles.statusWarn}>Review</strong>
           </div>
+          {renderFieldProvenance(fieldKey)}
         </div>
       );
     }
@@ -3032,6 +3441,7 @@ export const BrokerAppWorkspace = () => {
             type={workspaceField.type === 'date' ? 'date' : 'text'}
           />
         )}
+        {renderFieldProvenance(fieldKey)}
       </label>
     );
   };
@@ -3096,7 +3506,6 @@ export const BrokerAppWorkspace = () => {
               key={role}
               onClick={() => {
                 syncVisibleDomAnswers();
-                setOpenSelectFieldKey(null);
                 setActiveApplicantIndex(index);
               }}
               style={{
@@ -3160,7 +3569,14 @@ export const BrokerAppWorkspace = () => {
         </div>
         {!collapsedPageSections.includes(sectionKey) && (
           <>
-            <div style={styles.formGrid}>
+            <div
+              style={{
+                ...styles.formGrid,
+                ...(isCompactWorkspace
+                  ? { gridTemplateColumns: 'minmax(0, 1fr)' }
+                  : {}),
+              }}
+            >
               {section.fields.map((fieldDefinition) =>
                 renderWorkspaceField(fieldDefinition, applicantRole),
               )}
@@ -3187,7 +3603,14 @@ export const BrokerAppWorkspace = () => {
 
   const renderWorkspacePage = () => (
     <div style={styles.pageLayout}>
-      <section style={styles.pageHero}>
+      <section
+        style={{
+          ...styles.pageHero,
+          ...(isCompactWorkspace
+            ? { gridTemplateColumns: 'minmax(0, 1fr)' }
+            : {}),
+        }}
+      >
         <div>
           <div style={styles.small}>{activePage.group}</div>
           <h2 style={{ margin: '4px 0 8px', fontSize: '22px' }}>
@@ -3196,7 +3619,14 @@ export const BrokerAppWorkspace = () => {
           <p style={{ ...styles.small, maxWidth: '760px' }}>
             {activePage.summary}
           </p>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              marginTop: '8px',
+            }}
+          >
             <span style={styles.pill}>Stage: {activeStageOption.label}</span>
             <span style={styles.pill}>
               Save:{' '}
@@ -3207,7 +3637,14 @@ export const BrokerAppWorkspace = () => {
                 : saveStatus}
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              marginTop: '12px',
+            }}
+          >
             <button
               disabled={saveStatus === 'Saving'}
               onClick={() => void saveWorkspacePage()}
@@ -3333,6 +3770,11 @@ export const BrokerAppWorkspace = () => {
               <select
                 disabled={boardMoveStatus === 'Saving'}
                 onChange={(event) => {
+                  if (event.currentTarget.value) {
+                    void moveOpportunityToStage(event.currentTarget.value);
+                  }
+                }}
+                onInput={(event) => {
                   if (event.currentTarget.value) {
                     void moveOpportunityToStage(event.currentTarget.value);
                   }
@@ -3633,6 +4075,133 @@ export const BrokerAppWorkspace = () => {
       );
     }
 
+    if (activeTool === 'LoanDox') {
+      return (
+        <div style={styles.toolDrawerBody}>
+          <section style={styles.panel}>
+            <strong>LoanDox</strong>
+            <p style={styles.small}>
+              Broker-controlled document requests, ClientDash tasks, bank
+              statement collection, credit check preparation and future AI
+              document review. Provider actions stay disabled until approved in
+              Broker Settings.
+            </p>
+          </section>
+
+          <section
+            style={{
+              ...styles.loanDoxGrid,
+              ...(isCompactWorkspace
+                ? { gridTemplateColumns: 'minmax(0, 1fr)' }
+                : {}),
+            }}
+          >
+            <div style={styles.loanDoxColumn}>
+              <strong>Templates and stacks</strong>
+              {loanDoxTemplates.map((template) => (
+                <button
+                  key={template.name}
+                  onClick={() => void handleWorkspaceAction(`Add ${template.name}`)}
+                  style={styles.rowButton}
+                  type="button"
+                >
+                  <span>
+                    {template.name}
+                    <br />
+                    <small style={styles.small}>
+                      {template.category} · {template.target}
+                    </small>
+                  </span>
+                  <strong>+</strong>
+                </button>
+              ))}
+            </div>
+
+            <div style={styles.loanDoxColumn}>
+              <strong>Document request list</strong>
+              {loanDoxRequests.map((request) => (
+                <article key={request.title} style={styles.requestCard}>
+                  <div>
+                    <strong>{request.title}</strong>
+                    <div style={styles.small}>
+                      {request.applicant} · {request.method}
+                    </div>
+                  </div>
+                  <div style={styles.rowButton}>
+                    <span>Status</span>
+                    <strong
+                      style={
+                        request.status === 'Requested'
+                          ? styles.statusWarn
+                          : styles.statusBlock
+                      }
+                    >
+                      {request.status}
+                    </strong>
+                  </div>
+                  <textarea
+                    readOnly
+                    style={styles.textArea}
+                    value="Broker question / document instructions stay safe for ClientDash. Uploaded files are reviewed before they become accepted evidence."
+                  />
+                  <div style={styles.actionBar}>
+                    <button style={styles.subtleButton} type="button">
+                      Ask question
+                    </button>
+                    <button style={styles.subtleButton} type="button">
+                      Decline upload
+                    </button>
+                    <button style={styles.newButton} type="button">
+                      Send to ClientDash
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div style={styles.loanDoxColumn}>
+              <strong>History and gates</strong>
+              <div style={styles.rowButton}>
+                <span>Provider state</span>
+                <strong style={styles.statusBlock}>Disabled</strong>
+              </div>
+              <div style={styles.rowButton}>
+                <span>Missing items</span>
+                <strong>3</strong>
+              </div>
+              <div style={styles.rowButton}>
+                <span>Rejected uploads</span>
+                <strong>0</strong>
+              </div>
+              <div style={styles.validationPanel}>
+                <strong>Safety gate</strong>
+                <p style={styles.small}>
+                  CashDeck, Basiq, Equifax, IDV and AI review are configured as
+                  future provider actions and cannot run until Master Admin
+                  enables credentials.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>ClientDash steps</strong>
+            <div style={{ ...styles.clientStepGrid, marginTop: '12px' }}>
+              {clientDashSteps.map(([step, title, description]) => (
+                <div key={step} style={styles.clientStepCard}>
+                  <span style={styles.small}>{step}</span>
+                  <h3 style={{ fontSize: '15px', margin: '6px 0' }}>
+                    {title}
+                  </h3>
+                  <p style={styles.small}>{description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      );
+    }
+
     if (activeTool === 'Key Dates') {
       return (
         <div style={styles.toolDrawerBody}>
@@ -3710,75 +4279,123 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
-  const workspaceElement = isWorkspaceOpen ? (
-    <div style={styles.overlayScrim}>
-      <section aria-label="BrokerApp loan workspace" style={styles.workspaceModal}>
-        <div style={styles.workspaceToolbar}>
-          <div style={styles.toolbarLeft}>
-            <strong style={styles.toolbarTitle}>BrokerApp Loan Workspace</strong>
-            <nav aria-label="Loan workspace toolbar" style={styles.toolbarTabs}>
-              {toolbarTabs.map((tab) => (
-                <button
-                  key={tab.label}
-                  onClick={tab.onClick}
-                  style={{
-                    ...styles.toolbarTab,
-                    ...(tab.active ? styles.toolbarTabActive : {}),
-                  }}
-                  type="button"
-                >
-                  <span aria-hidden="true">{tab.icon}</span>
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-          <div style={styles.toolbarActions}>
-            <button
-              onClick={() => window.location.assign('/objects/opportunities')}
-              style={styles.subtleButton}
-              type="button"
-            >
-              Back to board
-            </button>
-            <button
-              onClick={() => setIsWorkspaceOpen(false)}
-              style={styles.closeButton}
-              type="button"
-            >
-              Close
-            </button>
-          </div>
+  const workspaceElement = (
+    <section
+      aria-label="BrokerApp loan workspace"
+      data-brokerapp-loan-workspace="true"
+      style={styles.workspaceInline}
+    >
+      <div style={styles.workspaceToolbar}>
+        <div style={styles.toolbarLeft}>
+          <button
+            onClick={() => setIsLoanSidebarCollapsed((current) => !current)}
+            style={styles.sidebarCollapseButton}
+            title={
+              isLoanSidebarCollapsed
+                ? 'Expand loan navigation'
+                : 'Collapse loan navigation'
+            }
+            type="button"
+          >
+            {isLoanSidebarCollapsed ? '>' : '<'}
+          </button>
+          <nav aria-label="Loan workspace toolbar" style={styles.toolbarTabs}>
+            {toolbarTabs.map((tab) => (
+              <button
+                key={tab.label}
+                onClick={tab.onClick}
+                style={{
+                  ...styles.toolbarTab,
+                  ...(tab.active ? styles.toolbarTabActive : {}),
+                }}
+                type="button"
+              >
+                <span aria-hidden="true">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
         </div>
-        <div style={styles.shell}>
+        <div style={styles.toolbarActions}>
+          <button
+            onClick={() => setIsToolboxCollapsed((current) => !current)}
+            style={styles.subtleButton}
+            type="button"
+          >
+            {isToolboxCollapsed ? 'Open tools' : 'Collapse tools'}
+          </button>
+        </div>
+      </div>
+      <div style={styles.shell}>
       <div
         style={{
           ...styles.opportunityShell,
-          gridTemplateColumns: `clamp(180px, 19vw, 232px) minmax(520px, 1fr) ${
-            isToolboxCollapsed ? '56px' : '360px'
-          }`,
+          gridTemplateColumns: isCompactWorkspace
+            ? 'minmax(0, 1fr)'
+            : `${
+                isLoanSidebarCollapsed ? '0px' : 'minmax(280px, 320px)'
+              } minmax(0, 1fr) ${
+                isToolboxCollapsed
+                  ? '56px'
+                  : activeTool === 'LoanDox'
+                    ? 'minmax(520px, 42vw)'
+                    : 'minmax(340px, 380px)'
+              }`,
+          gridTemplateRows: isCompactWorkspace ? 'auto minmax(0, 1fr) auto' : undefined,
         }}
       >
-        <aside style={styles.loanSidebar}>
+        <aside
+          style={{
+            ...styles.loanSidebar,
+            ...(isLoanSidebarCollapsed ? styles.loanSidebarCollapsed : {}),
+            ...(isCompactWorkspace
+              ? {
+                  borderBottom:
+                    '1px solid var(--t-border-color-medium, #ebebeb)',
+                  borderRight: '0',
+                  maxHeight: '58vh',
+                  order: 1,
+                }
+              : {}),
+            ...(isCompactWorkspace && isLoanSidebarCollapsed
+              ? styles.compactHidden
+              : {}),
+            ...(!isCompactWorkspace && isLoanSidebarCollapsed
+              ? styles.compactHidden
+              : {}),
+          }}
+        >
           <div style={styles.sidebarHeader}>
-            <span>Loan Onboarding</span>
-            <span>Record</span>
+            <span style={styles.sidebarTitle}>
+              {isLoanSidebarCollapsed ? 'Loan' : 'Loan Onboarding Record'}
+            </span>
+            <button
+              onClick={() => setIsLoanSidebarCollapsed((current) => !current)}
+              style={styles.sidebarCollapseButton}
+              type="button"
+            >
+              {isLoanSidebarCollapsed ? '>' : '<'}
+            </button>
           </div>
           {loanNavigationGroups.map((group) => (
             <div key={group.group} style={styles.navGroup}>
-              <button
-                onClick={() => toggleNavGroup(group.group)}
-                style={styles.navHeader}
-                type="button"
-              >
-                <span>{group.group}</span>
-                <span style={styles.small}>
-                  {collapsedNavGroups.includes(group.group) ? 'Expand' : 'Collapse'}
-                </span>
-              </button>
+              {!isLoanSidebarCollapsed && (
+                <button
+                  onClick={() => toggleNavGroup(group.group)}
+                  style={styles.navHeader}
+                  type="button"
+                >
+                  <span>{group.group}</span>
+                  <span style={styles.small}>
+                    {collapsedNavGroups.includes(group.group)
+                      ? 'Expand'
+                      : 'Collapse'}
+                  </span>
+                </button>
+              )}
               {!collapsedNavGroups.includes(group.group) &&
                 group.items.map((item) => {
-                  const isComplete = completedWorkspacePages.has(item);
+                  const itemStatus = getWorkspacePageStatus(item);
 
                   return (
                     <button
@@ -3795,19 +4412,26 @@ export const BrokerAppWorkspace = () => {
                         width: '100%',
                       }}
                       type="button"
+                      title={item}
                     >
                       <span
-                        aria-label={isComplete ? 'complete' : 'incomplete'}
+                        aria-label={itemStatus}
                         style={{
                           ...styles.navStatus,
-                          ...(isComplete
+                          ...(itemStatus === 'complete'
                             ? styles.navStatusComplete
-                            : styles.navStatusIncomplete),
+                            : itemStatus === 'incomplete'
+                              ? styles.navStatusIncomplete
+                              : styles.navStatusNeutral),
                         }}
                       >
-                        {isComplete ? '✓' : 'x'}
+                        {itemStatus === 'complete'
+                          ? '✓'
+                          : itemStatus === 'incomplete'
+                            ? 'x'
+                            : '-'}
                       </span>
-                      <span>{item}</span>
+                      {!isLoanSidebarCollapsed && <span>{item}</span>}
                     </button>
                   );
                 })}
@@ -3815,16 +4439,123 @@ export const BrokerAppWorkspace = () => {
           ))}
         </aside>
 
-        <main style={styles.loanMain}>
-          <div style={styles.warningBar}>
-            <span>Credit Guide & Privacy Consent is required</span>
+        <main
+          style={{
+            ...styles.loanMain,
+            ...(isCompactWorkspace ? { order: 2 } : {}),
+          }}
+        >
+          <section
+            style={{
+              ...styles.compactWorkspaceNav,
+              ...(isCompactWorkspace
+                ? {}
+                : {
+                    gridTemplateColumns:
+                      'minmax(180px, 240px) minmax(220px, 320px) minmax(280px, 1fr) auto',
+                    margin: '16px 20px 0',
+                  }),
+            }}
+          >
+              <div
+                style={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  gap: '8px',
+                  justifyContent: 'space-between',
+                  minWidth: 0,
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <strong>{activePage.title}</strong>
+                  <div style={styles.small}>{activePage.group}</div>
+                </div>
+                <span
+                  aria-label={getWorkspacePageStatus(activePageName)}
+                  style={{
+                    ...styles.navStatus,
+                    ...(getWorkspacePageStatus(activePageName) === 'complete'
+                      ? styles.navStatusComplete
+                      : getWorkspacePageStatus(activePageName) === 'incomplete'
+                        ? styles.navStatusIncomplete
+                        : styles.navStatusNeutral),
+                  }}
+                >
+                  {getWorkspacePageStatus(activePageName) === 'complete'
+                    ? '✓'
+                    : getWorkspacePageStatus(activePageName) === 'incomplete'
+                      ? 'x'
+                      : '-'}
+                </span>
+              </div>
+              <select
+                aria-label="Loan workspace section"
+                onChange={(event) => openWorkspacePage(event.currentTarget.value)}
+                onInput={(event) => openWorkspacePage(event.currentTarget.value)}
+                style={styles.input}
+                value={activePageName}
+              >
+                {workspacePageOptions.map((option) => (
+                  <option key={option.name} value={option.name}>
+                    {option.group} / {option.name}
+                  </option>
+                ))}
+              </select>
+              <div aria-label="Loan workspace page shortcuts" style={styles.pageChipBar}>
+                {workspacePageOptions.map((option) => (
+                  <a
+                    aria-label={`Open ${option.name}`}
+                    href={`${brokerAppPageHashPrefix}${encodeURIComponent(
+                      option.name,
+                    )}`}
+                    key={option.name}
+                    onClick={() => openWorkspacePage(option.name)}
+                    style={{
+                      ...styles.pageChipButton,
+                      ...(activePageName === option.name
+                        ? styles.pageChipButtonActive
+                        : {}),
+                    }}
+                  >
+                    {option.name}
+                  </a>
+                ))}
+              </div>
+              <button
+                onClick={() => setIsLoanSidebarCollapsed(false)}
+                style={styles.subtleButton}
+                type="button"
+              >
+                Show all sections
+              </button>
+          </section>
+          <div
+            style={{
+              ...styles.warningBar,
+              ...(isCompactWorkspace
+                ? { gridTemplateColumns: 'minmax(0, 1fr)', margin: '12px 12px 0' }
+                : {}),
+            }}
+          >
+            <span>
+              <strong>Credit Guide & Privacy Consent is required.</strong>{' '}
+              Client-facing steps stay locked until all required applicants
+              acknowledge the guide or a broker records an approved exception.
+            </span>
             <span>
               <button style={styles.iconButton}>Not Required</button>{' '}
               <button style={styles.newButton}>Get Started</button>
             </span>
           </div>
 
-          <div style={styles.loanTopbar}>
+          <div
+            style={{
+              ...styles.loanTopbar,
+              ...(isCompactWorkspace
+                ? { gridTemplateColumns: 'minmax(0, 1fr)', margin: '12px 12px 0' }
+                : {}),
+            }}
+          >
             <div style={styles.titleBlock}>
               <h1 style={styles.title}>{activePage.title}</h1>
               <div style={styles.small}>
@@ -3833,12 +4564,28 @@ export const BrokerAppWorkspace = () => {
                 once lodgement credentials are approved
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div
+              style={{
+                alignItems: 'center',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
+                justifyContent: isCompactWorkspace ? 'flex-start' : 'flex-end',
+              }}
+            >
               <select
                 onChange={(event) =>
                   void moveOpportunityToStage(event.currentTarget.value)
                 }
-                style={styles.stageSelect}
+                onInput={(event) =>
+                  void moveOpportunityToStage(event.currentTarget.value)
+                }
+                style={{
+                  ...styles.stageSelect,
+                  ...(isCompactWorkspace
+                    ? { minWidth: 0, width: '100%' }
+                    : {}),
+                }}
                 value={loanStageValue}
               >
                 <optgroup label="Lead board">
@@ -3871,10 +4618,22 @@ export const BrokerAppWorkspace = () => {
             </div>
           </div>
 
-          <div style={styles.workspaceContent}>
+          <div
+            style={{
+              ...styles.workspaceContent,
+              ...(isCompactWorkspace ? { padding: '12px', gap: '16px' } : {}),
+            }}
+          >
             {renderWorkspacePage()}
 
-            <section style={styles.panelGrid}>
+            <section
+              style={{
+                ...styles.panelGrid,
+                ...(isCompactWorkspace
+                  ? { gridTemplateColumns: 'minmax(0, 1fr)' }
+                  : {}),
+              }}
+            >
               <div style={styles.panel}>
                 <strong>Client Fact Find</strong>
                 <p style={styles.small}>
@@ -3911,6 +4670,15 @@ export const BrokerAppWorkspace = () => {
           style={{
             ...styles.toolShell,
             ...(isToolboxCollapsed ? styles.toolShellCollapsed : {}),
+            ...(isCompactWorkspace
+              ? {
+                  borderLeft: '0',
+                  borderTop:
+                    '1px solid var(--t-border-color-medium, #ebebeb)',
+                  maxHeight: isToolboxCollapsed ? 'auto' : '70vh',
+                  order: 3,
+                }
+              : {}),
           }}
         >
           <div style={styles.darkToolRail}>
@@ -3981,17 +4749,8 @@ export const BrokerAppWorkspace = () => {
           )}
         </aside>
       </div>
-        </div>
-      </section>
-    </div>
-  ) : (
-    <button
-      onClick={() => setIsWorkspaceOpen(true)}
-      style={styles.reopenButton}
-      type="button"
-    >
-      Open BrokerApp Loan Workspace
-    </button>
+      </div>
+    </section>
   );
 
   return workspaceElement;
