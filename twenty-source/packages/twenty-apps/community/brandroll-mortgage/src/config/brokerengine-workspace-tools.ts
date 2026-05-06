@@ -224,6 +224,33 @@ export const brokerEngineDealWorkspaceTools = [
   {
     workspaceArea: 'RIGHT_RAIL',
     position: 70,
+    toolName: 'ClientDash',
+    toolType: 'DRAWER',
+    recordOwner:
+      'Client portal sessions, client portal tasks, applicant consent, fact-find, KYC/CDD and LoanDox upload tasks',
+    shownInsideDeal: true,
+  },
+  {
+    workspaceArea: 'RIGHT_RAIL',
+    position: 80,
+    toolName: 'PolicySpace',
+    toolType: 'DRAWER',
+    recordOwner:
+      'Lender policy references, policy research runs, RAG source references and BDM question drafts',
+    shownInsideDeal: true,
+  },
+  {
+    workspaceArea: 'RIGHT_RAIL',
+    position: 90,
+    toolName: 'CreditDash',
+    toolType: 'DRAWER',
+    recordOwner:
+      'BDM-facing review portal scaffold for accepted supporting documents and policy questions',
+    shownInsideDeal: true,
+  },
+  {
+    workspaceArea: 'RIGHT_RAIL',
+    position: 100,
     toolName: 'Key Dates',
     toolType: 'DRAWER',
     recordOwner: 'Opportunity dates and mortgage application dates',
@@ -231,7 +258,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 80,
+    position: 110,
     toolName: 'Reports',
     toolType: 'DRAWER',
     recordOwner: 'Broker templates and document generation',
@@ -239,7 +266,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 90,
+    position: 120,
     toolName: '1-Click Workflows',
     toolType: 'DRAWER',
     recordOwner: 'Workflow templates',
@@ -247,7 +274,7 @@ export const brokerEngineDealWorkspaceTools = [
   },
   {
     workspaceArea: 'RIGHT_RAIL',
-    position: 100,
+    position: 130,
     toolName: 'Client Portal',
     toolType: 'DRAWER',
     recordOwner: 'Client portal sessions and portal tasks',

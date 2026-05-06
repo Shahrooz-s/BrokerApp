@@ -120,5 +120,73 @@ export default defineObject({
       label: 'AFG/BrokerEngine mapping notes',
       icon: 'IconRoute',
     },
+    {
+      universalIdentifier: '6b6d0000-2c20-4000-8000-000000000013',
+      type: FieldType.TEXT,
+      name: 'ragSourceReference',
+      label: 'RAG source reference',
+      icon: 'IconDatabaseSearch',
+      description:
+        'Paperless-ngx, Dify, RAGFlow, or approved lender-policy source reference used by PolicySpace.',
+    },
+    {
+      universalIdentifier: '6b6d0000-2c20-4000-8000-000000000014',
+      type: FieldType.SELECT,
+      name: 'ragIndexStatus',
+      label: 'RAG index status',
+      icon: 'IconProgressCheck',
+      options: [
+        { value: 'NOT_INDEXED', label: 'Not indexed', position: 0, color: 'gray' },
+        { value: 'QUEUED', label: 'Queued', position: 1, color: 'yellow' },
+        { value: 'INDEXED', label: 'Indexed', position: 2, color: 'green' },
+        { value: 'STALE', label: 'Stale', position: 3, color: 'orange' },
+        { value: 'ERROR', label: 'Error', position: 4, color: 'red' },
+      ],
+    },
+    {
+      universalIdentifier: '6b6d0000-2c20-4000-8000-000000000015',
+      type: FieldType.SELECT,
+      name: 'ragProvider',
+      label: 'RAG provider',
+      icon: 'IconBrain',
+      options: [
+        { value: 'NONE', label: 'None', position: 0, color: 'gray' },
+        { value: 'DIFY', label: 'Dify', position: 1, color: 'blue' },
+        { value: 'RAGFLOW', label: 'RAGFlow', position: 2, color: 'purple' },
+        { value: 'OLLAMA', label: 'Ollama', position: 3, color: 'green' },
+        { value: 'OTHER', label: 'Other', position: 4, color: 'gray' },
+      ],
+    },
+    {
+      universalIdentifier: '6b6d0000-2c20-4000-8000-000000000016',
+      type: FieldType.TEXT,
+      name: 'documentChecklistScenario',
+      label: 'Document checklist scenario',
+      icon: 'IconChecklist',
+      description:
+        'Scenario tag used by LoanDox and CreditDash to decide which evidence should be requested or shown.',
+    },
+    {
+      universalIdentifier: '6b6d0000-2c20-4000-8000-000000000017',
+      type: FieldType.TEXT,
+      name: 'bdmQuestionTemplate',
+      label: 'BDM question template',
+      icon: 'IconMailQuestion',
+      description:
+        'Broker-approved prompt/template for drafting lender BDM policy questions. Sending remains disabled until approved.',
+    },
+    {
+      universalIdentifier: '6b6d0000-2c20-4000-8000-000000000018',
+      type: FieldType.SELECT,
+      name: 'policyAccessLevel',
+      label: 'Policy access level',
+      icon: 'IconShieldLock',
+      options: [
+        { value: 'INTERNAL', label: 'Internal', position: 0, color: 'gray' },
+        { value: 'BROKER_VISIBLE', label: 'Broker visible', position: 1, color: 'blue' },
+        { value: 'CREDITDASH_VISIBLE', label: 'CreditDash visible', position: 2, color: 'green' },
+        { value: 'ARCHIVED', label: 'Archived', position: 3, color: 'gray' },
+      ],
+    },
   ],
 });

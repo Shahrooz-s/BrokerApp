@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { CoreApiClient } from 'twenty-client-sdk/core';
@@ -130,10 +135,64 @@ const rightRailTools = [
   'Texts',
   'LoanDox',
   'ClientDash',
+  'PolicySpace',
+  'CreditDash',
   'Key Dates',
   'Reports',
   '1-Click Workflows',
 ];
+
+const defaultActiveRightRailTool = 'LoanDox';
+const loanWorkspaceLayoutStorageKey = 'brokerapp.loanWorkspace.layout.v1';
+const defaultLoanSidebarWidth = 260;
+const defaultToolWorkspaceWidth = 430;
+const minLoanSidebarWidth = 220;
+const maxLoanSidebarWidth = 340;
+const minToolWorkspaceWidth = 360;
+const maxToolWorkspaceWidth = 620;
+const collapsedLoanSidebarWidth = 64;
+const collapsedToolWorkspaceWidth = 56;
+
+type LayoutResizePane = 'loan-sidebar' | 'tool-workspace';
+
+type LoanWorkspaceLayoutPreference = {
+  activeTool?: string;
+  isLoanSidebarCollapsed?: boolean;
+  isToolboxCollapsed?: boolean;
+  loanSidebarWidth?: number;
+  toolWorkspaceWidth?: number;
+};
+
+const clampNumber = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+const getStoredLoanWorkspaceLayout = (): LoanWorkspaceLayoutPreference => {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const storedPreference = window.localStorage.getItem(
+      loanWorkspaceLayoutStorageKey,
+    );
+
+    if (!storedPreference) {
+      return {};
+    }
+
+    return JSON.parse(storedPreference) as LoanWorkspaceLayoutPreference;
+  } catch {
+    return {};
+  }
+};
+
+const getInitialRightRailTool = () => {
+  const storedTool = getStoredLoanWorkspaceLayout().activeTool;
+
+  return storedTool && rightRailTools.includes(storedTool)
+    ? storedTool
+    : defaultActiveRightRailTool;
+};
 
 const rightRailToolIconPaths: Record<string, string[]> = {
   Notes: [
@@ -171,6 +230,19 @@ const rightRailToolIconPaths: Record<string, string[]> = {
   ClientDash: [
     'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
     'M4 21a8 8 0 0 1 16 0',
+  ],
+  PolicySpace: [
+    'M5 4h10a4 4 0 0 1 4 4v12H7a2 2 0 0 1-2-2V4z',
+    'M8 8h7',
+    'M8 12h8',
+    'M8 16h5',
+  ],
+  CreditDash: [
+    'M4 5h16v14H4V5z',
+    'M8 9h8',
+    'M8 13h4',
+    'M14 13h2',
+    'M8 17h8',
   ],
   'Key Dates': [
     'M6 5h12v14H6V5z',
@@ -1476,11 +1548,13 @@ const styles = {
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
     height: 'auto',
     left: 'var(--navigation-drawer-width, 72px)',
-    minHeight: 'calc(100vh - 120px)',
+    minHeight: 'calc(100vh - 48px)',
     overflow: 'hidden',
     position: 'fixed' as const,
     right: 0,
     top: '48px',
+    transition:
+      'left 140ms ease, width 140ms ease, transform 140ms ease',
     width: '100%',
     zIndex: 30,
   },
@@ -1945,11 +2019,36 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(280px, 320px) minmax(0, 1fr) 56px',
+    gridTemplateColumns: '260px 8px minmax(0, 1fr) 8px 430px',
     height: '100%',
     minHeight: '100%',
     minWidth: 0,
     overflow: 'hidden',
+    transition: 'grid-template-columns 140ms ease',
+  },
+  resizeHandle: {
+    alignItems: 'stretch',
+    background: 'var(--t-background-secondary, #fafafa)',
+    border: '0',
+    cursor: 'col-resize',
+    display: 'flex',
+    justifyContent: 'center',
+    minHeight: '100%',
+    padding: 0,
+    position: 'relative' as const,
+    width: '8px',
+  },
+  resizeHandleHidden: {
+    display: 'none',
+  },
+  resizeHandleActive: {
+    background: 'var(--t-accent-quaternary, #f7f8ff)',
+  },
+  resizeHandleGrip: {
+    background: 'var(--t-border-color-medium, #ebebeb)',
+    borderRadius: '999px',
+    height: '100%',
+    width: '1px',
   },
   toolDrawerPanel: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -2129,10 +2228,11 @@ const styles = {
     background: 'var(--t-background-primary, #ffffff)',
     borderLeft: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'grid',
-    gridTemplateColumns: '152px minmax(0, 1fr)',
+    gridTemplateColumns: '136px minmax(0, 1fr)',
     maxHeight: '100%',
     minHeight: 0,
     minWidth: 0,
+    transition: 'grid-template-columns 140ms ease',
   },
   toolShellCollapsed: {
     gridTemplateColumns: '56px 0px',
@@ -2663,9 +2763,31 @@ const styles = {
 export const BrokerAppWorkspace = () => {
   const opportunityRecordId = useRecordId();
   const [activePageName, setActivePageName] = useState('LoanDash');
-  const [activeTool, setActiveTool] = useState(rightRailTools[0]);
-  const [isLoanSidebarCollapsed, setIsLoanSidebarCollapsed] = useState(true);
-  const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(true);
+  const [activeTool, setActiveTool] = useState(getInitialRightRailTool);
+  const [isLoanSidebarCollapsed, setIsLoanSidebarCollapsed] = useState(
+    () => getStoredLoanWorkspaceLayout().isLoanSidebarCollapsed ?? false,
+  );
+  const [isToolboxCollapsed, setIsToolboxCollapsed] = useState(
+    () => getStoredLoanWorkspaceLayout().isToolboxCollapsed ?? false,
+  );
+  const [loanSidebarWidth, setLoanSidebarWidth] = useState(() =>
+    clampNumber(
+      getStoredLoanWorkspaceLayout().loanSidebarWidth ??
+        defaultLoanSidebarWidth,
+      minLoanSidebarWidth,
+      maxLoanSidebarWidth,
+    ),
+  );
+  const [toolWorkspaceWidth, setToolWorkspaceWidth] = useState(() =>
+    clampNumber(
+      getStoredLoanWorkspaceLayout().toolWorkspaceWidth ??
+        defaultToolWorkspaceWidth,
+      minToolWorkspaceWidth,
+      maxToolWorkspaceWidth,
+    ),
+  );
+  const [activeResizePane, setActiveResizePane] =
+    useState<LayoutResizePane | null>(null);
   const [viewportWidth, setViewportWidth] = useState(
     typeof window === 'undefined' ? 1280 : window.innerWidth,
   );
@@ -2710,15 +2832,26 @@ export const BrokerAppWorkspace = () => {
   const [lastWorkflowName, setLastWorkflowName] = useState(
     'Outstanding Supporting Documents',
   );
+  const workspaceRootRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
     const previousNavigationWidth = root.style.getPropertyValue(
       '--navigation-drawer-width',
     );
-    root.style.setProperty('--navigation-drawer-width', '72px');
+    const previousWorkspaceOpen =
+      root.dataset.brokerappLoanWorkspaceOpen ?? '';
+
+    root.dataset.brokerappLoanWorkspaceOpen = 'true';
+    root.style.setProperty('--navigation-drawer-width', '56px');
 
     return () => {
+      if (previousWorkspaceOpen) {
+        root.dataset.brokerappLoanWorkspaceOpen = previousWorkspaceOpen;
+      } else {
+        delete root.dataset.brokerappLoanWorkspaceOpen;
+      }
+
       if (previousNavigationWidth) {
         root.style.setProperty(
           '--navigation-drawer-width',
@@ -2729,6 +2862,29 @@ export const BrokerAppWorkspace = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(
+      loanWorkspaceLayoutStorageKey,
+      JSON.stringify({
+        activeTool,
+        isLoanSidebarCollapsed,
+        isToolboxCollapsed,
+        loanSidebarWidth,
+        toolWorkspaceWidth,
+      } satisfies LoanWorkspaceLayoutPreference),
+    );
+  }, [
+    activeTool,
+    isLoanSidebarCollapsed,
+    isToolboxCollapsed,
+    loanSidebarWidth,
+    toolWorkspaceWidth,
+  ]);
 
   useEffect(() => {
     const updateViewportWidth = () => setViewportWidth(window.innerWidth);
@@ -2763,9 +2919,11 @@ export const BrokerAppWorkspace = () => {
   }, []);
 
   useEffect(() => {
-    const root = document.querySelector<HTMLElement>(
-      '[data-brokerapp-loan-workspace="true"]',
-    );
+    const root =
+      workspaceRootRef.current ??
+      document.querySelector<HTMLElement>(
+        '[data-brokerapp-loan-workspace="true"]',
+      );
 
     if (!root) {
       return;
@@ -2973,6 +3131,62 @@ export const BrokerAppWorkspace = () => {
     });
   };
 
+  const startPanelResize = (
+    pane: LayoutResizePane,
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) => {
+    if (isCompactWorkspace) {
+      return;
+    }
+
+    event.preventDefault();
+    const workspaceRect = workspaceRootRef.current?.getBoundingClientRect();
+
+    if (!workspaceRect) {
+      return;
+    }
+
+    const previousCursor = document.body.style.cursor;
+    const previousUserSelect = document.body.style.userSelect;
+
+    setActiveResizePane(pane);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (pane === 'loan-sidebar') {
+        setLoanSidebarWidth(
+          clampNumber(
+            moveEvent.clientX - workspaceRect.left,
+            minLoanSidebarWidth,
+            maxLoanSidebarWidth,
+          ),
+        );
+        return;
+      }
+
+      setToolWorkspaceWidth(
+        clampNumber(
+          workspaceRect.right - moveEvent.clientX,
+          minToolWorkspaceWidth,
+          maxToolWorkspaceWidth,
+        ),
+      );
+    };
+
+    const stopResize = () => {
+      setActiveResizePane(null);
+      document.body.style.cursor = previousCursor;
+      document.body.style.userSelect = previousUserSelect;
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointercancel', stopResize);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', stopResize, { once: true });
+    window.addEventListener('pointercancel', stopResize, { once: true });
+  };
+
   const visibleTasks = generatedTasks.filter((task) =>
     taskFilter === 'Completed'
       ? task.status === 'Completed'
@@ -3003,6 +3217,34 @@ export const BrokerAppWorkspace = () => {
       ? 'Applicant name not added'
       : `Applicant ${index + 1} name not added`;
   };
+  const getApplicantMobileNumber = (role: string) => {
+    const mobileLabels = [
+      'Mobile Phone #',
+      'Mobile',
+      'Mobile Number',
+      'Phone',
+      'National number',
+    ];
+
+    for (const label of mobileLabels) {
+      const value = String(factFindAnswers[`Applicants:${role}:${label}`] ?? '')
+        .trim();
+
+      if (value) {
+        return value;
+      }
+    }
+
+    return '';
+  };
+  const applicantContactOptions = applicantRoles.map((role, index) => ({
+    displayName: getApplicantDisplayName(role, index),
+    mobile: getApplicantMobileNumber(role),
+    role,
+  }));
+  const suggestedSmsRecipient =
+    applicantContactOptions.find(({ mobile }) => mobile)?.mobile ??
+    '+61 400 000 000';
   const activePage = workspacePages[activePageName] ?? workspacePages.LoanDash;
   const activeStageOption =
     boardStageOptions.find((option) => option.value === loanStageValue) ??
@@ -3011,7 +3253,7 @@ export const BrokerAppWorkspace = () => {
     loanBoard === 'Deal' ? dealWorkflowStageOptions : leadWorkflowStageOptions;
   const loanWorkspaceContext = `${activePage.group} workspace`;
   const workspaceLeftOffset =
-    viewportWidth < 760 ? '0px' : 'var(--navigation-drawer-width, 72px)';
+    viewportWidth < 760 ? '0px' : 'var(--navigation-drawer-width, 56px)';
   const clientDashPortalUrl =
     typeof window === 'undefined'
       ? `/clientdash/${opportunityRecordId ?? 'preview'}`
@@ -3137,6 +3379,21 @@ export const BrokerAppWorkspace = () => {
       // target page is open.
     }
     setActivePageName(pageName);
+
+    if (
+      typeof window !== 'undefined' &&
+      workspacePages[pageName] &&
+      window.location.hash !==
+        `${brokerAppPageHashPrefix}${encodeURIComponent(pageName)}`
+    ) {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}${brokerAppPageHashPrefix}${encodeURIComponent(
+          pageName,
+        )}`,
+      );
+    }
   };
 
   const toggleNavGroup = (groupName: string) => {
@@ -4321,13 +4578,33 @@ export const BrokerAppWorkspace = () => {
               {activeTool === 'Emails' ? 'Send Email' : 'Send Text'}
             </strong>
             <div style={{ ...styles.sectionList, marginTop: '10px' }}>
+              {activeTool === 'Texts' && (
+                <select
+                  aria-label="Suggested applicant mobile number"
+                  style={styles.input}
+                  defaultValue={suggestedSmsRecipient}
+                >
+                  {applicantContactOptions
+                    .filter(({ mobile }) => mobile)
+                    .map(({ displayName, mobile, role }) => (
+                      <option key={role} value={mobile}>
+                        {displayName} · {role} · {mobile}
+                      </option>
+                    ))}
+                  {!applicantContactOptions.some(({ mobile }) => mobile) && (
+                    <option value="+61 400 000 000">
+                      No applicant mobile recorded yet
+                    </option>
+                  )}
+                </select>
+              )}
               <input
                 readOnly
                 style={styles.search}
                 value={
                   activeTool === 'Emails'
                     ? 'alex.morgan@example.com'
-                    : '+61 400 000 000'
+                    : suggestedSmsRecipient
                 }
               />
               <textarea
@@ -4358,6 +4635,34 @@ export const BrokerAppWorkspace = () => {
               statement collection, credit check preparation and future AI
               document review. Provider actions stay disabled until approved in
               Broker Settings.
+            </p>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Paperless-ngx document backend</strong>
+            <div style={{ ...styles.sectionList, marginTop: '12px' }}>
+              <div style={styles.rowButton}>
+                <span>Provider</span>
+                <strong style={styles.statusBlock}>Not configured</strong>
+              </div>
+              <div style={styles.rowButton}>
+                <span>Storage rule</span>
+                <strong>Reference only</strong>
+              </div>
+              <div style={styles.rowButton}>
+                <span>OCR status</span>
+                <strong style={styles.statusWarn}>Gated</strong>
+              </div>
+              <div style={styles.rowButton}>
+                <span>AI review</span>
+                <strong style={styles.statusBlock}>Disabled</strong>
+              </div>
+            </div>
+            <p style={styles.small}>
+              ClientDash uploads and broker imports should be stored/OCR&apos;d
+              in Paperless-ngx once credentials are enabled. BrokerApp stores
+              metadata, tags, OCR status, review result and the external
+              document reference only.
             </p>
           </section>
 
@@ -4611,6 +4916,152 @@ export const BrokerAppWorkspace = () => {
       );
     }
 
+    if (activeTool === 'PolicySpace') {
+      return (
+        <div style={styles.toolDrawerBody}>
+          <section style={styles.panel}>
+            <strong>PolicySpace</strong>
+            <p style={styles.small}>
+              Broker-side lender policy research workspace. It links lender
+              policy records, product rules, document checklists, serviceability
+              notes and BDM contacts, while RAG and email sending remain
+              Master-Admin gated.
+            </p>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Research question</strong>
+            <div style={{ ...styles.formGrid, padding: '12px 0 0' }}>
+              <label style={styles.fieldShell}>
+                <span style={styles.label}>Selected lender</span>
+                <select style={styles.input} defaultValue="">
+                  <option value="">Select lender</option>
+                  <option>ANZ</option>
+                  <option>Westpac</option>
+                  <option>NAB</option>
+                  <option>CBA</option>
+                  <option>AFG Panel</option>
+                </select>
+              </label>
+              <label style={styles.fieldShell}>
+                <span style={styles.label}>Policy category</span>
+                <select style={styles.input} defaultValue="DOCUMENTS">
+                  <option value="EMPLOYMENT">Employment</option>
+                  <option value="INCOME">Income</option>
+                  <option value="SECURITY">Security/property</option>
+                  <option value="LVR">LVR</option>
+                  <option value="DOCUMENTS">Documents</option>
+                  <option value="EXCEPTION">Exception policy</option>
+                </select>
+              </label>
+            </div>
+            <label style={{ ...styles.fieldShell, marginTop: '12px' }}>
+              <span style={styles.label}>Scenario / lender question</span>
+              <textarea
+                readOnly
+                style={styles.textArea}
+                value="Example: confirm required evidence for self-employed income, current security type, and whether an exception is required before submission."
+              />
+            </label>
+            <div style={styles.actionBar}>
+              <button
+                onClick={() =>
+                  void handleWorkspaceAction('Draft BDM policy question')
+                }
+                style={styles.newButton}
+                type="button"
+              >
+                Draft BDM question
+              </button>
+              <button
+                onClick={() => void handleWorkspaceAction('Run policy RAG')}
+                style={styles.subtleButton}
+                type="button"
+              >
+                Run RAG check
+              </button>
+            </div>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Provider gates</strong>
+            <div style={{ ...styles.sectionList, marginTop: '12px' }}>
+              {[
+                ['Dify / RAGFlow', 'Disabled'],
+                ['Ollama local model', 'Disabled'],
+                ['Activepieces workflow', 'Disabled'],
+                ['BDM email sending', 'Approval required'],
+              ].map(([label, status]) => (
+                <div key={label} style={styles.rowButton}>
+                  <span>{label}</span>
+                  <strong style={styles.statusBlock}>{status}</strong>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    if (activeTool === 'CreditDash') {
+      return (
+        <div style={styles.toolDrawerBody}>
+          <section style={styles.panel}>
+            <strong>CreditDash</strong>
+            <p style={styles.small}>
+              Lender/BDM-facing review portal scaffold for supporting documents
+              and policy questions only. It must never expose broker-only notes,
+              AML suspicion, internal risk scores or compliance escalations.
+            </p>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Review pack</strong>
+            <div style={{ ...styles.clientStepGrid, marginTop: '12px' }}>
+              {[
+                ['Scenario summary', 'Broker-approved summary only'],
+                ['Supporting documents', 'LoanDox accepted references'],
+                ['Policy questions', 'PolicySpace BDM drafts'],
+                ['Broker attestation', 'Manual approval required'],
+              ].map(([title, description]) => (
+                <div key={title} style={styles.clientStepCard}>
+                  <strong>{title}</strong>
+                  <p style={styles.small}>{description}</p>
+                </div>
+              ))}
+            </div>
+            <div style={styles.actionBar}>
+              <button
+                onClick={() =>
+                  void handleWorkspaceAction('Create CreditDash review pack')
+                }
+                style={styles.newButton}
+                type="button"
+              >
+                Create review pack
+              </button>
+              <button
+                disabled
+                style={{ ...styles.subtleButton, ...styles.disabledButton }}
+                type="button"
+              >
+                Share with BDM
+              </button>
+            </div>
+          </section>
+
+          <section style={styles.validationPanel}>
+            <strong>CreditDash gate</strong>
+            <p style={styles.small}>
+              Sharing is disabled until Master Admin enables lender portal
+              access, broker approval, document visibility rules and email
+              credentials.
+            </p>
+          </section>
+        </div>
+      );
+    }
+
     if (activeTool === 'Key Dates') {
       return (
         <div style={styles.toolDrawerBody}>
@@ -4707,10 +5158,25 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
+  const loanSidebarGridWidth = isLoanSidebarCollapsed
+    ? collapsedLoanSidebarWidth
+    : loanSidebarWidth;
+  const toolWorkspaceGridWidth = isToolboxCollapsed
+    ? collapsedToolWorkspaceWidth
+    : toolWorkspaceWidth;
+  const opportunityGridColumns = isCompactWorkspace
+    ? 'minmax(0, 1fr)'
+    : `${loanSidebarGridWidth}px ${
+        isLoanSidebarCollapsed ? '0px' : '8px'
+      } minmax(0, 1fr) ${
+        isToolboxCollapsed ? '0px' : '8px'
+      } ${toolWorkspaceGridWidth}px`;
+
   const workspaceElement = (
     <section
       aria-label="BrokerApp loan workspace"
       data-brokerapp-loan-workspace="true"
+      ref={workspaceRootRef}
       style={{
         ...styles.workspaceInline,
         left: workspaceLeftOffset,
@@ -4723,19 +5189,7 @@ export const BrokerAppWorkspace = () => {
       <div
         style={{
           ...styles.opportunityShell,
-          gridTemplateColumns: isCompactWorkspace
-            ? 'minmax(0, 1fr)'
-            : `${
-                isLoanSidebarCollapsed ? '64px' : 'minmax(280px, 320px)'
-              } minmax(0, 1fr) ${
-                isToolboxCollapsed
-                  ? '56px'
-                  : activeTool === 'LoanDox'
-                    ? 'minmax(460px, 520px)'
-                    : activeTool === 'ClientDash'
-                      ? 'minmax(420px, 480px)'
-                      : 'minmax(380px, 440px)'
-              }`,
+          gridTemplateColumns: opportunityGridColumns,
           gridTemplateRows: isCompactWorkspace ? 'auto minmax(0, 1fr) auto' : undefined,
         }}
       >
@@ -4843,6 +5297,23 @@ export const BrokerAppWorkspace = () => {
             ))}
           </div>
         </aside>
+
+        <button
+          aria-label="Resize loan workflow menu"
+          onPointerDown={(event) => startPanelResize('loan-sidebar', event)}
+          style={{
+            ...styles.resizeHandle,
+            ...(isLoanSidebarCollapsed || isCompactWorkspace
+              ? styles.resizeHandleHidden
+              : {}),
+            ...(activeResizePane === 'loan-sidebar'
+              ? styles.resizeHandleActive
+              : {}),
+          }}
+          type="button"
+        >
+          <span style={styles.resizeHandleGrip} />
+        </button>
 
         <main
           style={{
@@ -5060,6 +5531,23 @@ export const BrokerAppWorkspace = () => {
             </section>
           </div>
         </main>
+
+        <button
+          aria-label="Resize loan tools workspace"
+          onPointerDown={(event) => startPanelResize('tool-workspace', event)}
+          style={{
+            ...styles.resizeHandle,
+            ...(isToolboxCollapsed || isCompactWorkspace
+              ? styles.resizeHandleHidden
+              : {}),
+            ...(activeResizePane === 'tool-workspace'
+              ? styles.resizeHandleActive
+              : {}),
+          }}
+          type="button"
+        >
+          <span style={styles.resizeHandleGrip} />
+        </button>
 
         <aside
           aria-label="Loan record tools"

@@ -6,12 +6,13 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.44
+## Included In v0.16.45
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
 - A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table. The record workspace is inline record content, not a popup: no overlay scrim, modal border/shadow, Close button, or reopen button.
 - The Opportunity record workspace remains visible whenever an Opportunity loads. The global Twenty sidebar collapses to the icon rail, and the loan sidebar plus right tool rail can be expanded/collapsed without hiding the loan workflow.
+- The Loan Workspace now uses saved, resizable desktop panels: loan menu default `260px`, right tool workspace default `430px`, collapsed loan menu `64px`, collapsed tools `56px`, and drag handles for broker-controlled sizing. Preferences are stored under `brokerapp.loanWorkspace.layout.v1`.
 - Board handover controls inside LoanDash: moving an Opportunity from Lead to Deal updates the same `brokerWorkflowStage` record field to the first Deal stage so backend staff continue the same loan record without duplication.
 - LoanDash now removes the fake embedded board/pipeline and keeps board movement as a stage/handover control only. Native Lead and Deal boards remain the pipeline entry points.
 - Clickable loan workspace pages for DealDash, Team, Lender, Related Parties, Goals, Applicants, Dependants, Assets, Other Income, Liabilities, Living Expenses, Financial Security, Interview Guide, Security, Funding Position, Products, Smart Docs, BrokerWizard, Lodgement Funding, Credit Proposal, and Submission.
@@ -39,12 +40,16 @@ BrokerApp is designed as a white-labelled Twenty workspace for Australian mortga
 - Page chips are real hash links backed by a hash-change listener, so page switching still works if the embedded front-component click bridge is unreliable.
 - Collapsed loan navigation now leaves the grid entirely instead of reserving a 64px column, keeping the main workspace controls visible in Twenty’s narrow record canvas.
 - LoanDox now appears in the right-hand tool rail as the broker document request workspace with document templates/stacks, active document request cards, review actions, ClientDash step previews, and provider-disabled safety gates.
+- LoanDox now includes Paperless-ngx provider-gated metadata fields and UI status. BrokerApp stores external document references, source, OCR status, AI review status, and visibility flags rather than raw sensitive files.
 - The duplicated native-style Home/Timeline/Tasks/Notes toolbar has been removed from the BrokerApp loan workspace. BrokerApp now keeps loan pages in the left rail and broker tools in a single right-hand rail, matching the direction of Twenty's native record tools.
 - The right-hand tool rail now collapses to icons only and expands to icon + tool name with the active tool drawer beside it. This removes the initials-only tool list that was appearing inside the loan sidebar.
-- LoanDox, ClientDash, Tasks, Key Dates, Reports, Checklists and workflows now share the right-hand tool rail instead of being listed inside the loan navigation.
+- LoanDox, ClientDash, PolicySpace, CreditDash, Tasks, Key Dates, Reports, Checklists and workflows now share the right-hand tool rail instead of being listed inside the loan navigation.
 - The Loan Workspace now breaks out of Twenty's narrow record summary mount point into a fixed inline record workspace below the native header. This keeps LoanDash as the primary work area, hides the awkward duplicated Opportunity name/field chrome from the working canvas, and prevents the broker workflow from being squeezed into the left summary column.
 - ClientDash is now represented as a client-side borrower portal foundation with a portal launch/invite surface, borrower step plan, client visibility rules, applicant confirmation rules, shared-household rules, and linked LoanDox request status.
 - LoanDox rules are now modelled as first-class records and seeded for applicant-targeted document requests, ClientDash locking, and provider/AI action gates.
+- PolicySpace is scaffolded as the broker-side lender policy/RAG research tool, with lender policy RAG fields, policy research run records, and BDM question drafts. RAGFlow/Dify/Ollama/Activepieces and email sending remain Master-Admin gated.
+- CreditDash is scaffolded as a lender/BDM-facing review portal for accepted supporting documents and policy questions only, with sharing disabled until lender portal access, broker approval, document visibility rules, and email credentials are configured.
+- Party relationships are modelled as first-class records for applicants, companies, trusts, trustees, unit trusts, unit holders, directors, shareholders, guarantors, borrowers, beneficiaries, BDMs and related parties.
 - ABN Lookup is scaffolded for self-employed, sole trader, company and trust applicant fields. The official ABN Lookup provider remains disabled until an authentication GUID is configured in private settings.
 - Compact workflow-stage chips inside LoanDash so the current Lead/Deal stage remains visible without reintroducing a duplicate embedded pipeline board.
 - BrokerEngine-style lead and deal stage references with empty stages collapsed by default and clickable collapsed stages that expand inline.
