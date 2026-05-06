@@ -2819,9 +2819,7 @@ export const BrokerAppWorkspace = () => {
     firstDealStage;
   const visibleWorkflowStages =
     loanBoard === 'Deal' ? dealWorkflowStageOptions : leadWorkflowStageOptions;
-  const loanTitle = opportunityRecordId
-    ? `Opportunity ${opportunityRecordId.slice(0, 8)}`
-    : 'Opened Opportunity';
+  const loanWorkspaceContext = `${activePage.group} workspace`;
   const isCompactWorkspace = viewportWidth < 920 || workspaceWidth < 780;
   const cleanFieldLabel = (label: string) => label.replace(/^\*/, '').trim();
   const isAnswerFilled = (value: FactFindAnswerValue | undefined) =>
@@ -4781,9 +4779,8 @@ export const BrokerAppWorkspace = () => {
             <div style={styles.titleBlock}>
               <h1 style={styles.title}>{activePage.title}</h1>
               <div style={styles.small}>
-                {loanTitle} · {activePage.group} · Opened inside native Twenty
-                Opportunity · Residential consumer home loan · ApplyOnline-ready
-                once lodgement credentials are approved
+                {loanWorkspaceContext} · Residential consumer home loan ·
+                ApplyOnline-ready once lodgement credentials are approved
               </div>
             </div>
             <div
