@@ -6,7 +6,7 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.38
+## Included In v0.16.39
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
@@ -39,6 +39,10 @@ BrokerApp is designed as a white-labelled Twenty workspace for Australian mortga
 - Page chips are real hash links backed by a hash-change listener, so page switching still works if the embedded front-component click bridge is unreliable.
 - Collapsed loan navigation now leaves the grid entirely instead of reserving a 64px column, keeping the main workspace controls visible in Twenty’s narrow record canvas.
 - LoanDox now appears in the right rail as the broker document request workspace with document templates/stacks, active document request cards, review actions, ClientDash step previews, and provider-disabled safety gates.
+- The duplicated native-style Home/Timeline/Tasks/Notes toolbar has been removed from the BrokerApp loan workspace. The workspace now has one compact BrokerApp control bar that can hide its shortcuts, open LoanDox/ClientDash, and collapse the right tools.
+- The right tool rail now fully collapses out of the grid instead of leaving a duplicate icon strip. LoanDox, ClientDash, Tasks, and Key Dates can be reopened from the compact workspace bar.
+- ClientDash is now a separate right-rail tool with borrower portal steps, client visibility rules, applicant confirmation rules, shared-household rules, and linked LoanDox request status.
+- LoanDox rules are now modelled as first-class records and seeded for applicant-targeted document requests, ClientDash locking, and provider/AI action gates.
 - ABN Lookup is scaffolded for self-employed, sole trader, company and trust applicant fields. The official ABN Lookup provider remains disabled until an authentication GUID is configured in private settings.
 - Compact workflow-stage chips inside LoanDash so the current Lead/Deal stage remains visible without reintroducing a duplicate embedded pipeline board.
 - BrokerEngine-style lead and deal stage references with empty stages collapsed by default and clickable collapsed stages that expand inline.

@@ -32,7 +32,11 @@ The live pilot now prioritises broker-facing workflow:
 - Applicant fact-find panes stay mounted while tabs switch visibility, so Primary Applicant and co-applicant fields retain separate values during tab changes.
 - Current and previous address history includes broker-style address parts such as Street Number, Street Name, Street Type, Street Suffix, Suburb, State, Postcode and Country.
 - The workspace autosaves field changes back to the Opportunity `loanDashSummary`, `factFindStatus`, and `nextBrokerAction` fields, with manual Save still available for explicit broker confirmation.
-- LoanDox is available in the right tool rail as the broker document request workspace. It shows document templates/stacks, active applicant-specific requests, ClientDash steps, provider gates, and review/history placeholders while CashDeck, Basiq, Equifax, IDV and AI document review remain disabled until approved.
+- The duplicate native-style Home/Timeline/Tasks/Notes toolbar has been removed from the loan workspace. BrokerApp now uses one compact collapsible workspace control bar for section shortcuts and right-tool access.
+- The right tool rail fully collapses out of the workspace grid. LoanDox and ClientDash can be opened from the compact workspace bar, keeping the loan page as the priority content on desktop and mobile.
+- LoanDox is available in the right tool rail as the broker document request workspace. It shows document templates/stacks, active applicant-specific requests, ClientDash handoff, provider gates, document rules, and review/history controls while CashDeck, Basiq, Equifax, IDV and AI document review remain disabled until approved.
+- ClientDash is available as its own right-rail tool with borrower portal steps, visibility rules, applicant confirmation rules, shared-household rules, and links back to active LoanDox requests.
+- LoanDox rules are modelled as first-class workspace records so Master Admin can later manage document-stack, applicant-targeting, bank-statement, ClientDash lock, KYC/CDD and AI-review rules without exposing provider actions by default.
 - ABN Lookup is modelled as the official business lookup provider for ABN, ACN and business-name prefill. It requires an ABN Lookup GUID in private settings/environment and falls back to manual entry when not configured.
 - `Broker Settings` kept narrow for pilot configuration, starting with Lenders.
 - Internal configuration objects are kept unlisted where possible so brokers do not work from raw setup tables.

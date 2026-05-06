@@ -197,6 +197,55 @@ const toBrokerTemplateRecords = (): SeedRecord[] => {
   return [...templateRecords, ...reportRecords, ...workflowRecords];
 };
 
+const brokerAppLoanDoxRuleSeeds: SeedRecord[] = [
+  {
+    ruleName: 'LoanDox - applicant targeted document requests',
+    ruleType: 'APPLICANT_TARGETING',
+    ruleStatus: 'ACTIVE',
+    applicantScope: 'Primary, co-applicant, all applicants, household, company, trust, guarantor',
+    triggerCondition: 'Broker adds a document request or a fact-find answer creates a required evidence item',
+    requiredDocuments:
+      'Credit guide consent, KYC identity, PAYG income, self-employed income, bank statements, property and lender conditions',
+    uploadMethods: 'ClientDash upload; CashDeck, Basiq and provider import are provider-gated',
+    requiresMasterAdminApproval: false,
+    aiInstructions:
+      'Draft only: suggest missing evidence and discrepancy checks after broker review.',
+    doNotDoRules:
+      'Do not send client requests, run provider checks, accept evidence, or submit to lender without broker approval.',
+  },
+  {
+    ruleName: 'ClientDash - borrower portal safety and locking',
+    ruleType: 'CLIENTDASH_LOCK',
+    ruleStatus: 'ACTIVE',
+    applicantScope: 'Each applicant and shared household where applicable',
+    triggerCondition: 'Client submits fact-find, consent, KYC, bank statement task, or document upload',
+    requiredDocuments:
+      'Submitted client answers, upload metadata, consent records, broker review outcome, and timeline event',
+    uploadMethods: 'ClientDash upload first; manual broker upload stays broker-only',
+    requiresMasterAdminApproval: false,
+    aiInstructions:
+      'Draft only: compare submitted data against documents and flag missing fields for broker review.',
+    doNotDoRules:
+      'Do not expose AML suspicion, risk scores, broker notes, lender notes, or compliance escalations to clients.',
+  },
+  {
+    ruleName: 'LoanDox - provider and AI action gate',
+    ruleType: 'AI_REVIEW',
+    ruleStatus: 'PROVIDER_GATED',
+    applicantScope: 'All applicants and broker workspace',
+    triggerCondition:
+      'CashDeck, Basiq, Equifax, IDV, AI document review, email/SMS, ApplyOnline, AFG Flex, BrokerEngine or LIXI action',
+    requiredDocuments:
+      'Provider credentials, consent, Master Admin approval, broker approval, and audit event',
+    uploadMethods: 'Provider API actions disabled until configured',
+    requiresMasterAdminApproval: true,
+    aiInstructions:
+      'AI may triage and draft, but final broker/compliance review remains mandatory.',
+    doNotDoRules:
+      'Do not run external checks, send messages, or submit lender payloads without enabled credentials and explicit approval.',
+  },
+];
+
 const handler = async (): Promise<Record<string, number>> => {
   const client = new CoreApiClient();
 
@@ -271,6 +320,13 @@ const handler = async (): Promise<Record<string, number>> => {
     'settingName',
     brokerAppWhiteLabelSettingSeeds as unknown as SeedRecord[],
   );
+  const loanDoxRules = await seedRecords(
+    client,
+    'loanDoxRules',
+    'createLoanDoxRules',
+    'ruleName',
+    brokerAppLoanDoxRuleSeeds,
+  );
 
   const counts = {
     boardTemplates,
@@ -282,6 +338,7 @@ const handler = async (): Promise<Record<string, number>> => {
     checklistTemplates,
     integrationProviders,
     whiteLabelSettings,
+    loanDoxRules,
   };
 
   console.log('Seeded BrokerApp configuration records', counts);

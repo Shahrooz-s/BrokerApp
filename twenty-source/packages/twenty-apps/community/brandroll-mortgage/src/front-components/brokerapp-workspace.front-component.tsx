@@ -129,6 +129,7 @@ const rightRailTools = [
   'Emails',
   'Texts',
   'LoanDox',
+  'ClientDash',
   'Key Dates',
   'Reports',
   '1-Click Workflows',
@@ -141,6 +142,7 @@ const rightRailToolIcons: Record<string, string> = {
   Emails: '@',
   Texts: 'SMS',
   LoanDox: 'LD',
+  ClientDash: 'CD',
   'Key Dates': 'KD',
   Reports: 'R',
   '1-Click Workflows': 'WF',
@@ -422,7 +424,14 @@ const loanDoxTemplates = [
   },
 ];
 
-const loanDoxRequests = [
+type LoanDoxRequest = {
+  applicant: string;
+  method: string;
+  status: 'Draft' | 'Requested' | 'Submitted' | 'Accepted' | 'Declined';
+  title: string;
+};
+
+const loanDoxRequests: LoanDoxRequest[] = [
   {
     applicant: 'Primary Applicant',
     method: 'ClientDash upload',
@@ -443,6 +452,25 @@ const loanDoxRequests = [
   },
 ];
 
+const loanDoxRules = [
+  [
+    'Applicant targeting',
+    'Every request is scoped to primary applicant, co-applicant, all applicants, household, company, trust or guarantor before it is sent to ClientDash.',
+  ],
+  [
+    'Provider gates',
+    'Manual upload is available first. CashDeck, Basiq, Equifax, IDV and AI document review stay disabled until Master Admin enables credentials.',
+  ],
+  [
+    'Submission lock',
+    'Client uploads and fact-find submissions lock for broker review; broker changes after submission must create provenance and a timeline event.',
+  ],
+  [
+    'Document stacks',
+    'Templates can be stacked by PAYG, self-employed, bank statements, KYC, compliance and lender policy requirements.',
+  ],
+];
+
 const clientDashSteps = [
   ['Step 1', 'Credit Guide and Privacy Consent', 'Required before fact-find unlock'],
   ['Step 2', 'Fact Find', 'Applicant and shared household information'],
@@ -450,6 +478,25 @@ const clientDashSteps = [
   ['Step 4', 'Documents', 'LoanDox requests and uploads'],
   ['Step 5', 'Bank Statements', 'Manual upload now; CashDeck/Basiq gated later'],
   ['Step 6', 'Review and Confirm', 'All applicants confirm submitted information'],
+];
+
+const clientDashRules = [
+  [
+    'Client access',
+    'Client users see only their own application, portal tasks, safe messages and submitted items.',
+  ],
+  [
+    'Broker-only data',
+    'AML suspicion, risk scores, broker notes, lender notes and compliance escalations never render in ClientDash.',
+  ],
+  [
+    'Applicant confirmation',
+    'Each applicant must confirm their own KYC/CDD, fact-find answers, document uploads and final review before lodgement readiness.',
+  ],
+  [
+    'Shared household',
+    'Shared household fields can be completed once, while applicant-specific identity, address history, income and consent remain separate.',
+  ],
 ];
 
 type WorkspaceFieldType =
@@ -1412,22 +1459,32 @@ const styles = {
     background: 'var(--t-background-primary, #ffffff)',
     borderBottom: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'grid',
-    gap: '12px',
-    gridTemplateColumns: 'minmax(0, 1fr) auto',
-    minHeight: '52px',
-    padding: '0 16px',
+    gap: '10px',
+    gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+    minHeight: '48px',
+    padding: '8px 16px',
   },
   toolbarLeft: {
     alignItems: 'center',
     display: 'flex',
-    gap: '12px',
+    gap: '8px',
     minWidth: 0,
   },
   toolbarTitle: {
     color: 'var(--t-font-color-primary, #333333)',
-    fontSize: 'var(--t-font-size-sm, 0.95rem)',
+    fontSize: 'var(--t-font-size-xs, 0.85rem)',
     fontWeight: 700,
-    whiteSpace: 'normal',
+    lineHeight: 1.3,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  toolbarContext: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: '6px',
+    minWidth: 0,
+    overflowX: 'auto' as const,
   },
   toolbarTabs: {
     alignItems: 'center',
@@ -1459,6 +1516,8 @@ const styles = {
     alignItems: 'center',
     display: 'flex',
     gap: '8px',
+    justifyContent: 'flex-end',
+    minWidth: 0,
   },
   closeButton: {
     background: 'var(--t-background-primary-inverted, #333333)',
@@ -1764,7 +1823,7 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(280px, 320px) minmax(0, 1fr) 56px',
+    gridTemplateColumns: 'minmax(280px, 320px) minmax(0, 1fr) 0px',
     height: '100%',
     minHeight: '100%',
     minWidth: 0,
@@ -1946,7 +2005,8 @@ const styles = {
     maxHeight: '100%',
   },
   toolShellCollapsed: {
-    gridTemplateColumns: '56px',
+    display: 'none',
+    gridTemplateColumns: '0px',
   },
   darkToolRail: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -1981,6 +2041,9 @@ const styles = {
     minWidth: 0,
     overflow: 'auto',
     maxHeight: '100%',
+  },
+  toolDrawerHidden: {
+    display: 'none',
   },
   toolDrawerHeader: {
     alignItems: 'center',
@@ -2353,7 +2416,7 @@ const styles = {
     display: 'flex',
     flexWrap: 'wrap' as const,
     gap: '6px',
-    maxHeight: '96px',
+    maxHeight: '72px',
     overflow: 'auto',
   },
   pageChipButton: {
@@ -2411,6 +2474,14 @@ const styles = {
     minHeight: '110px',
     padding: '14px',
   },
+  ruleCard: {
+    background: 'var(--t-background-secondary, #fafafa)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'grid',
+    gap: '6px',
+    padding: '12px',
+  },
 } as const;
 
 export const BrokerAppWorkspace = () => {
@@ -2429,6 +2500,10 @@ export const BrokerAppWorkspace = () => {
   );
   const [applicantCount, setApplicantCount] = useState(2);
   const [activeApplicantIndex, setActiveApplicantIndex] = useState(0);
+  const [activeLoanDoxRequests, setActiveLoanDoxRequests] =
+    useState<LoanDoxRequest[]>(loanDoxRequests);
+  const [isWorkspaceToolbarCollapsed, setIsWorkspaceToolbarCollapsed] =
+    useState(false);
   const [loanBoard, setLoanBoard] = useState<BoardKey>('Deal');
   const [loanStageValue, setLoanStageValue] = useState(firstDealStage.value);
   const [boardMoveStatus, setBoardMoveStatus] = useState<
@@ -2658,6 +2733,52 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
+  const addLoanDoxRequestFromTemplate = (templateName: string) => {
+    const template = loanDoxTemplates.find(
+      (loanDoxTemplate) => loanDoxTemplate.name === templateName,
+    );
+
+    if (!template) {
+      return false;
+    }
+
+    setActiveLoanDoxRequests((current) => [
+      {
+        applicant:
+          template.target === 'All applicants'
+            ? 'All applicants'
+            : activeApplicantRole,
+        method:
+          template.category === 'Bank statements'
+            ? 'Manual upload / CashDeck / Basiq gated'
+            : 'ClientDash upload',
+        status: 'Draft',
+        title: template.name,
+      },
+      ...current,
+    ]);
+    setActiveTool('LoanDox');
+    setIsToolboxCollapsed(false);
+
+    return true;
+  };
+
+  const updateLoanDoxRequestStatus = (
+    requestIndex: number,
+    status: LoanDoxRequest['status'],
+  ) => {
+    setActiveLoanDoxRequests((current) =>
+      current.map((request, index) =>
+        index === requestIndex
+          ? {
+              ...request,
+              status,
+            }
+          : request,
+      ),
+    );
+  };
+
   const runAbrLookup = async (lookupType: 'ABN_ACN' | 'BUSINESS_NAME') => {
     const providerMessage =
       lookupType === 'ABN_ACN'
@@ -2822,65 +2943,6 @@ export const BrokerAppWorkspace = () => {
     setActivePageName(pageName);
   };
 
-  const toolbarTabs = [
-    {
-      icon: '⌂',
-      label: 'Home',
-      active: activePageName === 'LoanDash',
-      onClick: () => openWorkspacePage('LoanDash'),
-    },
-    {
-      icon: '◷',
-      label: 'Timeline',
-      active: activeTool === 'Notes',
-      onClick: () => {
-        setActiveTool('Notes');
-        setIsToolboxCollapsed(false);
-      },
-    },
-    {
-      icon: '✓',
-      label: 'Tasks',
-      active: activeTool === 'Tasks',
-      onClick: () => {
-        setActiveTool('Tasks');
-        setIsToolboxCollapsed(false);
-      },
-    },
-    {
-      icon: '□',
-      label: 'Notes',
-      active: activeTool === 'Notes',
-      onClick: () => {
-        setActiveTool('Notes');
-        setIsToolboxCollapsed(false);
-      },
-    },
-    {
-      icon: '⌕',
-      label: 'Files',
-      active: activePageName === 'Smart Docs',
-      onClick: () => openWorkspacePage('Smart Docs'),
-    },
-    {
-      icon: '@',
-      label: 'Emails',
-      active: activeTool === 'Emails',
-      onClick: () => {
-        setActiveTool('Emails');
-        setIsToolboxCollapsed(false);
-      },
-    },
-    {
-      icon: '▣',
-      label: 'Calendar',
-      active: activeTool === 'Key Dates',
-      onClick: () => {
-        setActiveTool('Key Dates');
-        setIsToolboxCollapsed(false);
-      },
-    },
-  ];
   const toggleNavGroup = (groupName: string) => {
     setCollapsedNavGroups((current) =>
       current.includes(groupName)
@@ -3127,6 +3189,21 @@ export const BrokerAppWorkspace = () => {
     if (action === 'Search Business Name') {
       await runAbrLookup('BUSINESS_NAME');
       return;
+    }
+
+    if (action.startsWith('Add ')) {
+      const templateWasAdded = addLoanDoxRequestFromTemplate(
+        action.replace(/^Add /, ''),
+      );
+
+      if (templateWasAdded) {
+        await enqueueSnackbar({
+          message:
+            'LoanDox request added as a draft. It stays internal until you send it to ClientDash.',
+          variant: 'success',
+        });
+        return;
+      }
     }
 
     if (action.includes('Validate') || action.includes('checklist')) {
@@ -4119,8 +4196,11 @@ export const BrokerAppWorkspace = () => {
 
             <div style={styles.loanDoxColumn}>
               <strong>Document request list</strong>
-              {loanDoxRequests.map((request) => (
-                <article key={request.title} style={styles.requestCard}>
+              {activeLoanDoxRequests.map((request, requestIndex) => (
+                <article
+                  key={`${request.title}-${requestIndex}`}
+                  style={styles.requestCard}
+                >
                   <div>
                     <strong>{request.title}</strong>
                     <div style={styles.small}>
@@ -4145,13 +4225,33 @@ export const BrokerAppWorkspace = () => {
                     value="Broker question / document instructions stay safe for ClientDash. Uploaded files are reviewed before they become accepted evidence."
                   />
                   <div style={styles.actionBar}>
-                    <button style={styles.subtleButton} type="button">
+                    <button
+                      onClick={() =>
+                        void handleWorkspaceAction(
+                          `Ask question about ${request.title}`,
+                        )
+                      }
+                      style={styles.subtleButton}
+                      type="button"
+                    >
                       Ask question
                     </button>
-                    <button style={styles.subtleButton} type="button">
+                    <button
+                      onClick={() =>
+                        updateLoanDoxRequestStatus(requestIndex, 'Declined')
+                      }
+                      style={styles.subtleButton}
+                      type="button"
+                    >
                       Decline upload
                     </button>
-                    <button style={styles.newButton} type="button">
+                    <button
+                      onClick={() =>
+                        updateLoanDoxRequestStatus(requestIndex, 'Requested')
+                      }
+                      style={styles.newButton}
+                      type="button"
+                    >
                       Send to ClientDash
                     </button>
                   </div>
@@ -4185,7 +4285,37 @@ export const BrokerAppWorkspace = () => {
           </section>
 
           <section style={styles.panel}>
-            <strong>ClientDash steps</strong>
+            <strong>LoanDox rules</strong>
+            <div style={{ ...styles.clientStepGrid, marginTop: '12px' }}>
+              {loanDoxRules.map(([ruleName, ruleDescription]) => (
+                <div key={ruleName} style={styles.ruleCard}>
+                  <strong>{ruleName}</strong>
+                  <p style={{ ...styles.small, margin: 0 }}>
+                    {ruleDescription}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    if (activeTool === 'ClientDash') {
+      return (
+        <div style={styles.toolDrawerBody}>
+          <section style={styles.panel}>
+            <strong>ClientDash</strong>
+            <p style={styles.small}>
+              Borrower portal foundation for credit guide consent, fact-find,
+              KYC/CDD, document requests, bank statement collection and final
+              applicant confirmation. External providers are not active until a
+              Master Admin enables them.
+            </p>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Client steps</strong>
             <div style={{ ...styles.clientStepGrid, marginTop: '12px' }}>
               {clientDashSteps.map(([step, title, description]) => (
                 <div key={step} style={styles.clientStepCard}>
@@ -4194,6 +4324,51 @@ export const BrokerAppWorkspace = () => {
                     {title}
                   </h3>
                   <p style={styles.small}>{description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Portal rules</strong>
+            <div style={{ ...styles.sectionList, marginTop: '12px' }}>
+              {clientDashRules.map(([ruleName, ruleDescription]) => (
+                <div key={ruleName} style={styles.ruleCard}>
+                  <strong>{ruleName}</strong>
+                  <p style={{ ...styles.small, margin: 0 }}>
+                    {ruleDescription}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section style={styles.panel}>
+            <strong>Linked LoanDox requests</strong>
+            <div style={{ ...styles.sectionList, marginTop: '12px' }}>
+              {activeLoanDoxRequests.map((request, requestIndex) => (
+                <div key={`${request.title}-${requestIndex}`} style={styles.rowButton}>
+                  <span>
+                    {request.title}
+                    <br />
+                    <small style={styles.small}>
+                      {request.applicant} · {request.method}
+                    </small>
+                  </span>
+                  <strong
+                    style={
+                      request.status === 'Requested' ||
+                      request.status === 'Submitted'
+                        ? styles.statusWarn
+                        : request.status === 'Accepted'
+                          ? styles.statusOk
+                          : request.status === 'Declined'
+                            ? styles.statusBlock
+                            : undefined
+                    }
+                  >
+                    {request.status}
+                  </strong>
                 </div>
               ))}
             </div>
@@ -4299,24 +4474,69 @@ export const BrokerAppWorkspace = () => {
           >
             {isLoanSidebarCollapsed ? '>' : '<'}
           </button>
-          <nav aria-label="Loan workspace toolbar" style={styles.toolbarTabs}>
-            {toolbarTabs.map((tab) => (
+          <span style={styles.toolbarTitle}>
+            Loan Workspace · {activePageName}
+          </span>
+          <button
+            onClick={() =>
+              setIsWorkspaceToolbarCollapsed((current) => !current)
+            }
+            style={styles.subtleButton}
+            type="button"
+          >
+            {isWorkspaceToolbarCollapsed ? 'Show controls' : 'Hide controls'}
+          </button>
+        </div>
+        {!isWorkspaceToolbarCollapsed && !isCompactWorkspace && (
+          <nav
+            aria-label="Loan workspace page shortcuts"
+            style={styles.toolbarContext}
+          >
+            {workspacePageOptions
+              .filter(
+                (pageOption) =>
+                  pageOption.name === activePageName ||
+                  pageOption.name === 'LoanDash' ||
+                  pageOption.group === activePage.group,
+              )
+              .slice(0, 10)
+              .map((pageOption) => (
+                <button
+                  key={`${pageOption.group}-${pageOption.name}`}
+                  onClick={() => openWorkspacePage(pageOption.name)}
+                  style={{
+                    ...styles.pageChipButton,
+                    ...(pageOption.name === activePageName
+                      ? styles.pageChipButtonActive
+                      : {}),
+                  }}
+                  type="button"
+                >
+                  {pageOption.name}
+                </button>
+              ))}
+          </nav>
+        )}
+        <div style={styles.toolbarActions}>
+          {!isWorkspaceToolbarCollapsed &&
+            ['LoanDox', 'ClientDash', 'Tasks', 'Key Dates'].map((toolName) => (
               <button
-                key={tab.label}
-                onClick={tab.onClick}
+                key={toolName}
+                onClick={() => {
+                  setActiveTool(toolName);
+                  setIsToolboxCollapsed(false);
+                }}
                 style={{
-                  ...styles.toolbarTab,
-                  ...(tab.active ? styles.toolbarTabActive : {}),
+                  ...styles.subtleButton,
+                  ...(activeTool === toolName && !isToolboxCollapsed
+                    ? styles.stageChipActive
+                    : {}),
                 }}
                 type="button"
               >
-                <span aria-hidden="true">{tab.icon}</span>
-                {tab.label}
+                {toolName}
               </button>
             ))}
-          </nav>
-        </div>
-        <div style={styles.toolbarActions}>
           <button
             onClick={() => setIsToolboxCollapsed((current) => !current)}
             style={styles.subtleButton}
@@ -4336,10 +4556,12 @@ export const BrokerAppWorkspace = () => {
                 isLoanSidebarCollapsed ? '0px' : 'minmax(280px, 320px)'
               } minmax(0, 1fr) ${
                 isToolboxCollapsed
-                  ? '56px'
+                  ? '0px'
                   : activeTool === 'LoanDox'
-                    ? 'minmax(520px, 42vw)'
-                    : 'minmax(340px, 380px)'
+                    ? 'minmax(420px, 38vw)'
+                    : activeTool === 'ClientDash'
+                      ? 'minmax(380px, 36vw)'
+                      : 'minmax(340px, 380px)'
               }`,
           gridTemplateRows: isCompactWorkspace ? 'auto minmax(0, 1fr) auto' : undefined,
         }}
@@ -4666,62 +4888,55 @@ export const BrokerAppWorkspace = () => {
           </div>
         </main>
 
-        <aside
-          style={{
-            ...styles.toolShell,
-            ...(isToolboxCollapsed ? styles.toolShellCollapsed : {}),
-            ...(isCompactWorkspace
-              ? {
-                  borderLeft: '0',
-                  borderTop:
-                    '1px solid var(--t-border-color-medium, #ebebeb)',
-                  maxHeight: isToolboxCollapsed ? 'auto' : '70vh',
-                  order: 3,
-                }
-              : {}),
-          }}
-        >
-          <div style={styles.darkToolRail}>
-            <button
-              onClick={() => setIsToolboxCollapsed((current) => !current)}
-              style={{
-                ...styles.toolButton,
-                fontSize: '16px',
-                minHeight: '38px',
-              }}
-              title={
-                isToolboxCollapsed
-                  ? 'Expand right toolbox'
-                  : 'Collapse right toolbox'
-              }
-              type="button"
-            >
-              {isToolboxCollapsed ? '<' : '>'}
-            </button>
-            {rightRailTools.map((tool) => (
+        {!isToolboxCollapsed && (
+          <aside
+            style={{
+              ...styles.toolShell,
+              ...(isCompactWorkspace
+                ? {
+                    borderLeft: '0',
+                    borderTop:
+                      '1px solid var(--t-border-color-medium, #ebebeb)',
+                    maxHeight: '70vh',
+                    order: 3,
+                  }
+                : {}),
+            }}
+          >
+            <div style={styles.darkToolRail}>
               <button
-                key={tool}
-                onClick={() => {
-                  setActiveTool(tool);
-                  setIsToolboxCollapsed(false);
-                }}
+                onClick={() => setIsToolboxCollapsed(true)}
                 style={{
                   ...styles.toolButton,
-                  ...(activeTool === tool ? styles.toolButtonActive : {}),
+                  fontSize: '16px',
+                  minHeight: '38px',
                 }}
-                title={tool}
+                title="Collapse right toolbox"
+                type="button"
               >
-                <span style={styles.toolIcon}>
-                  {rightRailToolIcons[tool] ?? tool.slice(0, 2)}
-                </span>
-                {!isToolboxCollapsed && (
-                  <span style={styles.toolLabel}>{tool}</span>
-                )}
+                {'>'}
               </button>
-            ))}
-          </div>
+              {rightRailTools.map((tool) => (
+                <button
+                  key={tool}
+                  onClick={() => {
+                    setActiveTool(tool);
+                    setIsToolboxCollapsed(false);
+                  }}
+                  style={{
+                    ...styles.toolButton,
+                    ...(activeTool === tool ? styles.toolButtonActive : {}),
+                  }}
+                  title={tool}
+                >
+                  <span style={styles.toolIcon}>
+                    {rightRailToolIcons[tool] ?? tool.slice(0, 2)}
+                  </span>
+                  <span style={styles.toolLabel}>{tool}</span>
+                </button>
+              ))}
+            </div>
 
-          {!isToolboxCollapsed && (
             <div style={styles.toolDrawer}>
               <div style={styles.toolDrawerHeader}>
                 <strong>{activeTool}</strong>
@@ -4746,8 +4961,8 @@ export const BrokerAppWorkspace = () => {
                 </div>
               </div>
             </div>
-          )}
-        </aside>
+          </aside>
+        )}
       </div>
       </div>
     </section>
