@@ -135,17 +135,60 @@ const rightRailTools = [
   '1-Click Workflows',
 ];
 
-const rightRailToolIcons: Record<string, string> = {
-  Notes: 'N',
-  Checklists: 'CL',
-  Tasks: 'T',
-  Emails: '@',
-  Texts: 'SMS',
-  LoanDox: 'LD',
-  ClientDash: 'CD',
-  'Key Dates': 'KD',
-  Reports: 'R',
-  '1-Click Workflows': 'WF',
+const rightRailToolIconPaths: Record<string, string[]> = {
+  Notes: [
+    'M6 4h9l3 3v13H6V4z',
+    'M14 4v4h4',
+    'M9 11h6',
+    'M9 15h6',
+  ],
+  Checklists: [
+    'M5 6h14',
+    'M5 12h14',
+    'M5 18h14',
+    'M4 6l1 1 2-3',
+    'M4 12l1 1 2-3',
+  ],
+  Tasks: [
+    'M5 5h14v14H5V5z',
+    'M8 12l2 2 5-5',
+  ],
+  Emails: [
+    'M4 6h16v12H4V6z',
+    'M4 7l8 6 8-6',
+  ],
+  Texts: [
+    'M5 5h14v10H8l-3 3V5z',
+    'M8 9h8',
+    'M8 12h5',
+  ],
+  LoanDox: [
+    'M7 3h7l4 4v14H7V3z',
+    'M14 3v5h4',
+    'M9 12h6',
+    'M9 16h6',
+  ],
+  ClientDash: [
+    'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+    'M4 21a8 8 0 0 1 16 0',
+  ],
+  'Key Dates': [
+    'M6 5h12v14H6V5z',
+    'M8 3v4',
+    'M16 3v4',
+    'M6 9h12',
+    'M9 13h2',
+    'M13 13h2',
+  ],
+  Reports: [
+    'M6 4h12v16H6V4z',
+    'M9 8h6',
+    'M9 12h6',
+    'M9 16h4',
+  ],
+  '1-Click Workflows': [
+    'M13 2L4 14h7l-1 8 10-12h-7l0-8z',
+  ],
 };
 
 const loanDashboardMetricCards = [
@@ -1424,14 +1467,22 @@ const styles = {
   },
   workspaceInline: {
     background: 'var(--t-background-secondary, #fafafa)',
+    borderLeft: '1px solid var(--t-border-color-light, #f1f1f1)',
+    bottom: 0,
+    boxSizing: 'border-box' as const,
     color: 'var(--t-font-color-primary, #333333)',
     display: 'flex',
     flexDirection: 'column' as const,
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
-    height: '100%',
+    height: 'auto',
+    left: 'var(--navigation-drawer-width, 72px)',
     minHeight: 'calc(100vh - 120px)',
     overflow: 'hidden',
+    position: 'fixed' as const,
+    right: 0,
+    top: '48px',
     width: '100%',
+    zIndex: 30,
   },
   overlayScrim: {
     background: 'transparent',
@@ -1518,6 +1569,77 @@ const styles = {
     gap: '8px',
     justifyContent: 'flex-end',
     minWidth: 0,
+  },
+  workspaceRail: {
+    background: 'var(--t-background-secondary, #fafafa)',
+    borderRight: '1px solid var(--t-border-color-medium, #ebebeb)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  workspaceRailCollapsed: {
+    alignItems: 'center',
+  },
+  workspaceRailBody: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column' as const,
+    gap: '12px',
+    minHeight: 0,
+    overflow: 'auto',
+    padding: '10px',
+  },
+  workspaceRailHeader: {
+    alignItems: 'center',
+    borderBottom: '1px solid var(--t-border-color-light, #f1f1f1)',
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'space-between',
+    minHeight: '44px',
+    padding: '8px 10px',
+  },
+  workspaceRailSection: {
+    display: 'grid',
+    gap: '4px',
+  },
+  workspaceRailSectionTitle: {
+    color: 'var(--t-font-color-secondary, #666666)',
+    fontSize: '11px',
+    fontWeight: 700,
+    padding: '8px 8px 4px',
+    textTransform: 'uppercase' as const,
+  },
+  workspaceRailButton: {
+    alignItems: 'center',
+    background: 'transparent',
+    border: '1px solid transparent',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    display: 'grid',
+    fontSize: '13px',
+    fontWeight: 600,
+    gap: '8px',
+    gridTemplateColumns: '24px minmax(0, 1fr)',
+    minHeight: '36px',
+    padding: '0 8px',
+    textAlign: 'left' as const,
+    width: '100%',
+  },
+  workspaceRailButtonCollapsed: {
+    gridTemplateColumns: '24px',
+    justifyContent: 'center',
+    padding: '0',
+    width: '40px',
+  },
+  workspaceRailButtonActive: {
+    background: 'var(--t-background-tertiary, #f1f1f1)',
+    color: 'var(--t-font-color-primary, #333333)',
+  },
+  railDivider: {
+    borderTop: '1px solid var(--t-border-color-light, #f1f1f1)',
+    margin: '4px 0',
   },
   closeButton: {
     background: 'var(--t-background-primary-inverted, #333333)',
@@ -1823,11 +1945,18 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(280px, 320px) minmax(0, 1fr) 0px',
+    gridTemplateColumns: 'minmax(280px, 320px) minmax(0, 1fr) 56px',
     height: '100%',
     minHeight: '100%',
     minWidth: 0,
     overflow: 'hidden',
+  },
+  toolDrawerPanel: {
+    background: 'var(--t-background-primary, #ffffff)',
+    borderLeft: '1px solid var(--t-border-color-medium, #ebebeb)',
+    minHeight: 0,
+    maxHeight: '100%',
+    overflow: 'auto',
   },
   loanSidebar: {
     background: 'var(--t-background-secondary, #fafafa)',
@@ -2000,21 +2129,23 @@ const styles = {
     background: 'var(--t-background-primary, #ffffff)',
     borderLeft: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'grid',
-    gridTemplateColumns: '56px minmax(0, 1fr)',
-    minHeight: 0,
+    gridTemplateColumns: '152px minmax(0, 1fr)',
     maxHeight: '100%',
+    minHeight: 0,
+    minWidth: 0,
   },
   toolShellCollapsed: {
-    display: 'none',
-    gridTemplateColumns: '0px',
+    gridTemplateColumns: '56px 0px',
   },
   darkToolRail: {
     background: 'var(--t-background-primary, #ffffff)',
     borderRight: '1px solid var(--t-border-color-medium, #ebebeb)',
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '8px',
-    padding: '10px 6px',
+    gap: '4px',
+    minWidth: 0,
+    overflow: 'auto',
+    padding: '8px 6px',
   },
   toolButton: {
     alignItems: 'center',
@@ -2024,13 +2155,20 @@ const styles = {
     color: 'var(--t-font-color-secondary, #666666)',
     cursor: 'pointer',
     display: 'flex',
-    flexDirection: 'row' as const,
-    fontSize: '11px',
+    fontSize: '12px',
     fontWeight: 700,
-    gap: '4px',
+    gap: '8px',
+    justifyContent: 'flex-start',
+    lineHeight: 1.2,
+    minHeight: '36px',
+    minWidth: 0,
+    padding: '0 8px',
+    textAlign: 'left' as const,
+    width: '100%',
+  },
+  toolButtonCollapsed: {
     justifyContent: 'center',
-    minHeight: '42px',
-    padding: '5px 6px',
+    padding: '0',
   },
   toolButtonActive: {
     background: 'var(--t-accent-quaternary, #f7f8ff)',
@@ -2038,6 +2176,8 @@ const styles = {
     color: 'var(--t-accent-accent11, #415abf)',
   },
   toolDrawer: {
+    background: 'var(--t-background-primary, #ffffff)',
+    borderLeft: '1px solid var(--t-border-color-light, #f1f1f1)',
     minWidth: 0,
     overflow: 'auto',
     maxHeight: '100%',
@@ -2228,20 +2368,34 @@ const styles = {
   toolIcon: {
     alignItems: 'center',
     background: 'var(--t-background-tertiary, #f1f1f1)',
-    borderRadius: '999px',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
     color: 'var(--t-font-color-primary, #333333)',
     display: 'inline-flex',
-    fontSize: '10px',
-    fontWeight: 800,
-    height: '24px',
+    flex: '0 0 auto',
+    height: '28px',
     justifyContent: 'center',
-    minWidth: '24px',
-    padding: '0 4px',
+    width: '28px',
+  },
+  toolSvg: {
+    fill: 'none',
+    height: '17px',
+    stroke: 'currentColor',
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    strokeWidth: 1.9,
+    width: '17px',
   },
   toolLabel: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  toolRailHeader: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: '8px',
+    minHeight: '36px',
+    padding: '0 2px 4px',
   },
   applicantDeck: {
     display: 'grid',
@@ -2308,6 +2462,20 @@ const styles = {
     height: '24px',
     justifyContent: 'center',
     width: '24px',
+  },
+  applicantTabLabel: {
+    display: 'grid',
+    gap: '2px',
+    minWidth: 0,
+  },
+  applicantTabName: {
+    color: 'var(--t-font-color-primary, #333333)',
+    fontSize: '13px',
+    fontWeight: 700,
+    lineHeight: 1.2,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   addApplicantButton: {
     alignItems: 'center',
@@ -2482,6 +2650,14 @@ const styles = {
     gap: '6px',
     padding: '12px',
   },
+  portalLaunchCard: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    display: 'grid',
+    gap: '12px',
+    padding: '16px',
+  },
 } as const;
 
 export const BrokerAppWorkspace = () => {
@@ -2502,8 +2678,6 @@ export const BrokerAppWorkspace = () => {
   const [activeApplicantIndex, setActiveApplicantIndex] = useState(0);
   const [activeLoanDoxRequests, setActiveLoanDoxRequests] =
     useState<LoanDoxRequest[]>(loanDoxRequests);
-  const [isWorkspaceToolbarCollapsed, setIsWorkspaceToolbarCollapsed] =
-    useState(false);
   const [loanBoard, setLoanBoard] = useState<BoardKey>('Deal');
   const [loanStageValue, setLoanStageValue] = useState(firstDealStage.value);
   const [boardMoveStatus, setBoardMoveStatus] = useState<
@@ -2542,7 +2716,6 @@ export const BrokerAppWorkspace = () => {
     const previousNavigationWidth = root.style.getPropertyValue(
       '--navigation-drawer-width',
     );
-
     root.style.setProperty('--navigation-drawer-width', '72px');
 
     return () => {
@@ -2813,6 +2986,23 @@ export const BrokerAppWorkspace = () => {
   ].slice(0, applicantCount);
   const activeApplicantRole =
     applicantRoles[activeApplicantIndex] ?? 'Primary Applicant';
+  const getApplicantDisplayName = (role: string, index: number) => {
+    const firstName = String(
+      factFindAnswers[`Applicants:${role}:First Name`] ?? '',
+    ).trim();
+    const lastName = String(
+      factFindAnswers[`Applicants:${role}:Last Name`] ?? '',
+    ).trim();
+    const displayName = `${firstName} ${lastName}`.trim();
+
+    if (displayName) {
+      return displayName;
+    }
+
+    return index === 0
+      ? 'Applicant name not added'
+      : `Applicant ${index + 1} name not added`;
+  };
   const activePage = workspacePages[activePageName] ?? workspacePages.LoanDash;
   const activeStageOption =
     boardStageOptions.find((option) => option.value === loanStageValue) ??
@@ -2820,6 +3010,14 @@ export const BrokerAppWorkspace = () => {
   const visibleWorkflowStages =
     loanBoard === 'Deal' ? dealWorkflowStageOptions : leadWorkflowStageOptions;
   const loanWorkspaceContext = `${activePage.group} workspace`;
+  const workspaceLeftOffset =
+    viewportWidth < 760 ? '0px' : 'var(--navigation-drawer-width, 72px)';
+  const clientDashPortalUrl =
+    typeof window === 'undefined'
+      ? `/clientdash/${opportunityRecordId ?? 'preview'}`
+      : `${window.location.origin}/clientdash/${
+          opportunityRecordId ?? 'preview'
+        }`;
   const isCompactWorkspace = viewportWidth < 920 || workspaceWidth < 780;
   const cleanFieldLabel = (label: string) => label.replace(/^\*/, '').trim();
   const isAnswerFilled = (value: FactFindAnswerValue | undefined) =>
@@ -3594,11 +3792,11 @@ export const BrokerAppWorkspace = () => {
               <span style={styles.applicantBadge}>
                 {index === 0 ? 'P' : index + 1}
               </span>
-              <span>
-                {role}
-                <small style={styles.small}>
-                  {index === 0 ? 'Primary' : `Applicant ${index + 1}`}
-                </small>
+              <span style={styles.applicantTabLabel}>
+                <strong style={styles.applicantTabName}>
+                  {getApplicantDisplayName(role, index)}
+                </strong>
+                <small style={styles.small}>{role}</small>
               </span>
             </button>
           ))}
@@ -4302,13 +4500,51 @@ export const BrokerAppWorkspace = () => {
     if (activeTool === 'ClientDash') {
       return (
         <div style={styles.toolDrawerBody}>
-          <section style={styles.panel}>
-            <strong>ClientDash</strong>
+          <section style={styles.portalLaunchCard}>
+            <div>
+              <strong>ClientDash borrower portal</strong>
+              <p style={styles.small}>
+                ClientDash is the applicant-side portal for managing this loan:
+                credit guide consent, fact-find, KYC/CDD, LoanDox document
+                requests, bank statement tasks, messages, submitted items and
+                final review.
+              </p>
+            </div>
+            <div style={styles.rowButton}>
+              <span>Portal URL</span>
+              <strong style={{ overflowWrap: 'anywhere', textAlign: 'right' }}>
+                {clientDashPortalUrl}
+              </strong>
+            </div>
+            <div style={styles.actionBar}>
+              <a
+                href={clientDashPortalUrl}
+                rel="noreferrer"
+                style={{
+                  ...styles.newButton,
+                  alignItems: 'center',
+                  display: 'inline-flex',
+                  textDecoration: 'none',
+                }}
+                target="_blank"
+              >
+                Open ClientDash
+              </a>
+              <button
+                onClick={() =>
+                  void handleWorkspaceAction('Create ClientDash invite')
+                }
+                style={styles.subtleButton}
+                type="button"
+              >
+                Create invite
+              </button>
+            </div>
             <p style={styles.small}>
-              Borrower portal foundation for credit guide consent, fact-find,
-              KYC/CDD, document requests, bank statement collection and final
-              applicant confirmation. External providers are not active until a
-              Master Admin enables them.
+              The public portal route is reserved and provider-gated. Email
+              magic links, passkeys, Basiq, CashDeck, IDV and Equifax are not
+              active until Master Admin configures credentials and enables the
+              portal.
             </p>
           </section>
 
@@ -4452,98 +4688,37 @@ export const BrokerAppWorkspace = () => {
     );
   };
 
+  const renderToolIcon = (tool: string) => {
+    const paths = rightRailToolIconPaths[tool] ?? rightRailToolIconPaths.Notes;
+
+    return (
+      <span style={styles.toolIcon}>
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          style={styles.toolSvg}
+          viewBox="0 0 24 24"
+        >
+          {paths.map((path, index) => (
+            <path d={path} key={`${tool}-${index}`} />
+          ))}
+        </svg>
+      </span>
+    );
+  };
+
   const workspaceElement = (
     <section
       aria-label="BrokerApp loan workspace"
       data-brokerapp-loan-workspace="true"
-      style={styles.workspaceInline}
+      style={{
+        ...styles.workspaceInline,
+        left: workspaceLeftOffset,
+        minHeight: 'auto',
+        top: viewportWidth < 760 ? '0px' : '48px',
+        width: 'auto',
+      }}
     >
-      <div style={styles.workspaceToolbar}>
-        <div style={styles.toolbarLeft}>
-          <button
-            onClick={() => setIsLoanSidebarCollapsed((current) => !current)}
-            style={styles.sidebarCollapseButton}
-            title={
-              isLoanSidebarCollapsed
-                ? 'Expand loan navigation'
-                : 'Collapse loan navigation'
-            }
-            type="button"
-          >
-            {isLoanSidebarCollapsed ? '>' : '<'}
-          </button>
-          <span style={styles.toolbarTitle}>
-            Loan Workspace · {activePageName}
-          </span>
-          <button
-            onClick={() =>
-              setIsWorkspaceToolbarCollapsed((current) => !current)
-            }
-            style={styles.subtleButton}
-            type="button"
-          >
-            {isWorkspaceToolbarCollapsed ? 'Show controls' : 'Hide controls'}
-          </button>
-        </div>
-        {!isWorkspaceToolbarCollapsed && !isCompactWorkspace && (
-          <nav
-            aria-label="Loan workspace page shortcuts"
-            style={styles.toolbarContext}
-          >
-            {workspacePageOptions
-              .filter(
-                (pageOption) =>
-                  pageOption.name === activePageName ||
-                  pageOption.name === 'LoanDash' ||
-                  pageOption.group === activePage.group,
-              )
-              .slice(0, 10)
-              .map((pageOption) => (
-                <button
-                  key={`${pageOption.group}-${pageOption.name}`}
-                  onClick={() => openWorkspacePage(pageOption.name)}
-                  style={{
-                    ...styles.pageChipButton,
-                    ...(pageOption.name === activePageName
-                      ? styles.pageChipButtonActive
-                      : {}),
-                  }}
-                  type="button"
-                >
-                  {pageOption.name}
-                </button>
-              ))}
-          </nav>
-        )}
-        <div style={styles.toolbarActions}>
-          {!isWorkspaceToolbarCollapsed &&
-            ['LoanDox', 'ClientDash', 'Tasks', 'Key Dates'].map((toolName) => (
-              <button
-                key={toolName}
-                onClick={() => {
-                  setActiveTool(toolName);
-                  setIsToolboxCollapsed(false);
-                }}
-                style={{
-                  ...styles.subtleButton,
-                  ...(activeTool === toolName && !isToolboxCollapsed
-                    ? styles.stageChipActive
-                    : {}),
-                }}
-                type="button"
-              >
-                {toolName}
-              </button>
-            ))}
-          <button
-            onClick={() => setIsToolboxCollapsed((current) => !current)}
-            style={styles.subtleButton}
-            type="button"
-          >
-            {isToolboxCollapsed ? 'Open tools' : 'Collapse tools'}
-          </button>
-        </div>
-      </div>
       <div style={styles.shell}>
       <div
         style={{
@@ -4551,43 +4726,37 @@ export const BrokerAppWorkspace = () => {
           gridTemplateColumns: isCompactWorkspace
             ? 'minmax(0, 1fr)'
             : `${
-                isLoanSidebarCollapsed ? '0px' : 'minmax(280px, 320px)'
+                isLoanSidebarCollapsed ? '64px' : 'minmax(280px, 320px)'
               } minmax(0, 1fr) ${
                 isToolboxCollapsed
-                  ? '0px'
+                  ? '56px'
                   : activeTool === 'LoanDox'
-                    ? 'minmax(420px, 38vw)'
+                    ? 'minmax(460px, 520px)'
                     : activeTool === 'ClientDash'
-                      ? 'minmax(380px, 36vw)'
-                      : 'minmax(340px, 380px)'
+                      ? 'minmax(420px, 480px)'
+                      : 'minmax(380px, 440px)'
               }`,
           gridTemplateRows: isCompactWorkspace ? 'auto minmax(0, 1fr) auto' : undefined,
         }}
       >
         <aside
           style={{
-            ...styles.loanSidebar,
-            ...(isLoanSidebarCollapsed ? styles.loanSidebarCollapsed : {}),
+            ...styles.workspaceRail,
+            ...(isLoanSidebarCollapsed ? styles.workspaceRailCollapsed : {}),
             ...(isCompactWorkspace
               ? {
                   borderBottom:
                     '1px solid var(--t-border-color-medium, #ebebeb)',
                   borderRight: '0',
-                  maxHeight: '58vh',
+                  maxHeight: isLoanSidebarCollapsed ? '56px' : '58vh',
                   order: 1,
                 }
               : {}),
-            ...(isCompactWorkspace && isLoanSidebarCollapsed
-              ? styles.compactHidden
-              : {}),
-            ...(!isCompactWorkspace && isLoanSidebarCollapsed
-              ? styles.compactHidden
-              : {}),
           }}
         >
-          <div style={styles.sidebarHeader}>
+          <div style={styles.workspaceRailHeader}>
             <span style={styles.sidebarTitle}>
-              {isLoanSidebarCollapsed ? 'Loan' : 'Loan Onboarding Record'}
+              {isLoanSidebarCollapsed ? 'Loan' : 'Loan Workspace'}
             </span>
             <button
               onClick={() => setIsLoanSidebarCollapsed((current) => !current)}
@@ -4597,66 +4766,82 @@ export const BrokerAppWorkspace = () => {
               {isLoanSidebarCollapsed ? '>' : '<'}
             </button>
           </div>
-          {loanNavigationGroups.map((group) => (
-            <div key={group.group} style={styles.navGroup}>
-              {!isLoanSidebarCollapsed && (
-                <button
-                  onClick={() => toggleNavGroup(group.group)}
-                  style={styles.navHeader}
-                  type="button"
-                >
-                  <span>{group.group}</span>
-                  <span style={styles.small}>
-                    {collapsedNavGroups.includes(group.group)
-                      ? 'Expand'
-                      : 'Collapse'}
-                  </span>
-                </button>
-              )}
-              {!collapsedNavGroups.includes(group.group) &&
-                group.items.map((item) => {
-                  const itemStatus = getWorkspacePageStatus(item);
+          <div style={styles.workspaceRailBody}>
+            {!isLoanSidebarCollapsed && (
+              <select
+                aria-label="Loan workspace section"
+                onChange={(event) => openWorkspacePage(event.currentTarget.value)}
+                onInput={(event) => openWorkspacePage(event.currentTarget.value)}
+                style={styles.input}
+                value={activePageName}
+              >
+                {workspacePageOptions.map((option) => (
+                  <option key={option.name} value={option.name}>
+                    {option.group} / {option.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {loanNavigationGroups.map((group) => (
+              <div key={group.group} style={styles.workspaceRailSection}>
+                {!isLoanSidebarCollapsed && (
+                  <button
+                    onClick={() => toggleNavGroup(group.group)}
+                    style={styles.navHeader}
+                    type="button"
+                  >
+                    <span>{group.group}</span>
+                    <span style={styles.small}>
+                      {collapsedNavGroups.includes(group.group)
+                        ? 'Expand'
+                        : 'Collapse'}
+                    </span>
+                  </button>
+                )}
+                {!collapsedNavGroups.includes(group.group) &&
+                  group.items.map((item) => {
+                    const itemStatus = getWorkspacePageStatus(item);
 
-                  return (
-                    <button
-                      key={item}
-                      onClick={() => openWorkspacePage(item)}
-                      style={{
-                        ...styles.navItem,
-                        ...(item === activePageName
-                          ? styles.navItemActive
-                          : {}),
-                        border: '0',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        width: '100%',
-                      }}
-                      type="button"
-                      title={item}
-                    >
-                      <span
-                        aria-label={itemStatus}
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => openWorkspacePage(item)}
                         style={{
-                          ...styles.navStatus,
-                          ...(itemStatus === 'complete'
-                            ? styles.navStatusComplete
-                            : itemStatus === 'incomplete'
-                              ? styles.navStatusIncomplete
-                              : styles.navStatusNeutral),
+                          ...styles.workspaceRailButton,
+                          ...(isLoanSidebarCollapsed
+                            ? styles.workspaceRailButtonCollapsed
+                            : {}),
+                          ...(item === activePageName
+                            ? styles.workspaceRailButtonActive
+                            : {}),
                         }}
+                        title={item}
+                        type="button"
                       >
-                        {itemStatus === 'complete'
-                          ? '✓'
-                          : itemStatus === 'incomplete'
-                            ? 'x'
-                            : '-'}
-                      </span>
-                      {!isLoanSidebarCollapsed && <span>{item}</span>}
-                    </button>
-                  );
-                })}
-            </div>
-          ))}
+                        <span
+                          aria-label={itemStatus}
+                          style={{
+                            ...styles.navStatus,
+                            ...(itemStatus === 'complete'
+                              ? styles.navStatusComplete
+                              : itemStatus === 'incomplete'
+                                ? styles.navStatusIncomplete
+                                : styles.navStatusNeutral),
+                          }}
+                        >
+                          {itemStatus === 'complete'
+                            ? '✓'
+                            : itemStatus === 'incomplete'
+                              ? 'x'
+                              : '-'}
+                        </span>
+                        {!isLoanSidebarCollapsed && <span>{item}</span>}
+                      </button>
+                    );
+                  })}
+              </div>
+            ))}
+          </div>
         </aside>
 
         <main
@@ -4665,18 +4850,8 @@ export const BrokerAppWorkspace = () => {
             ...(isCompactWorkspace ? { order: 2 } : {}),
           }}
         >
-          <section
-            style={{
-              ...styles.compactWorkspaceNav,
-              ...(isCompactWorkspace
-                ? {}
-                : {
-                    gridTemplateColumns:
-                      'minmax(180px, 240px) minmax(220px, 320px) minmax(280px, 1fr) auto',
-                    margin: '16px 20px 0',
-                  }),
-            }}
-          >
+          {isCompactWorkspace && (
+            <section style={styles.compactWorkspaceNav}>
               <div
                 style={{
                   alignItems: 'center',
@@ -4748,7 +4923,8 @@ export const BrokerAppWorkspace = () => {
               >
                 Show all sections
               </button>
-          </section>
+            </section>
+          )}
           <div
             style={{
               ...styles.warningBar,
@@ -4885,81 +5061,118 @@ export const BrokerAppWorkspace = () => {
           </div>
         </main>
 
-        {!isToolboxCollapsed && (
-          <aside
-            style={{
-              ...styles.toolShell,
-              ...(isCompactWorkspace
-                ? {
-                    borderLeft: '0',
-                    borderTop:
-                      '1px solid var(--t-border-color-medium, #ebebeb)',
-                    maxHeight: '70vh',
-                    order: 3,
-                  }
-                : {}),
-            }}
-          >
-            <div style={styles.darkToolRail}>
+        <aside
+          aria-label="Loan record tools"
+          style={{
+            ...styles.toolShell,
+            ...(isToolboxCollapsed ? styles.toolShellCollapsed : {}),
+            ...(isCompactWorkspace
+              ? {
+                  bottom: 0,
+                  boxShadow: isToolboxCollapsed
+                    ? 'none'
+                    : 'var(--t-box-shadow-light, 0 1px 2px rgba(0, 0, 0, 0.08))',
+                  maxWidth: isToolboxCollapsed ? '52px' : 'min(92vw, 430px)',
+                  position: 'fixed' as const,
+                  right: 0,
+                  top: viewportWidth < 760 ? '0px' : '48px',
+                  width: isToolboxCollapsed ? '52px' : 'min(92vw, 430px)',
+                  zIndex: 45,
+                }
+              : {}),
+          }}
+        >
+          <nav aria-label="Loan workspace tools" style={styles.darkToolRail}>
+            <div style={styles.toolRailHeader}>
               <button
-                onClick={() => setIsToolboxCollapsed(true)}
+                aria-label={
+                  isToolboxCollapsed ? 'Open loan tools' : 'Collapse loan tools'
+                }
+                onClick={() => setIsToolboxCollapsed((current) => !current)}
                 style={{
                   ...styles.toolButton,
-                  fontSize: '16px',
-                  minHeight: '38px',
+                  ...(isToolboxCollapsed ? styles.toolButtonCollapsed : {}),
                 }}
-                title="Collapse right toolbox"
+                title={
+                  isToolboxCollapsed ? 'Open loan tools' : 'Collapse loan tools'
+                }
                 type="button"
               >
-                {'>'}
-              </button>
-              {rightRailTools.map((tool) => (
-                <button
-                  key={tool}
-                  onClick={() => {
-                    setActiveTool(tool);
-                    setIsToolboxCollapsed(false);
-                  }}
-                  style={{
-                    ...styles.toolButton,
-                    ...(activeTool === tool ? styles.toolButtonActive : {}),
-                  }}
-                  title={tool}
-                >
-                  <span style={styles.toolIcon}>
-                    {rightRailToolIcons[tool] ?? tool.slice(0, 2)}
-                  </span>
-                  <span style={styles.toolLabel}>{tool}</span>
-                </button>
-              ))}
-            </div>
-
-            <div style={styles.toolDrawer}>
-              <div style={styles.toolDrawerHeader}>
-                <strong>{activeTool}</strong>
-                <span style={{ display: 'flex', gap: '8px' }}>
-                  <button style={styles.iconButton}>+</button>
-                  <button
-                    onClick={() => setIsToolboxCollapsed(true)}
-                    style={styles.iconButton}
-                    type="button"
+                <span style={styles.toolIcon}>
+                  <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    style={styles.toolSvg}
+                    viewBox="0 0 24 24"
                   >
-                    Collapse
-                  </button>
+                    <path
+                      d={
+                        isToolboxCollapsed
+                          ? 'M9 6l6 6-6 6'
+                          : 'M15 6l-6 6 6 6'
+                      }
+                    />
+                  </svg>
                 </span>
-              </div>
-              {renderToolDrawer()}
-              <div style={styles.gate}>
-                <strong>Submission gate</strong>
-                <div style={{ ...styles.small, marginTop: '6px' }}>
-                  Blocks lodgement until fact-find, CDD/KYC, serviceability,
-                  product comparison, compliance acknowledgements, and credit
-                  proposal are ready. Last workflow run: {lastWorkflowName}.
-                </div>
+                {!isToolboxCollapsed && (
+                  <span style={styles.toolLabel}>Tools</span>
+                )}
+              </button>
+            </div>
+            {rightRailTools.map((tool) => (
+              <button
+                key={tool}
+                onClick={() => {
+                  setActiveTool(tool);
+                  setIsToolboxCollapsed(false);
+                }}
+                style={{
+                  ...styles.toolButton,
+                  ...(isToolboxCollapsed ? styles.toolButtonCollapsed : {}),
+                  ...(activeTool === tool && !isToolboxCollapsed
+                    ? styles.toolButtonActive
+                    : {}),
+                }}
+                title={tool}
+                type="button"
+              >
+                {renderToolIcon(tool)}
+                {!isToolboxCollapsed && (
+                  <span style={styles.toolLabel}>{tool}</span>
+                )}
+              </button>
+            ))}
+          </nav>
+          <div
+            style={{
+              ...styles.toolDrawer,
+              ...(isToolboxCollapsed ? styles.toolDrawerHidden : {}),
+            }}
+          >
+            <div style={styles.toolDrawerHeader}>
+              <strong>{activeTool}</strong>
+              <span style={{ display: 'flex', gap: '8px' }}>
+                <button style={styles.iconButton}>+</button>
+                <button
+                  onClick={() => setIsToolboxCollapsed(true)}
+                  style={styles.iconButton}
+                  type="button"
+                >
+                  Collapse
+                </button>
+              </span>
+            </div>
+            {renderToolDrawer()}
+            <div style={styles.gate}>
+              <strong>Submission gate</strong>
+              <div style={{ ...styles.small, marginTop: '6px' }}>
+                Blocks lodgement until fact-find, CDD/KYC, serviceability,
+                product comparison, compliance acknowledgements, and credit
+                proposal are ready. Last workflow run: {lastWorkflowName}.
               </div>
             </div>
-          </aside>
-        )}
+          </div>
+        </aside>
       </div>
       </div>
     </section>
