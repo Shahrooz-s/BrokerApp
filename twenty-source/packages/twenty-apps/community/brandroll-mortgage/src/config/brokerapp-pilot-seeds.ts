@@ -131,6 +131,36 @@ export const brokerAppIntegrationProviderSeeds = [
       'Future AI/RAG document review skills, discrepancy extraction and checklist recommendations. Broker approval required before any action affects lodgement readiness.',
   },
   {
+    providerName: 'Paperless-ngx document archive',
+    providerStatus: 'PLANNED',
+    providerCategory: 'DOCUMENT_STORAGE',
+    authMethod: 'paperless-ngx-api-token',
+    secretEnvNames: 'PAPERLESS_NGX_BASE_URL,PAPERLESS_NGX_API_TOKEN',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'Preferred LoanDox v1 document archive and OCR backend. BrokerApp stores Paperless document IDs, tags, correspondents, OCR status and visibility metadata, not raw sensitive files.',
+  },
+  {
+    providerName: 'Paperless-ngx AI',
+    providerStatus: 'PLANNED',
+    providerCategory: 'DOCUMENT_AI',
+    authMethod: 'admin-enabled-agent-tools',
+    secretEnvNames: 'PAPERLESS_NGX_AI_BASE_URL,PAPERLESS_NGX_AI_TOKEN',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'Optional Paperless-ngx AI enrichment adapter for LoanDox. Disabled until Master Admin enables provider credentials, broker review rules and do-not-do instructions.',
+  },
+  {
+    providerName: 'Paperless-ngx GPT',
+    providerStatus: 'PLANNED',
+    providerCategory: 'DOCUMENT_AI',
+    authMethod: 'admin-enabled-agent-tools',
+    secretEnvNames: 'PAPERLESS_NGX_GPT_BASE_URL,PAPERLESS_NGX_GPT_TOKEN',
+    noSmsOtpRequired: true,
+    implementationNotes:
+      'Optional GPT-style document assistant for LoanDox discrepancy checks and summary drafting. It must not make final compliance decisions or submit lender data automatically.',
+  },
+  {
     providerName: 'BrokerApp email magic links',
     providerStatus: 'PLANNED',
     providerCategory: 'PORTAL_AUTH',

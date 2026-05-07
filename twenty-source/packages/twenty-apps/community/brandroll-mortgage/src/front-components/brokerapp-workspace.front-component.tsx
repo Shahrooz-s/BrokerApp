@@ -143,15 +143,16 @@ const rightRailTools = [
 ];
 
 const defaultActiveRightRailTool = 'LoanDox';
-const loanWorkspaceLayoutStorageKey = 'brokerapp.loanWorkspace.layout.v1';
-const defaultLoanSidebarWidth = 260;
-const defaultToolWorkspaceWidth = 430;
-const minLoanSidebarWidth = 220;
-const maxLoanSidebarWidth = 340;
-const minToolWorkspaceWidth = 360;
-const maxToolWorkspaceWidth = 620;
+const loanWorkspaceLayoutStorageKey = 'brokerapp.loanWorkspace.layout.v3';
+const defaultLoanSidebarWidth = 228;
+const defaultToolWorkspaceWidth = 560;
+const minLoanSidebarWidth = 188;
+const maxLoanSidebarWidth = 300;
+const minToolWorkspaceWidth = 440;
+const maxToolWorkspaceWidth = 820;
 const collapsedLoanSidebarWidth = 64;
 const collapsedToolWorkspaceWidth = 56;
+const collapsedTwentyNavigationWidth = 40;
 
 type LayoutResizePane = 'loan-sidebar' | 'tool-workspace';
 
@@ -167,7 +168,7 @@ const clampNumber = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 const getStoredLoanWorkspaceLayout = (): LoanWorkspaceLayoutPreference => {
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' || !window.localStorage) {
     return {};
   }
 
@@ -1546,7 +1547,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'column' as const,
     fontFamily: 'var(--t-font-family, Inter, sans-serif)',
-    height: 'auto',
+    height: 'calc(100dvh - 48px)',
+    isolation: 'isolate' as const,
     left: 'var(--navigation-drawer-width, 72px)',
     minHeight: 'calc(100vh - 48px)',
     overflow: 'hidden',
@@ -1556,7 +1558,7 @@ const styles = {
     transition:
       'left 140ms ease, width 140ms ease, transform 140ms ease',
     width: '100%',
-    zIndex: 30,
+    zIndex: 80,
   },
   overlayScrim: {
     background: 'transparent',
@@ -2019,7 +2021,7 @@ const styles = {
   },
   opportunityShell: {
     display: 'grid',
-    gridTemplateColumns: '260px 8px minmax(0, 1fr) 8px 430px',
+    gridTemplateColumns: '228px 8px minmax(0, 1fr) 8px 560px',
     height: '100%',
     minHeight: '100%',
     minWidth: 0,
@@ -2835,17 +2837,71 @@ export const BrokerAppWorkspace = () => {
   const workspaceRootRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
     const root = document.documentElement;
     const previousNavigationWidth = root.style.getPropertyValue(
       '--navigation-drawer-width',
     );
     const previousWorkspaceOpen =
       root.dataset.brokerappLoanWorkspaceOpen ?? '';
+    const collapseStyleElement = document.createElement('style');
+    const previousNavigationExpanded =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('isNavigationDrawerExpanded')
+        : null;
 
     root.dataset.brokerappLoanWorkspaceOpen = 'true';
-    root.style.setProperty('--navigation-drawer-width', '56px');
+    root.style.setProperty(
+      '--navigation-drawer-width',
+      `${collapsedTwentyNavigationWidth}px`,
+    );
+
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem('isNavigationDrawerExpanded', 'false');
+        window.dispatchEvent(
+          new StorageEvent('storage', {
+            key: 'isNavigationDrawerExpanded',
+            newValue: 'false',
+          }),
+        );
+      } catch {
+        // Keep the workspace usable even if storage is blocked.
+      }
+    }
+
+    collapseStyleElement.setAttribute(
+      'data-brokerapp-loan-workspace-style',
+      'true',
+    );
+    collapseStyleElement.textContent = `
+html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] {
+  min-width: ${collapsedTwentyNavigationWidth}px !important;
+  overflow: hidden !important;
+  width: ${collapsedTwentyNavigationWidth}px !important;
+  z-index: 70 !important;
+}
+html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] + * {
+  min-width: 0 !important;
+}
+html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] [aria-expanded],
+html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] [title],
+html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] a,
+html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] button {
+  max-width: ${collapsedTwentyNavigationWidth}px !important;
+}
+html[data-brokerapp-loan-workspace-open="true"] body {
+  overflow: hidden;
+}
+`;
+    document.head.appendChild(collapseStyleElement);
 
     return () => {
+      collapseStyleElement.remove();
+
       if (previousWorkspaceOpen) {
         root.dataset.brokerappLoanWorkspaceOpen = previousWorkspaceOpen;
       } else {
@@ -2860,24 +2916,43 @@ export const BrokerAppWorkspace = () => {
       } else {
         root.style.removeProperty('--navigation-drawer-width');
       }
+
+      if (typeof window !== 'undefined') {
+        try {
+          if (previousNavigationExpanded === null) {
+            window.localStorage.removeItem('isNavigationDrawerExpanded');
+          } else {
+            window.localStorage.setItem(
+              'isNavigationDrawerExpanded',
+              previousNavigationExpanded,
+            );
+          }
+        } catch {
+          // Ignore storage restore errors.
+        }
+      }
     };
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || !window.localStorage) {
       return;
     }
 
-    window.localStorage.setItem(
-      loanWorkspaceLayoutStorageKey,
-      JSON.stringify({
-        activeTool,
-        isLoanSidebarCollapsed,
-        isToolboxCollapsed,
-        loanSidebarWidth,
-        toolWorkspaceWidth,
-      } satisfies LoanWorkspaceLayoutPreference),
-    );
+    try {
+      window.localStorage.setItem(
+        loanWorkspaceLayoutStorageKey,
+        JSON.stringify({
+          activeTool,
+          isLoanSidebarCollapsed,
+          isToolboxCollapsed,
+          loanSidebarWidth,
+          toolWorkspaceWidth,
+        } satisfies LoanWorkspaceLayoutPreference),
+      );
+    } catch {
+      // Layout preferences are convenience-only; rendering must continue.
+    }
   }, [
     activeTool,
     isLoanSidebarCollapsed,
@@ -2887,6 +2962,10 @@ export const BrokerAppWorkspace = () => {
   ]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const updateViewportWidth = () => setViewportWidth(window.innerWidth);
 
     updateViewportWidth();
@@ -2896,6 +2975,10 @@ export const BrokerAppWorkspace = () => {
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const syncPageFromHash = () => {
       const hash = window.location.hash;
 
@@ -2903,9 +2986,15 @@ export const BrokerAppWorkspace = () => {
         return;
       }
 
-      const pageName = decodeURIComponent(
-        hash.slice(brokerAppPageHashPrefix.length),
-      );
+      let pageName = '';
+
+      try {
+        pageName = decodeURIComponent(
+          hash.slice(brokerAppPageHashPrefix.length),
+        );
+      } catch {
+        pageName = '';
+      }
 
       if (workspacePages[pageName]) {
         setActivePageName(pageName);
@@ -2919,6 +3008,10 @@ export const BrokerAppWorkspace = () => {
   }, []);
 
   useEffect(() => {
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+      return;
+    }
+
     const root =
       workspaceRootRef.current ??
       document.querySelector<HTMLElement>(
@@ -3135,7 +3228,12 @@ export const BrokerAppWorkspace = () => {
     pane: LayoutResizePane,
     event: ReactPointerEvent<HTMLButtonElement>,
   ) => {
-    if (isCompactWorkspace) {
+    if (
+      isCompactWorkspace ||
+      typeof window === 'undefined' ||
+      typeof document === 'undefined' ||
+      !document.body
+    ) {
       return;
     }
 
@@ -3179,6 +3277,7 @@ export const BrokerAppWorkspace = () => {
       document.body.style.cursor = previousCursor;
       document.body.style.userSelect = previousUserSelect;
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', stopResize);
       window.removeEventListener('pointercancel', stopResize);
     };
 
@@ -3253,7 +3352,7 @@ export const BrokerAppWorkspace = () => {
     loanBoard === 'Deal' ? dealWorkflowStageOptions : leadWorkflowStageOptions;
   const loanWorkspaceContext = `${activePage.group} workspace`;
   const workspaceLeftOffset =
-    viewportWidth < 760 ? '0px' : 'var(--navigation-drawer-width, 56px)';
+    viewportWidth < 760 ? '0px' : `${collapsedTwentyNavigationWidth}px`;
   const clientDashPortalUrl =
     typeof window === 'undefined'
       ? `/clientdash/${opportunityRecordId ?? 'preview'}`
@@ -3338,6 +3437,10 @@ export const BrokerAppWorkspace = () => {
       collectControlValue(fieldKey, control);
     });
 
+    if (typeof document === 'undefined') {
+      return domAnswers;
+    }
+
     const controls = document.querySelectorAll<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >('[data-brokerapp-field-key], input[name], textarea[name], select[name]');
@@ -3386,13 +3489,19 @@ export const BrokerAppWorkspace = () => {
       window.location.hash !==
         `${brokerAppPageHashPrefix}${encodeURIComponent(pageName)}`
     ) {
-      window.history.replaceState(
-        null,
-        '',
-        `${window.location.pathname}${window.location.search}${brokerAppPageHashPrefix}${encodeURIComponent(
+      try {
+        window.history.replaceState(
+          null,
+          '',
+          `${window.location.pathname}${window.location.search}${brokerAppPageHashPrefix}${encodeURIComponent(
+            pageName,
+          )}`,
+        );
+      } catch {
+        window.location.hash = `${brokerAppPageHashPrefix}${encodeURIComponent(
           pageName,
-        )}`,
-      );
+        )}`;
+      }
     }
   };
 
@@ -4646,6 +4755,10 @@ export const BrokerAppWorkspace = () => {
                 <strong style={styles.statusBlock}>Not configured</strong>
               </div>
               <div style={styles.rowButton}>
+                <span>Paperless-ngx API</span>
+                <strong style={styles.statusBlock}>Disabled</strong>
+              </div>
+              <div style={styles.rowButton}>
                 <span>Storage rule</span>
                 <strong>Reference only</strong>
               </div>
@@ -4654,7 +4767,11 @@ export const BrokerAppWorkspace = () => {
                 <strong style={styles.statusWarn}>Gated</strong>
               </div>
               <div style={styles.rowButton}>
-                <span>AI review</span>
+                <span>Paperless-ngx AI</span>
+                <strong style={styles.statusBlock}>Disabled</strong>
+              </div>
+              <div style={styles.rowButton}>
+                <span>Paperless-ngx GPT</span>
                 <strong style={styles.statusBlock}>Disabled</strong>
               </div>
             </div>
@@ -5560,11 +5677,11 @@ export const BrokerAppWorkspace = () => {
                   boxShadow: isToolboxCollapsed
                     ? 'none'
                     : 'var(--t-box-shadow-light, 0 1px 2px rgba(0, 0, 0, 0.08))',
-                  maxWidth: isToolboxCollapsed ? '52px' : 'min(92vw, 430px)',
+                  maxWidth: isToolboxCollapsed ? '52px' : 'min(92vw, 500px)',
                   position: 'fixed' as const,
                   right: 0,
                   top: viewportWidth < 760 ? '0px' : '48px',
-                  width: isToolboxCollapsed ? '52px' : 'min(92vw, 430px)',
+                  width: isToolboxCollapsed ? '52px' : 'min(92vw, 500px)',
                   zIndex: 45,
                 }
               : {}),
