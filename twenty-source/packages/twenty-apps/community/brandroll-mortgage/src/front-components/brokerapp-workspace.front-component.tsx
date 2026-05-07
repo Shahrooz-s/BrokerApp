@@ -194,6 +194,42 @@ const getInitialRightRailTool = () => {
     : defaultActiveRightRailTool;
 };
 
+const getSafeLocationHash = () => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  try {
+    return typeof window.location?.hash === 'string'
+      ? window.location.hash
+      : '';
+  } catch {
+    return '';
+  }
+};
+
+const replaceSafeLocationHash = (hash: string) => {
+  if (typeof window === 'undefined' || !window.history?.replaceState) {
+    return;
+  }
+
+  try {
+    const pathname =
+      typeof window.location?.pathname === 'string'
+        ? window.location.pathname
+        : '';
+    const search =
+      typeof window.location?.search === 'string'
+        ? window.location.search
+        : '';
+
+    window.history.replaceState(null, '', `${pathname}${search}${hash}`);
+  } catch {
+    // Twenty front components can run with a worker-backed location object.
+    // Never assign location.hash here because WorkerLocation.hash is read-only.
+  }
+};
+
 const rightRailToolIconPaths: Record<string, string[]> = {
   Notes: [
     'M6 4h9l3 3v13H6V4z',
@@ -2987,7 +3023,7 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
     }
 
     const syncPageFromHash = () => {
-      const hash = window.location.hash;
+      const hash = getSafeLocationHash();
 
       if (!hash.startsWith(brokerAppPageHashPrefix)) {
         return;
@@ -3235,28 +3271,38 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
     pane: LayoutResizePane,
     event: ReactPointerEvent<HTMLButtonElement>,
   ) => {
+    const ownerDocument = workspaceRootRef.current?.ownerDocument ?? document;
+    const ownerWindow = ownerDocument.defaultView ?? window;
+
     if (
       isCompactWorkspace ||
-      typeof window === 'undefined' ||
-      typeof document === 'undefined' ||
-      !document.body
+      typeof ownerWindow === 'undefined' ||
+      !ownerDocument.body
     ) {
       return;
     }
 
     event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer capture is not available in every front-component host.
+    }
+
     const workspaceRect = workspaceRootRef.current?.getBoundingClientRect();
 
     if (!workspaceRect) {
       return;
     }
 
-    const previousCursor = document.body.style.cursor;
-    const previousUserSelect = document.body.style.userSelect;
+    const previousCursor = ownerDocument.body.style.cursor;
+    const previousUserSelect = ownerDocument.body.style.userSelect;
 
     setActiveResizePane(pane);
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
+    ownerDocument.body.style.cursor = 'col-resize';
+    ownerDocument.body.style.userSelect = 'none';
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
       if (pane === 'loan-sidebar') {
@@ -3281,16 +3327,17 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
 
     const stopResize = () => {
       setActiveResizePane(null);
-      document.body.style.cursor = previousCursor;
-      document.body.style.userSelect = previousUserSelect;
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', stopResize);
-      window.removeEventListener('pointercancel', stopResize);
+      ownerDocument.body.style.cursor = previousCursor;
+      ownerDocument.body.style.userSelect = previousUserSelect;
+      ownerWindow.removeEventListener('pointermove', handlePointerMove);
+      ownerWindow.removeEventListener('pointerup', stopResize);
+      ownerWindow.removeEventListener('pointercancel', stopResize);
     };
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', stopResize, { once: true });
-    window.addEventListener('pointercancel', stopResize, { once: true });
+    handlePointerMove(event.nativeEvent);
+    ownerWindow.addEventListener('pointermove', handlePointerMove);
+    ownerWindow.addEventListener('pointerup', stopResize, { once: true });
+    ownerWindow.addEventListener('pointercancel', stopResize, { once: true });
   };
 
   const visibleTasks = generatedTasks.filter((task) =>
@@ -3366,7 +3413,9 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
       : `${window.location.origin}/clientdash/${
           opportunityRecordId ?? 'preview'
         }`;
-  const isCompactWorkspace = viewportWidth < 920 || workspaceWidth < 780;
+  const isCompactWorkspace = viewportWidth < 760;
+  const shouldShowCompactWorkspaceNav =
+    isCompactWorkspace || workspaceWidth < 780;
   const cleanFieldLabel = (label: string) => label.replace(/^\*/, '').trim();
   const isAnswerFilled = (value: FactFindAnswerValue | undefined) =>
     value !== undefined && value !== '' && value !== false;
@@ -3493,22 +3542,12 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
     if (
       typeof window !== 'undefined' &&
       workspacePages[pageName] &&
-      window.location.hash !==
+      getSafeLocationHash() !==
         `${brokerAppPageHashPrefix}${encodeURIComponent(pageName)}`
     ) {
-      try {
-        window.history.replaceState(
-          null,
-          '',
-          `${window.location.pathname}${window.location.search}${brokerAppPageHashPrefix}${encodeURIComponent(
-            pageName,
-          )}`,
-        );
-      } catch {
-        window.location.hash = `${brokerAppPageHashPrefix}${encodeURIComponent(
-          pageName,
-        )}`;
-      }
+      replaceSafeLocationHash(
+        `${brokerAppPageHashPrefix}${encodeURIComponent(pageName)}`,
+      );
     }
   };
 
@@ -5445,7 +5484,7 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
             ...(isCompactWorkspace ? { order: 2 } : {}),
           }}
         >
-          {isCompactWorkspace && (
+          {shouldShowCompactWorkspaceNav && (
             <section style={styles.compactWorkspaceNav}>
               <div
                 style={{
@@ -5493,11 +5532,8 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
               </select>
               <div aria-label="Loan workspace page shortcuts" style={styles.pageChipBar}>
                 {workspacePageOptions.map((option) => (
-                  <a
+                  <button
                     aria-label={`Open ${option.name}`}
-                    href={`${brokerAppPageHashPrefix}${encodeURIComponent(
-                      option.name,
-                    )}`}
                     key={option.name}
                     onClick={() => openWorkspacePage(option.name)}
                     style={{
@@ -5506,9 +5542,10 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
                         ? styles.pageChipButtonActive
                         : {}),
                     }}
+                    type="button"
                   >
                     {option.name}
-                  </a>
+                  </button>
                 ))}
               </div>
               <button
