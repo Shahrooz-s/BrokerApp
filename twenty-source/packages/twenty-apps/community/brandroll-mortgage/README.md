@@ -10,11 +10,13 @@ BrokerApp uses native Twenty Opportunities as the broker deal/opportunity record
 
 The live pilot now prioritises broker-facing workflow:
 
-- `Boards` navigation with native Kanban views for `Lead board` and `Deal board`; opening an Opportunity launches the BrokerApp loan workspace.
+- `Boards` navigation with native Kanban views for `Lead board` and `Deal board`; opening an Opportunity uses the native Twenty record with the BrokerApp LoanDash workspace available as the record-bound loan workspace tab.
 - Lead stages matching the residential lead workflow: New Lead, Attempted Contact 1-3, Initial Call Held > Get Docs, Docs Requested, Research > Servicing, Prepare Loan Proposal, Loan Proposal Presented, Client Accepted > Handover, On Hold, Lost Opps.
 - Deal stages matching the residential loan processing workflow: Outstanding Supporting Documents through Settlement and Lost / Declined.
 - Board handover is a stage change on the same Opportunity: when a lead is accepted, moving it to Deal sets `brokerWorkflowStage` to the Deal board’s first stage so assistant brokers and processors continue the same loan record.
-- A `BrokerApp LoanDash` front component mounted on the native Opportunity record page for the broker loan workspace. The workspace is inline record content, not a popup: no overlay scrim, modal shadow, Close button, or reopen button. It collapses the global Twenty navigation to the icon rail and gives brokers a collapsible loan sidebar plus collapsible right tool rail.
+- Recovery build note: `0.16.52` restores the BrokerApp LoanDash front component and Opportunity record layout binding after the live workspace drifted back to a stock/recovery install.
+- LoanDash is installed as an extension tab on Twenty's native Opportunity record layout. BrokerApp no longer ships a full custom Opportunity `RECORD_PAGE` replacement, because replacing the standard record page can leave the live Opportunity view stuck on a blank loading skeleton.
+- The native Opportunity `LoanDash` tab extension is the record-bound BrokerApp workspace entry. If the live shell ever falls back to stock Twenty again, redeploy a new app version rather than reinstalling an immutable older artifact.
 - The workspace remains visible when an Opportunity record loads. Brokers collapse/expand navigation and tools instead of closing the loan workspace.
 - Compact and mobile Opportunity views collapse the loan sidebar by default and show a native workspace-section selector so the active fact-find page remains readable instead of being squeezed by the sidebar. Compact mode uses both browser width and the actual rendered Loan Workspace container width, so it also triggers when Twenty’s native record layout narrows the front component on desktop.
 - The loan sidebar starts collapsed on opened Opportunities, and the main content always includes the workspace-section selector so brokers can switch pages even when the native record canvas is narrow.

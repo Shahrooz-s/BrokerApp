@@ -6,11 +6,12 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.48
+## Included In v0.16.52
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
-- A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table. The record workspace is inline record content, not a popup: no overlay scrim, modal border/shadow, Close button, or reopen button.
+- Recovery build note: `0.16.52` restores the BrokerApp LoanDash front component and Opportunity record layout binding after the live workspace drifted back to a stock/recovery install.
+- LoanDash extends the native Opportunity record as a record-bound workspace tab. BrokerApp avoids a full custom Opportunity shell so native records remain accessible while the loan workspace is available inside the opened Opportunity.
 - The Opportunity record workspace remains visible whenever an Opportunity loads. The global Twenty sidebar collapses to the icon rail, and the loan sidebar plus right tool rail can be expanded/collapsed without hiding the loan workflow.
 - The Loan Workspace now uses saved, resizable desktop panels: loan menu default `228px`, right tool workspace default `560px`, collapsed loan menu `64px`, collapsed tools `56px`, and drag handles for broker-controlled sizing. Preferences are stored under `brokerapp.loanWorkspace.layout.v3` so older cramped local layout settings are reset.
 - The browser layout preference read/write is now wrapped so sandboxed front-component contexts cannot stall the Opportunity record on a loading skeleton when local storage access is blocked or delayed.
