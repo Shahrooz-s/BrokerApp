@@ -208,26 +208,66 @@ const getSafeLocationHash = () => {
   }
 };
 
-const replaceSafeLocationHash = (hash: string) => {
-  if (typeof window === 'undefined' || !window.history?.replaceState) {
-    return;
+const getSafeLocationPathname = () => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const candidateUrls: string[] = [];
+
+  try {
+    if (typeof window.top?.location?.href === 'string') {
+      candidateUrls.push(window.top.location.href);
+    }
+  } catch {
+    // Cross-origin or worker-backed hosts can block top window access.
   }
 
   try {
-    const pathname =
-      typeof window.location?.pathname === 'string'
-        ? window.location.pathname
-        : '';
-    const search =
-      typeof window.location?.search === 'string'
-        ? window.location.search
-        : '';
-
-    window.history.replaceState(null, '', `${pathname}${search}${hash}`);
+    if (typeof window.parent?.location?.href === 'string') {
+      candidateUrls.push(window.parent.location.href);
+    }
   } catch {
-    // Twenty front components can run with a worker-backed location object.
-    // Never assign location.hash here because WorkerLocation.hash is read-only.
+    // Cross-origin or worker-backed hosts can block parent access.
   }
+
+  try {
+    if (typeof document?.referrer === 'string') {
+      candidateUrls.push(document.referrer);
+    }
+  } catch {
+    // Ignore referrer access issues.
+  }
+
+  try {
+    if (typeof window.location?.href === 'string') {
+      candidateUrls.push(window.location.href);
+    }
+  } catch {
+    // WorkerLocation can be partial/read-only.
+  }
+
+  try {
+    if (typeof window.location?.pathname === 'string') {
+      candidateUrls.push(window.location.pathname);
+    }
+  } catch {
+    // WorkerLocation can be partial/read-only.
+  }
+
+  for (const candidateUrl of candidateUrls) {
+    try {
+      if (candidateUrl.startsWith('/')) {
+        return candidateUrl;
+      }
+
+      return new URL(candidateUrl).pathname;
+    } catch {
+      // Try the next route candidate.
+    }
+  }
+
+  return '';
 };
 
 const rightRailToolIconPaths: Record<string, string[]> = {
@@ -1710,6 +1750,28 @@ const styles = {
     minHeight: '44px',
     padding: '8px 10px',
   },
+  widthControls: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    gap: '4px',
+    marginLeft: 'auto',
+  },
+  miniIconButton: {
+    alignItems: 'center',
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    color: 'var(--t-font-color-secondary, #666666)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    fontSize: '12px',
+    fontWeight: 700,
+    height: '26px',
+    justifyContent: 'center',
+    lineHeight: 1,
+    minWidth: '26px',
+    padding: 0,
+  },
   workspaceRailSection: {
     display: 'grid',
     gap: '4px',
@@ -2067,25 +2129,63 @@ const styles = {
     alignItems: 'stretch',
     background: 'var(--t-background-secondary, #fafafa)',
     border: '0',
+    borderLeft: '1px solid transparent',
+    borderRight: '1px solid transparent',
     cursor: 'col-resize',
     display: 'flex',
     justifyContent: 'center',
     minHeight: '100%',
     padding: 0,
     position: 'relative' as const,
-    width: '8px',
+    touchAction: 'none' as const,
+    width: '12px',
   },
   resizeHandleHidden: {
     display: 'none',
   },
   resizeHandleActive: {
     background: 'var(--t-accent-quaternary, #f7f8ff)',
+    borderLeft: '1px solid var(--t-color-blue, #1961ed)',
+    borderRight: '1px solid var(--t-color-blue, #1961ed)',
   },
   resizeHandleGrip: {
     background: 'var(--t-border-color-medium, #ebebeb)',
     borderRadius: '999px',
-    height: '100%',
-    width: '1px',
+    height: '48px',
+    margin: 'auto 0',
+    width: '3px',
+  },
+  quickPreviewShell: {
+    background: 'var(--t-background-primary, #ffffff)',
+    border: '1px solid var(--t-border-color-medium, #ebebeb)',
+    borderRadius: 'var(--t-border-radius-md, 8px)',
+    color: 'var(--t-font-color-primary, #333333)',
+    display: 'grid',
+    fontFamily: 'var(--t-font-family, Inter, sans-serif)',
+    gap: '12px',
+    lineHeight: 1.45,
+    margin: '12px',
+    padding: '14px',
+  },
+  quickPreviewHeader: {
+    alignItems: 'flex-start',
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'space-between',
+    minWidth: 0,
+  },
+  quickPreviewGrid: {
+    display: 'grid',
+    gap: '8px',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  },
+  quickPreviewMetric: {
+    background: 'var(--t-background-secondary, #fafafa)',
+    border: '1px solid var(--t-border-color-light, #f1f1f1)',
+    borderRadius: 'var(--t-border-radius-sm, 4px)',
+    display: 'grid',
+    gap: '4px',
+    padding: '10px',
   },
   toolDrawerPanel: {
     background: 'var(--t-background-primary, #ffffff)',
@@ -2799,6 +2899,11 @@ const styles = {
 
 export const BrokerAppWorkspace = () => {
   const opportunityRecordId = useRecordId();
+  const safePathname = getSafeLocationPathname();
+  const isBoardQuickPreview =
+    safePathname.startsWith('/objects/') ||
+    safePathname.includes('/objects/opportunities');
+  const isFullOpportunityRecord = !isBoardQuickPreview;
   const [activePageName, setActivePageName] = useState('LoanDash');
   const [activeTool, setActiveTool] = useState(getInitialRightRailTool);
   const [isLoanSidebarCollapsed, setIsLoanSidebarCollapsed] = useState(
@@ -2872,6 +2977,10 @@ export const BrokerAppWorkspace = () => {
   const workspaceRootRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    if (!isFullOpportunityRecord) {
+      return;
+    }
+
     if (typeof document === 'undefined') {
       return;
     }
@@ -2973,7 +3082,7 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
         }
       }
     };
-  }, []);
+  }, [isFullOpportunityRecord]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -3340,6 +3449,28 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
     ownerWindow.addEventListener('pointercancel', stopResize, { once: true });
   };
 
+  const adjustLoanSidebarWidth = (delta: number) => {
+    if (isCompactWorkspace) {
+      return;
+    }
+
+    setIsLoanSidebarCollapsed(false);
+    setLoanSidebarWidth((current) =>
+      clampNumber(current + delta, minLoanSidebarWidth, maxLoanSidebarWidth),
+    );
+  };
+
+  const adjustToolWorkspaceWidth = (delta: number) => {
+    if (isCompactWorkspace) {
+      return;
+    }
+
+    setIsToolboxCollapsed(false);
+    setToolWorkspaceWidth((current) =>
+      clampNumber(current + delta, minToolWorkspaceWidth, maxToolWorkspaceWidth),
+    );
+  };
+
   const visibleTasks = generatedTasks.filter((task) =>
     taskFilter === 'Completed'
       ? task.status === 'Completed'
@@ -3538,17 +3669,6 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
       // target page is open.
     }
     setActivePageName(pageName);
-
-    if (
-      typeof window !== 'undefined' &&
-      workspacePages[pageName] &&
-      getSafeLocationHash() !==
-        `${brokerAppPageHashPrefix}${encodeURIComponent(pageName)}`
-    ) {
-      replaceSafeLocationHash(
-        `${brokerAppPageHashPrefix}${encodeURIComponent(pageName)}`,
-      );
-    }
   };
 
   const toggleNavGroup = (groupName: string) => {
@@ -5321,6 +5441,58 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
     );
   };
 
+  if (!isFullOpportunityRecord) {
+    const fullWorkspaceUrl = opportunityRecordId
+      ? `/object/opportunity/${opportunityRecordId}`
+      : '/objects/opportunities';
+
+    return (
+      <section
+        aria-label="BrokerApp LoanDash quick preview"
+        data-brokerapp-loan-workspace-preview="true"
+        style={styles.quickPreviewShell}
+      >
+        <div style={styles.quickPreviewHeader}>
+          <div style={{ minWidth: 0 }}>
+            <strong>LoanDash</strong>
+            <p style={{ ...styles.small, margin: '4px 0 0' }}>
+              Open the full Opportunity to use the BrokerApp Loan Workspace,
+              LoanDox, ClientDash, fact find, strategy and lodgement tools.
+            </p>
+          </div>
+          <a href={fullWorkspaceUrl} style={styles.newButton}>
+            Open workspace
+          </a>
+        </div>
+        <div style={styles.quickPreviewGrid}>
+          <div style={styles.quickPreviewMetric}>
+            <span style={styles.small}>Board</span>
+            <strong>{loanBoard}</strong>
+          </div>
+          <div style={styles.quickPreviewMetric}>
+            <span style={styles.small}>Stage</span>
+            <strong>{activeStageOption.label}</strong>
+          </div>
+          <div style={styles.quickPreviewMetric}>
+            <span style={styles.small}>Fact Find</span>
+            <strong>62%</strong>
+          </div>
+          <div style={styles.quickPreviewMetric}>
+            <span style={styles.small}>LoanDox</span>
+            <strong>Provider gated</strong>
+          </div>
+        </div>
+        <button
+          onClick={() => setActiveTool('LoanDox')}
+          style={styles.subtleButton}
+          type="button"
+        >
+          Preview only - external actions remain disabled
+        </button>
+      </section>
+    );
+  }
+
   const loanSidebarGridWidth = isLoanSidebarCollapsed
     ? collapsedLoanSidebarWidth
     : loanSidebarWidth;
@@ -5375,6 +5547,31 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
             <span style={styles.sidebarTitle}>
               {isLoanSidebarCollapsed ? 'Loan' : 'Loan Workspace'}
             </span>
+            {!isLoanSidebarCollapsed && !isCompactWorkspace && (
+              <span
+                aria-label="Loan menu width controls"
+                style={styles.widthControls}
+              >
+                <button
+                  aria-label="Narrow loan menu"
+                  onClick={() => adjustLoanSidebarWidth(-24)}
+                  style={styles.miniIconButton}
+                  title="Narrow loan menu"
+                  type="button"
+                >
+                  -
+                </button>
+                <button
+                  aria-label="Widen loan menu"
+                  onClick={() => adjustLoanSidebarWidth(24)}
+                  style={styles.miniIconButton}
+                  title="Widen loan menu"
+                  type="button"
+                >
+                  +
+                </button>
+              </span>
+            )}
             <button
               onClick={() => setIsLoanSidebarCollapsed((current) => !current)}
               style={styles.sidebarCollapseButton}
@@ -5801,6 +5998,28 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
             <div style={styles.toolDrawerHeader}>
               <strong>{activeTool}</strong>
               <span style={{ display: 'flex', gap: '8px' }}>
+                {!isCompactWorkspace && (
+                  <>
+                    <button
+                      aria-label="Narrow loan tools"
+                      onClick={() => adjustToolWorkspaceWidth(-40)}
+                      style={styles.miniIconButton}
+                      title="Narrow loan tools"
+                      type="button"
+                    >
+                      -
+                    </button>
+                    <button
+                      aria-label="Widen loan tools"
+                      onClick={() => adjustToolWorkspaceWidth(40)}
+                      style={styles.miniIconButton}
+                      title="Widen loan tools"
+                      type="button"
+                    >
+                      +
+                    </button>
+                  </>
+                )}
                 <button style={styles.iconButton}>+</button>
                 <button
                   onClick={() => setIsToolboxCollapsed(true)}
