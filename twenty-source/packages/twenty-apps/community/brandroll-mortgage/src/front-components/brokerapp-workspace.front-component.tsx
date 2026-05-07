@@ -168,14 +168,13 @@ const clampNumber = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 const getStoredLoanWorkspaceLayout = (): LoanWorkspaceLayoutPreference => {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  if (typeof window === 'undefined') {
     return {};
   }
 
   try {
-    const storedPreference = window.localStorage.getItem(
-      loanWorkspaceLayoutStorageKey,
-    );
+    const storage = window.localStorage;
+    const storedPreference = storage.getItem(loanWorkspaceLayoutStorageKey);
 
     if (!storedPreference) {
       return {};
@@ -2848,10 +2847,17 @@ export const BrokerAppWorkspace = () => {
     const previousWorkspaceOpen =
       root.dataset.brokerappLoanWorkspaceOpen ?? '';
     const collapseStyleElement = document.createElement('style');
-    const previousNavigationExpanded =
-      typeof window !== 'undefined'
-        ? window.localStorage.getItem('isNavigationDrawerExpanded')
-        : null;
+    let previousNavigationExpanded: string | null = null;
+
+    if (typeof window !== 'undefined') {
+      try {
+        previousNavigationExpanded = window.localStorage.getItem(
+          'isNavigationDrawerExpanded',
+        );
+      } catch {
+        previousNavigationExpanded = null;
+      }
+    }
 
     root.dataset.brokerappLoanWorkspaceOpen = 'true';
     root.style.setProperty(
@@ -2886,15 +2892,6 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
 }
 html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] + * {
   min-width: 0 !important;
-}
-html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] [aria-expanded],
-html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] [title],
-html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] a,
-html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigation-drawer"] button {
-  max-width: ${collapsedTwentyNavigationWidth}px !important;
-}
-html[data-brokerapp-loan-workspace-open="true"] body {
-  overflow: hidden;
 }
 `;
     document.head.appendChild(collapseStyleElement);
@@ -2935,12 +2932,14 @@ html[data-brokerapp-loan-workspace-open="true"] body {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.localStorage) {
+    if (typeof window === 'undefined') {
       return;
     }
 
     try {
-      window.localStorage.setItem(
+      const storage = window.localStorage;
+
+      storage.setItem(
         loanWorkspaceLayoutStorageKey,
         JSON.stringify({
           activeTool,

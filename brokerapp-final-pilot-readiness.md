@@ -6,13 +6,14 @@ This file is the pilot readiness checklist for the BrokerApp Twenty app. It desc
 
 BrokerApp is designed as a white-labelled Twenty workspace for Australian mortgage broking. The pilot uses Twenty-native objects, fields, views, roles, navigation entries, and post-install seed records rather than a separate SaaS dependency.
 
-## Included In v0.16.47
+## Included In v0.16.48
 
 - BrokerEngine-style board and stage templates for Lead, Deal, Maintenance, Partnerships, Construction, Asset Finance, with Commercial and Business Lending scaffolded for later.
 - BrokerEngine-style deal workspace inventory: Overview, Fact Find, Strategy, Lodgement, and right-rail tools.
 - A BrokerApp LoanDash front component mounted on the native Opportunity record page. DealDash/LoanDash is now the first dashboard page inside an opened loan/opportunity, not a standalone Boards navigation item or a separate opportunity table. The record workspace is inline record content, not a popup: no overlay scrim, modal border/shadow, Close button, or reopen button.
 - The Opportunity record workspace remains visible whenever an Opportunity loads. The global Twenty sidebar collapses to the icon rail, and the loan sidebar plus right tool rail can be expanded/collapsed without hiding the loan workflow.
 - The Loan Workspace now uses saved, resizable desktop panels: loan menu default `228px`, right tool workspace default `560px`, collapsed loan menu `64px`, collapsed tools `56px`, and drag handles for broker-controlled sizing. Preferences are stored under `brokerapp.loanWorkspace.layout.v3` so older cramped local layout settings are reset.
+- The browser layout preference read/write is now wrapped so sandboxed front-component contexts cannot stall the Opportunity record on a loading skeleton when local storage access is blocked or delayed.
 - The workspace hardens Opportunity rendering by resetting stale panel preferences, visually collapsing the native Twenty navigation drawer while a loan workspace is open, guarding browser-only DOM/storage calls, and keeping section dropdown/hash navigation from breaking the record render.
 - Board handover controls inside LoanDash: moving an Opportunity from Lead to Deal updates the same `brokerWorkflowStage` record field to the first Deal stage so backend staff continue the same loan record without duplication.
 - LoanDash now removes the fake embedded board/pipeline and keeps board movement as a stage/handover control only. Native Lead and Deal boards remain the pipeline entry points.
