@@ -2840,12 +2840,17 @@ export const BrokerAppWorkspace = () => {
       return;
     }
 
-    const root = document.documentElement;
+    const root = document.documentElement ?? document.body;
+
+    if (!root || !root.style || !document.head) {
+      return;
+    }
+
     const previousNavigationWidth = root.style.getPropertyValue(
       '--navigation-drawer-width',
     );
     const previousWorkspaceOpen =
-      root.dataset.brokerappLoanWorkspaceOpen ?? '';
+      root.getAttribute('data-brokerapp-loan-workspace-open') ?? '';
     const collapseStyleElement = document.createElement('style');
     let previousNavigationExpanded: string | null = null;
 
@@ -2859,7 +2864,7 @@ export const BrokerAppWorkspace = () => {
       }
     }
 
-    root.dataset.brokerappLoanWorkspaceOpen = 'true';
+    root.setAttribute('data-brokerapp-loan-workspace-open', 'true');
     root.style.setProperty(
       '--navigation-drawer-width',
       `${collapsedTwentyNavigationWidth}px`,
@@ -2900,9 +2905,12 @@ html[data-brokerapp-loan-workspace-open="true"] [data-click-outside-id="navigati
       collapseStyleElement.remove();
 
       if (previousWorkspaceOpen) {
-        root.dataset.brokerappLoanWorkspaceOpen = previousWorkspaceOpen;
+        root.setAttribute(
+          'data-brokerapp-loan-workspace-open',
+          previousWorkspaceOpen,
+        );
       } else {
-        delete root.dataset.brokerappLoanWorkspaceOpen;
+        root.removeAttribute('data-brokerapp-loan-workspace-open');
       }
 
       if (previousNavigationWidth) {

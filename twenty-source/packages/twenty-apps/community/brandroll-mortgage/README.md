@@ -14,7 +14,7 @@ The live pilot now prioritises broker-facing workflow:
 - Lead stages matching the residential lead workflow: New Lead, Attempted Contact 1-3, Initial Call Held > Get Docs, Docs Requested, Research > Servicing, Prepare Loan Proposal, Loan Proposal Presented, Client Accepted > Handover, On Hold, Lost Opps.
 - Deal stages matching the residential loan processing workflow: Outstanding Supporting Documents through Settlement and Lost / Declined.
 - Board handover is a stage change on the same Opportunity: when a lead is accepted, moving it to Deal sets `brokerWorkflowStage` to the Deal board’s first stage so assistant brokers and processors continue the same loan record.
-- Recovery build note: `0.16.52` restores the BrokerApp LoanDash front component and Opportunity record layout binding after the live workspace drifted back to a stock/recovery install.
+- Recovery build note: `0.16.53` keeps the BrokerApp LoanDash front component active and guards the Twenty sidebar-collapse effect against sandboxed DOM states where `dataset` is unavailable during mount.
 - LoanDash is installed as an extension tab on Twenty's native Opportunity record layout. BrokerApp no longer ships a full custom Opportunity `RECORD_PAGE` replacement, because replacing the standard record page can leave the live Opportunity view stuck on a blank loading skeleton.
 - The native Opportunity `LoanDash` tab extension is the record-bound BrokerApp workspace entry. If the live shell ever falls back to stock Twenty again, redeploy a new app version rather than reinstalling an immutable older artifact.
 - The workspace remains visible when an Opportunity record loads. Brokers collapse/expand navigation and tools instead of closing the loan workspace.
