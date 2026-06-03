@@ -134,6 +134,7 @@ return array(
     'Modules\\Calls\\Database\\Seeders\\' => array($baseDir . '/modules/Calls/database/seeders'),
     'Modules\\Calls\\Database\\Factories\\' => array($baseDir . '/modules/Calls/database/factories'),
     'Modules\\Calls\\' => array($baseDir . '/modules/Calls/app'),
+    'Modules\\BrokerApp\\' => array($baseDir . '/modules/BrokerApp/app'),
     'Modules\\Brands\\Database\\State\\' => array($baseDir . '/modules/Brands/database/state'),
     'Modules\\Brands\\Database\\Seeders\\' => array($baseDir . '/modules/Brands/database/seeders'),
     'Modules\\Brands\\Database\\Factories\\' => array($baseDir . '/modules/Brands/database/factories'),

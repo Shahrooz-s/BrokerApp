@@ -1,0 +1,9 @@
+{
+    "name": "modules/brokerapp",
+    "description": "BrokerApp loan onboarding module for Concord CRM.",
+    "autoload": {
+        "psr-4": {
+            "Modules\\BrokerApp\\": "app/"
+        }
+    }
+}

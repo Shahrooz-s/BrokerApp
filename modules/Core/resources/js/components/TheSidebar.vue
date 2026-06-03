@@ -1,6 +1,6 @@
 <template>
   <!-- Sidebar for mobile -->
-  <TransitionRoot as="template" :show="sidebarOpen">
+  <TransitionRoot as="template" :show="false && sidebarOpen">
     <Dialog
       as="div"
       class="fixed inset-0 z-50 flex md:hidden"
@@ -208,10 +208,10 @@
     </Dialog>
   </TransitionRoot>
 
-  <!-- Static sidebar for desktop -->
+  <!-- Static sidebar for all devices -->
   <div
     v-show="['404', '403', 'not-found'].indexOf($route.name) === -1"
-    class="hidden bg-[rgb(var(--sidebar-bg-color))] dark:bg-[rgb(var(--sidebar-dark-bg-color))] md:flex md:shrink-0"
+    class="flex shrink-0 bg-[rgb(var(--sidebar-bg-color))] dark:bg-[rgb(var(--sidebar-dark-bg-color))]"
   >
     <div class="flex w-56 flex-col">
       <!-- Sidebar component, swap this element with another sidebar if you like -->

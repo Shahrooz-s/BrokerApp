@@ -6621,6 +6621,7 @@ return array(
     'Modules\\Brands\\Providers\\RouteServiceProvider' => $baseDir . '/modules/Brands/app/Providers/RouteServiceProvider.php',
     'Modules\\Brands\\Services\\BrandLogoService' => $baseDir . '/modules/Brands/app/Services/BrandLogoService.php',
     'Modules\\Brands\\Services\\BrandService' => $baseDir . '/modules/Brands/app/Services/BrandService.php',
+    'Modules\\BrokerApp\\Providers\\BrokerAppServiceProvider' => $baseDir . '/modules/BrokerApp/app/Providers/BrokerAppServiceProvider.php',
     'Modules\\Calls\\Cards\\LoggedCalls' => $baseDir . '/modules/Calls/app/Cards/LoggedCalls.php',
     'Modules\\Calls\\Cards\\LoggedCallsByDay' => $baseDir . '/modules/Calls/app/Cards/LoggedCallsByDay.php',
     'Modules\\Calls\\Cards\\OverviewByCallOutcome' => $baseDir . '/modules/Calls/app/Cards/OverviewByCallOutcome.php',

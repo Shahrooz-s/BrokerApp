@@ -5,7 +5,7 @@
     <button
       v-once
       type="button"
-      class="border-r border-neutral-200 px-3 text-neutral-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:border-neutral-500/30 dark:text-neutral-200 md:hidden"
+      class="hidden border-r border-neutral-200 px-3 text-neutral-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:border-neutral-500/30 dark:text-neutral-200"
       @click="sidebarOpen = true"
     >
       <span class="sr-only">Open sidebar</span>

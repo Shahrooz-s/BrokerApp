@@ -1,0 +1,15 @@
+{
+    "name": "BrokerApp",
+    "alias": "brokerapp",
+    "description": "Australian mortgage broking boards and loan onboarding workspace for Concord CRM.",
+    "keywords": [
+        "mortgage",
+        "broker",
+        "loan"
+    ],
+    "priority": 0,
+    "providers": [
+        "Modules\\BrokerApp\\Providers\\BrokerAppServiceProvider"
+    ],
+    "files": []
+}

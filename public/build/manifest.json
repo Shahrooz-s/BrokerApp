@@ -1,14 +1,14 @@
 {
-  "_twilio-DGclgSoL.js": {
-    "file": "assets/twilio-DGclgSoL.js",
+  "_twilio-DJRxaQPs.js": {
+    "file": "assets/twilio-DJRxaQPs.js",
     "name": "twilio",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_vuedraggable.umd-D_toZsAT.js": {
-    "file": "assets/vuedraggable.umd-D_toZsAT.js",
+  "_vuedraggable.umd-DSfLg3be.js": {
+    "file": "assets/vuedraggable.umd-DSfLg3be.js",
     "name": "vuedraggable.umd",
     "isDynamicEntry": true,
     "imports": [
@@ -16,7 +16,7 @@
     ]
   },
   "modules/Core/resources/js/components/CropsAndUploadsImage.vue": {
-    "file": "assets/CropsAndUploadsImage-BWDz50PA.js",
+    "file": "assets/CropsAndUploadsImage-BHSXBj97.js",
     "name": "CropsAndUploadsImage",
     "src": "modules/Core/resources/js/components/CropsAndUploadsImage.vue",
     "isDynamicEntry": true,
@@ -28,7 +28,7 @@
     ]
   },
   "modules/Core/resources/js/components/FullCalendar.vue": {
-    "file": "assets/FullCalendar-CSU4Lwzy.js",
+    "file": "assets/FullCalendar-CU3YfxBm.js",
     "name": "FullCalendar",
     "src": "modules/Core/resources/js/components/FullCalendar.vue",
     "isDynamicEntry": true,
@@ -40,7 +40,7 @@
     ]
   },
   "modules/Core/resources/js/components/TextCollapse.vue": {
-    "file": "assets/TextCollapse-DegQvFKE.js",
+    "file": "assets/TextCollapse-BeXBlrYV.js",
     "name": "TextCollapse",
     "src": "modules/Core/resources/js/components/TextCollapse.vue",
     "isDynamicEntry": true,
@@ -49,7 +49,7 @@
     ]
   },
   "node_modules/v-calendar/dist/es/index.js": {
-    "file": "assets/index-BUgr6Z5k.js",
+    "file": "assets/index-DKPLuVHs.js",
     "name": "index",
     "src": "node_modules/v-calendar/dist/es/index.js",
     "isDynamicEntry": true,
@@ -63,20 +63,20 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-a2m3rLN7.js",
+    "file": "assets/app-c2X7qwth.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
       "node_modules/v-calendar/dist/es/index.js",
       "modules/Core/resources/js/components/FullCalendar.vue",
-      "_vuedraggable.umd-D_toZsAT.js",
+      "_vuedraggable.umd-DSfLg3be.js",
       "modules/Core/resources/js/components/TextCollapse.vue",
       "modules/Core/resources/js/components/CropsAndUploadsImage.vue",
-      "_twilio-DGclgSoL.js"
+      "_twilio-DJRxaQPs.js"
     ],
     "css": [
-      "assets/app-NBJX8GGO.css"
+      "assets/app-D0t6ajzN.css"
     ]
   }
 }
