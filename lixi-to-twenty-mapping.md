@@ -4,6 +4,8 @@
 
 This mapping is deliberately conceptual. It avoids copying restricted LIXI schema items, definitions, enumerations, or sample payloads. Detailed field-level mapping must be completed inside the licensed LIXI development environment using the approved schemas, documentation, CSV representations, and samples.
 
+Every LIXI-related provider action must remain gated by lender/aggregator approval, borrower consent where applicable, and an audit record. This includes ApplyOnline, AFG Flex, BrokerEngine, LIXI package validation/submission, serviceability, valuation, LMI, credit decisioning, fraud, title/property search, and document-prep workflows.
+
 Use `Contacts` as the staff-facing label for natural persons. Where Twenty or LIXI uses different internal naming, keep that as an implementation detail and map it behind the CRM terminology.
 
 ## High-Level Mapping
