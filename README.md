@@ -52,7 +52,9 @@ Public source material used to frame this pack:
 ## Documentation Index
 
 - [Twenty CRM First Docker Deployment](./DEPLOYMENT.md)
+- [Lendaloan Final Implementation Plan](./lendaloan-final-plan.md)
 - [LIXI Standards Overview](./lixi-standards-overview.md)
+- [LIXI Public Capture And Development Skill](./lixi-public-capture-and-skill.md)
 - [Twenty CRM Data Model](./twenty-crm-data-model.md)
 - [LIXI to Twenty Mapping](./lixi-to-twenty-mapping.md)
 - [LIXI Tooling and Reference Implementations](./lixi-tooling-and-reference-implementations.md)
